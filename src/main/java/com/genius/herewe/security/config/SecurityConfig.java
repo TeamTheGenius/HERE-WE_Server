@@ -1,8 +1,8 @@
 package com.genius.herewe.security.config;
 
-import com.genius.herewe.security.oauth.handler.OAuth2FailureHandler;
-import com.genius.herewe.security.oauth.handler.OAuth2SuccessHandler;
-import com.genius.herewe.security.oauth.service.CustomOAuth2Service;
+import com.genius.herewe.security.handler.OAuth2FailureHandler;
+import com.genius.herewe.security.handler.OAuth2SuccessHandler;
+import com.genius.herewe.security.service.CustomOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

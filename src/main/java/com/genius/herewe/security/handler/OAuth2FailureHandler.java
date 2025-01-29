@@ -1,4 +1,4 @@
-package com.genius.herewe.security.oauth.handler;
+package com.genius.herewe.security.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,6 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-        
+
     }
 }

@@ -1,4 +1,4 @@
-package com.genius.herewe.security.oauth.dto;
+package com.genius.herewe.security.dto;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;

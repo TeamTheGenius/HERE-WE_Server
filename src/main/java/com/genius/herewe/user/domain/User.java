@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,17 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private ProviderInfo providerInfo;
 
+    private String email;
+
     @Column(unique = true, length = 20)
     private String nickname;
+
+
+    @Builder
+    public User(ProviderInfo providerInfo, Role role, String email, String nickname) {
+        this.providerInfo = providerInfo;
+        this.role = role;
+        this.email = email;
+        this.nickname = nickname;
+    }
 }

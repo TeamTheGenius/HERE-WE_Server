@@ -17,8 +17,10 @@ public enum ProviderInfo {
     private final String profileImage;
 
     public static ProviderInfo from(String registrationId) {
+        String upperRegistrationId = registrationId.toUpperCase();
+
         return Arrays.stream(ProviderInfo.values())
-                .filter(provider -> provider.name().equals(registrationId.toUpperCase()))
+                .filter(provider -> provider.name().equals(upperRegistrationId))
                 .findFirst()
                 .orElseThrow();
     }

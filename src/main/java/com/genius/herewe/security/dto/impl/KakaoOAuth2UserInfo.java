@@ -1,8 +1,8 @@
-package com.genius.herewe.security.oauth.dto.impl;
+package com.genius.herewe.security.dto.impl;
 
 import static com.genius.herewe.user.domain.ProviderInfo.KAKAO;
 
-import com.genius.herewe.security.oauth.dto.OAuth2UserInfo;
+import com.genius.herewe.security.dto.OAuth2UserInfo;
 import java.util.Map;
 
 public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
