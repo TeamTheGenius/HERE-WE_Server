@@ -1,0 +1,3 @@
+[submodule "HERE-WE-SECRET"]
+	path = HERE-WE-SECRET
+	url = https://github.com/TeamTheGenius/HERE-WE-SECRET.git
