@@ -14,6 +14,21 @@ jobs:
           token: ${{ secrets.ACTIONS_TOKEN }}
           submodules: true
 
+      - name: Create directories and copy yml files
+        run:  |
+          mkdir -p src/main/resources
+          cp HERE-WE-SECRET/main/resources/application.yml src/main/resources/
+          cp HERE-WE-SECRET/main/resources/application-dev.yml src/main/resources/
+    
+          mkdir -p src/test/resources
+          cp HERE-WE-SECRET/test/resources/application.yml src/test/resources/
+          cp HERE-WE-SECRET/test/resources/application-test.yml src/test/resources/
+    
+          echo "Main resources contents:"
+          ls -la src/main/resources/
+          echo "Test resources contents:"
+          ls -la src/test/resources/
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
