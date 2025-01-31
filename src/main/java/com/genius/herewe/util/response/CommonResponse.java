@@ -1,22 +1,30 @@
 package com.genius.herewe.util.response;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommonResponse {
-    private int resultCode;
-    private HttpStatus code;
+	private int resultCode;
+	private HttpStatus code;
 
+	public CommonResponse(HttpStatus code) {
+		this.code = code;
+		this.resultCode = code.value();
+	}
 
-    public CommonResponse(HttpStatus code) {
-        this.code = code;
-        this.resultCode = code.value();
-    }
+	public static CommonResponse ok() {
+		return new CommonResponse(HttpStatus.OK);
+	}
+
+	public static CommonResponse created() {
+		return new CommonResponse(HttpStatus.CREATED);
+	}
 }
