@@ -24,23 +24,25 @@ public class Files {
 	private Long id;
 
 	@Enumerated(value = EnumType.STRING)
+	@Column(nullable = false)
 	private FileEnv environment;
 
 	@Enumerated(value = EnumType.STRING)
+	@Column(nullable = false)
 	private FileType type;
 
 	private String originalName;
 
 	private String storedName;
 
-	private String storedPath;
+	private String fileURI;
 
 	@Builder
-	public Files(FileEnv environment, FileType type, String originalName, String storedName, String storedPath) {
+	public Files(FileEnv environment, FileType type, String originalName, String storedName, String fileURI) {
 		this.environment = environment;
 		this.type = type;
 		this.originalName = originalName;
 		this.storedName = storedName;
-		this.storedPath = storedPath;
+		this.fileURI = fileURI;
 	}
 }
