@@ -16,6 +16,4 @@ public interface FilesStorage {
 	FileDTO update(FileDTO fileDTO, MultipartFile multipartFile);
 
 	void delete(FileDTO fileDTO);
-
-	void validateFileExist(FileDTO fileDTO);
 }

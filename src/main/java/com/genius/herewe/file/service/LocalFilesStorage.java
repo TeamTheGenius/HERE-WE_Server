@@ -71,9 +71,4 @@ public class LocalFilesStorage implements FilesStorage {
 			throw new BusinessException(FILE_NOT_DELETED);
 		}
 	}
-
-	@Override
-	public void validateFileExist(FileDTO fileDTO) {
-
-	}
 }
