@@ -1,5 +1,7 @@
 package com.genius.herewe.file.domain;
 
+import com.genius.herewe.file.dto.FileDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,5 +46,12 @@ public class Files {
 		this.originalName = originalName;
 		this.storedName = storedName;
 		this.fileURI = fileURI;
+	}
+
+	//== 비지니스 로직 ==//
+	public void updateFiles(FileDTO fileDTO) {
+		this.originalName = fileDTO.originalName();
+		this.storedName = fileDTO.storedName();
+		this.fileURI = fileDTO.fileURI();
 	}
 }
