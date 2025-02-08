@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import com.genius.herewe.file.config.S3Config;
 import com.genius.herewe.file.domain.FileEnv;
 import com.genius.herewe.file.service.FilesStorage;
 import com.genius.herewe.file.service.LocalFilesStorage;
@@ -12,12 +11,13 @@ import com.genius.herewe.file.service.S3FilesStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class AppConfig {
-	private final S3Config s3Config;
+	private final S3Client s3Client;
 	private final Environment env;
 
 	@Bean
@@ -30,8 +30,8 @@ public class AppConfig {
 			return new LocalFilesStorage(UPLOAD_PATH);
 		}
 
-		final String bucket = env.getProperty("file.cloud.aws.s3.bucket");
-		final String cloudFrontDomain = env.getProperty("file.cloud.aws.cloud-front.domain");
-		return new S3FilesStorage(s3Config.s3Client(), bucket, cloudFrontDomain);
+		final String bucket = env.getProperty("spring.cloud.aws.s3.bucket");
+		final String cloudFrontDomain = env.getProperty("spring.cloud.aws.cloud-front.domain");
+		return new S3FilesStorage(s3Client, bucket, cloudFrontDomain);
 	}
 }
