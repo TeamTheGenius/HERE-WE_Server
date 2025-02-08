@@ -30,11 +30,6 @@ public class LocalFilesStorage implements FilesStorage {
 	}
 
 	@Override
-	public String getUploadPath() {
-		return UPLOAD_PATH;
-	}
-
-	@Override
 	public String getSource(FileDTO fileDTO) {
 		try {
 			UrlResource urlResource = new UrlResource("file:" + fileDTO.fileURI());

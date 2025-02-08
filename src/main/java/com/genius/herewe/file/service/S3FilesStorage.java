@@ -33,11 +33,6 @@ public class S3FilesStorage implements FilesStorage {
 	}
 
 	@Override
-	public String getUploadPath() {
-		return "";
-	}
-
-	@Override
 	public String getSource(FileDTO fileDTO) {
 		return cloudFrontDomain + fileDTO.fileURI();
 	}
