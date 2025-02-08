@@ -15,7 +15,6 @@ import com.genius.herewe.file.domain.Files;
 import com.genius.herewe.file.dto.FileDTO;
 import com.genius.herewe.file.dto.FileResponse;
 import com.genius.herewe.file.repository.FilesRepository;
-import com.genius.herewe.file.util.FileUtil;
 import com.genius.herewe.util.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
@@ -51,8 +50,7 @@ public class FilesManager {
 
 	@Transactional
 	public Files updateFile(Files files, MultipartFile multipartFile) {
-		String upload_path = filesStorage.getUploadPath();
-		FileDTO fileDTO = FileUtil.getFileDTO(multipartFile, files.getEnvironment(), files.getType(), upload_path);
+		FileDTO fileDTO = FileDTO.create(files);
 		FileDTO updated = filesStorage.update(fileDTO, multipartFile);
 
 		files.updateFiles(updated);

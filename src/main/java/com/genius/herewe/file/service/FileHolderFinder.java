@@ -23,6 +23,6 @@ public class FileHolderFinder {
 					.orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
 			}
 		}
-		throw new BusinessException();
+		throw new BusinessException(NOT_SUPPORTED_IMAGE_TYPE);
 	}
 }
