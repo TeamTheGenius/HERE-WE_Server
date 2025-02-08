@@ -25,7 +25,6 @@ jobs:
           mkdir -p src/test/resources
           cp HERE-WE-SECRET/test/resources/application.yml src/test/resources/
           cp HERE-WE-SECRET/test/resources/application-test.yml src/test/resources/
-          cp HERE-WE-SECRET/test/resources/application-oauth.yml src/test/resources/
           
           echo "Main resources contents:"
           ls -la src/main/resources/
