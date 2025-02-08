@@ -28,6 +28,11 @@ public class S3FilesStorage implements FilesStorage {
 	}
 
 	@Override
+	public FileEnv getFileEnvironment() {
+		return FileEnv.CLOUD;
+	}
+
+	@Override
 	public String getUploadPath() {
 		return "";
 	}

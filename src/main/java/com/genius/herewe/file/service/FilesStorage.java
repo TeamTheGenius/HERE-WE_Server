@@ -9,6 +9,8 @@ import com.genius.herewe.file.dto.FileDTO;
 
 @Service
 public interface FilesStorage {
+	FileEnv getFileEnvironment();
+
 	String getUploadPath();
 
 	String getSource(FileDTO fileDTO);

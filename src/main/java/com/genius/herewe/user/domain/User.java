@@ -1,12 +1,19 @@
 package com.genius.herewe.user.domain;
 
+import com.genius.herewe.file.domain.FileHolder;
+import com.genius.herewe.file.domain.Files;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -18,30 +25,38 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User implements FileHolder {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private Role role;
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "files_id")
+	private Files files;
 
-    @NotNull
-    @Enumerated(value = EnumType.STRING)
-    private ProviderInfo providerInfo;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
-    private String email;
+	@NotNull
+	@Enumerated(value = EnumType.STRING)
+	private ProviderInfo providerInfo;
 
-    @Column(unique = true, length = 20)
-    private String nickname;
+	private String email;
 
+	@Column(unique = true, length = 20)
+	private String nickname;
 
-    @Builder
-    public User(ProviderInfo providerInfo, Role role, String email, String nickname) {
-        this.providerInfo = providerInfo;
-        this.role = role;
-        this.email = email;
-        this.nickname = nickname;
-    }
+	@Builder
+	public User(ProviderInfo providerInfo, Role role, String email, String nickname) {
+		this.providerInfo = providerInfo;
+		this.role = role;
+		this.email = email;
+		this.nickname = nickname;
+	}
+
+	@Override
+	public void setFiles(Files files) {
+		this.files = files;
+	}
 }

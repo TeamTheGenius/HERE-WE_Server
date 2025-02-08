@@ -25,6 +25,11 @@ public class LocalFilesStorage implements FilesStorage {
 	}
 
 	@Override
+	public FileEnv getFileEnvironment() {
+		return FileEnv.LOCAL;
+	}
+
+	@Override
 	public String getUploadPath() {
 		return UPLOAD_PATH;
 	}

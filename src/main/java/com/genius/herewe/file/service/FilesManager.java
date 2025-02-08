@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.genius.herewe.file.domain.FileEnv;
+import com.genius.herewe.file.domain.FileHolder;
 import com.genius.herewe.file.domain.FileType;
 import com.genius.herewe.file.domain.Files;
 import com.genius.herewe.file.dto.FileDTO;
@@ -32,7 +33,8 @@ public class FilesManager {
 	}
 
 	@Transactional
-	public Files uploadFile(MultipartFile multipartFile, FileType fileType, FileEnv fileEnv) {
+	public Files uploadFile(FileHolder fileHolder, MultipartFile multipartFile, FileType fileType) {
+		FileEnv fileEnv = filesStorage.getFileEnvironment();
 		FileDTO fileDTO = filesStorage.upload(multipartFile, fileEnv, fileType);
 
 		Files files = Files.builder()
@@ -43,13 +45,12 @@ public class FilesManager {
 			.fileURI(fileDTO.fileURI())
 			.build();
 
+		fileHolder.setFiles(files);
 		return filesRepository.save(files);
 	}
 
 	@Transactional
-	public Files updateFile(Long fileId, MultipartFile multipartFile) {
-		Files files = findFile(fileId);
-
+	public Files updateFile(Files files, MultipartFile multipartFile) {
 		String upload_path = filesStorage.getUploadPath();
 		FileDTO fileDTO = FileUtil.getFileDTO(multipartFile, files.getEnvironment(), files.getType(), upload_path);
 		FileDTO updated = filesStorage.update(fileDTO, multipartFile);
@@ -59,10 +60,14 @@ public class FilesManager {
 	}
 
 	@Transactional
-	public void deleteFile(Long fileId) {
-		Files files = findFile(fileId);
+	public void deleteFile(Files files) {
 		filesStorage.delete(FileDTO.create(files));
 		filesRepository.delete(files);
+	}
+
+	public FileResponse convertToFileResponse(Files files) {
+		String source = filesStorage.getSource(FileDTO.create(files));
+		return FileResponse.createExist(files, source);
 	}
 
 	public FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
