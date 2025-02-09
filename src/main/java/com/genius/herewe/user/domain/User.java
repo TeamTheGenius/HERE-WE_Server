@@ -1,7 +1,12 @@
 package com.genius.herewe.user.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.genius.herewe.crew.domain.CrewMember;
 import com.genius.herewe.file.domain.FileHolder;
 import com.genius.herewe.file.domain.Files;
+import com.genius.herewe.moment.domain.MomentMember;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -13,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +34,14 @@ import lombok.NoArgsConstructor;
 public class User implements FileHolder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "users_id")
 	private Long id;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CrewMember> crewMembers = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MomentMember> momentMembers = new ArrayList<>();
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "files_id")
