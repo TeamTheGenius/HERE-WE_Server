@@ -29,7 +29,7 @@ public class Location {
 	private Moment moment;
 
 	@Column(nullable = false)
-	private int index;
+	private int locationIndex;
 
 	@Column(nullable = false)
 	private String name;
@@ -48,8 +48,9 @@ public class Location {
 
 	@Builder
 
-	public Location(int index, String name, String address, String roadAddress, Double x, Double y, String phone) {
-		this.index = index;
+	public Location(int locationIndex, String name, String address, String roadAddress, Double x, Double y,
+		String phone) {
+		this.locationIndex = locationIndex;
 		this.name = name;
 		this.address = address;
 		this.roadAddress = roadAddress;

@@ -1,6 +1,5 @@
 package com.genius.herewe.crew.domain;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import com.genius.herewe.chat.domain.ChatRoom;
 import com.genius.herewe.file.domain.Files;
 import com.genius.herewe.notice.domain.Notice;
+import com.genius.herewe.util.domain.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Crew {
+public class Crew extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "crew_id")
@@ -60,14 +60,11 @@ public class Crew {
 	@ColumnDefault("0")
 	private int participantCount;
 
-	private LocalDateTime createdAt;
-
 	@Builder
-	public Crew(String leaderName, String name, String introduce, int participantCount, LocalDateTime createdAt) {
+	public Crew(String leaderName, String name, String introduce, int participantCount) {
 		this.leaderName = leaderName;
 		this.name = name;
 		this.introduce = introduce;
 		this.participantCount = participantCount;
-		this.createdAt = createdAt;
 	}
 }

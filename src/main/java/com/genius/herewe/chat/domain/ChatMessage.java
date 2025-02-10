@@ -1,8 +1,7 @@
 package com.genius.herewe.chat.domain;
 
-import java.time.LocalDateTime;
-
 import com.genius.herewe.user.domain.User;
+import com.genius.herewe.util.domain.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessage {
+public class ChatMessage extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "chat_message_id")
@@ -37,12 +36,8 @@ public class ChatMessage {
 	@Column(columnDefinition = "TEXT", nullable = false) // length 지정 필요
 	private String message;
 
-	@Column(nullable = false)
-	private LocalDateTime send_at; //auditing 필요
-
 	@Builder
-	public ChatMessage(String message, LocalDateTime send_at) {
+	public ChatMessage(String message) {
 		this.message = message;
-		this.send_at = send_at;
 	}
 }

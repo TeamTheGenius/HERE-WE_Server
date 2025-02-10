@@ -1,8 +1,7 @@
 package com.genius.herewe.notice.domain;
 
-import java.time.LocalDateTime;
-
 import com.genius.herewe.crew.domain.Crew;
+import com.genius.herewe.util.domain.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notice {
+public class Notice extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "notice_id")
@@ -36,12 +35,9 @@ public class Notice {
 	@Column(columnDefinition = "TEXT", length = 500)
 	private String content;
 
-	private LocalDateTime modifiedAt; //auditing 추가 필요
-
 	@Builder
-	public Notice(String title, String content, LocalDateTime modifiedAt) {
+	public Notice(String title, String content) {
 		this.title = title;
 		this.content = content;
-		this.modifiedAt = modifiedAt;
 	}
 }
