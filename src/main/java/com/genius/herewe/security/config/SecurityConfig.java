@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-	public static final String PERMITTED_URI[] = {"/api/auth/**"};
+	public static final String[] PERMITTED_URI = {"/api/auth/**"};
 	private static final String[] PERMITTED_ROLES = {"USER", "ADMIN"};
 
 	private final CustomCorsConfiguration customCorsConfiguration;
