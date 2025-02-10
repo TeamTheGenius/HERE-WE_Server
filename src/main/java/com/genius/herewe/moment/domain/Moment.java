@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.crew.domain.Crew;
+import com.genius.herewe.file.domain.FileHolder;
 import com.genius.herewe.file.domain.Files;
 import com.genius.herewe.location.domain.Location;
 
@@ -29,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Moment {
+public class Moment implements FileHolder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "moment_id")
@@ -65,5 +66,11 @@ public class Moment {
 		this.capacity = capacity;
 		this.meetAt = meetAt;
 		this.closedAt = closedAt;
+	}
+
+	//== 비지니스 로직 ==//
+	@Override
+	public void setFiles(Files files) {
+		this.files = files;
 	}
 }

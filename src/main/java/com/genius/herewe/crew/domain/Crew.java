@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.chat.domain.ChatRoom;
+import com.genius.herewe.file.domain.FileHolder;
 import com.genius.herewe.file.domain.Files;
 import com.genius.herewe.notice.domain.Notice;
 import com.genius.herewe.util.domain.BaseTimeEntity;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Crew extends BaseTimeEntity {
+public class Crew extends BaseTimeEntity implements FileHolder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "crew_id")
@@ -66,5 +67,11 @@ public class Crew extends BaseTimeEntity {
 		this.name = name;
 		this.introduce = introduce;
 		this.participantCount = participantCount;
+	}
+
+	//== 비지니스 로직 ==//
+	@Override
+	public void setFiles(Files files) {
+		this.files = files;
 	}
 }
