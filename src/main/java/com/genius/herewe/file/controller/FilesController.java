@@ -23,13 +23,13 @@ import com.genius.herewe.util.response.SingleResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/auth/file")
+@RequestMapping("/api/file")
 @RequiredArgsConstructor
 public class FilesController {
 	private final FilesManager filesManager;
 	private final FileHolderFinder holderFinder;
 
-	@GetMapping("/{id}")
+	@GetMapping({"/auth/{id}", "/{id}"})
 	public SingleResponse<FileResponse> getFile(
 		@PathVariable Long id,
 		@RequestParam("type") String type
