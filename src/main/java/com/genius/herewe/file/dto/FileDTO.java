@@ -16,6 +16,15 @@ public record FileDTO(
 ) {
 
 	public static FileDTO create(Files files) {
+		if (files == null) {
+			return FileDTO.builder()
+				.environment(null)
+				.fileType(null)
+				.originalName("")
+				.storedName("")
+				.fileURI("")
+				.build();
+		}
 		return FileDTO.builder()
 			.environment(files.getEnvironment())
 			.fileType(files.getType())

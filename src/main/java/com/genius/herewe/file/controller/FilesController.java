@@ -2,6 +2,7 @@ package com.genius.herewe.file.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,11 +23,24 @@ import com.genius.herewe.util.response.SingleResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/file")
+@RequestMapping("/api/auth/file")
 @RequiredArgsConstructor
 public class FilesController {
 	private final FilesManager filesManager;
 	private final FileHolderFinder holderFinder;
+
+	@GetMapping("/{id}")
+	public SingleResponse<FileResponse> getFile(
+		@PathVariable Long id,
+		@RequestParam("type") String type
+	) {
+		FileType fileType = FileType.findType(type);
+		FileHolder fileHolder = holderFinder.find(id, fileType);
+
+		FileResponse fileResponse = filesManager.convertToFileResponse(fileHolder.getFiles());
+
+		return new SingleResponse<>(HttpStatus.OK, fileResponse);
+	}
 
 	@PostMapping("/{id}")
 	public SingleResponse<FileResponse> uploadFile(
@@ -66,7 +80,7 @@ public class FilesController {
 		FileType fileType = FileType.findType(type);
 		FileHolder fileHolder = holderFinder.find(id, fileType);
 		filesManager.deleteFile(fileHolder.getFiles());
-		
+
 		return new CommonResponse(HttpStatus.OK);
 	}
 }
