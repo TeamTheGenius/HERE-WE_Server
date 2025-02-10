@@ -47,19 +47,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		User user = userRepository.findByOAuth2Info(email, providerInfo)
 			.orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-		String redirectUrl = getRedirectUrlByRole(user.getRole(), email);
+		String redirectUrl = getRedirectUrlByRole(user.getRole(), user.getId());
 		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
 
-	private String getRedirectUrlByRole(Role role, String email) {
+	private String getRedirectUrlByRole(Role role, Long userId) {
 		if (role == Role.NOT_REGISTERED) {
 			return UriComponentsBuilder.fromUri(URI.create(SIGNUP_URL))
-				.queryParam("email", email)
+				.queryParam("id", userId)
 				.build()
 				.toUriString();
 		}
 		return UriComponentsBuilder.fromUri(URI.create(AUTH_URL))
-			.queryParam("email", email)
+			.queryParam("id", userId)
 			.build()
 			.toUriString();
 	}

@@ -72,4 +72,13 @@ public class User implements FileHolder {
 	public void setFiles(Files files) {
 		this.files = files;
 	}
+
+	//== 비지니스 로직 ==//
+	public void updateRole(Role role) {
+		this.role = role;
+	}
+
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
 }
