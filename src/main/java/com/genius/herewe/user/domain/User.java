@@ -69,6 +69,14 @@ public class User implements FileHolder {
 	}
 
 	@Override
+	public Files getFiles() {
+		if (files == null) {
+			return Files.createDummy();
+		}
+		return this.files;
+	}
+
+	@Override
 	public void setFiles(Files files) {
 		this.files = files;
 	}

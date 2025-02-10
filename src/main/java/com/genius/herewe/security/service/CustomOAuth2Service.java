@@ -45,13 +45,10 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
 		String email = oAuth2UserInfo.getEmail();
 
 		User user = getUser(email, providerInfo);
-		
-		// 소셜로부터 받은 프로필 사진 저장
-		if (user.getFiles() == null) {
-			Files files = filesManager.getProfileFromSocial(oAuth2UserInfo.getProfileImage(), providerInfo);
-			user.setFiles(files);
-			userRepository.save(user);
-		}
+
+		Files files = filesManager.getProfileFromSocial(oAuth2UserInfo.getProfileImage(), providerInfo);
+		user.setFiles(files);
+		userRepository.save(user);
 
 		String userNameAttributeName = clientRegistration.getProviderDetails().getUserInfoEndpoint()
 			.getUserNameAttributeName();
