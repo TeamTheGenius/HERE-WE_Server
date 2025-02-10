@@ -21,7 +21,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,14 +46,15 @@ public class User implements FileHolder {
 	@JoinColumn(name = "files_id")
 	private Files files;
 
-	@NotNull
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private Role role;
 
-	@NotNull
 	@Enumerated(value = EnumType.STRING)
+	@Column(nullable = false)
 	private ProviderInfo providerInfo;
 
+	@Column(nullable = false)
 	private String email;
 
 	@Column(unique = true, length = 20)
