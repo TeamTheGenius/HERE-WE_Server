@@ -2,6 +2,11 @@ package com.genius.herewe.file.util;
 
 import static com.genius.herewe.util.exception.ErrorCode.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,16 +15,53 @@ import org.springframework.web.multipart.MultipartFile;
 import com.genius.herewe.file.domain.FileEnv;
 import com.genius.herewe.file.domain.FileType;
 import com.genius.herewe.file.dto.FileDTO;
+import com.genius.herewe.user.domain.ProviderInfo;
 import com.genius.herewe.util.exception.BusinessException;
 
 public class FileUtil {
 	private static final List<String> SUPPORT_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
 
+	public static MultipartFile downloadFromUrl(String imageUrl, ProviderInfo providerInfo) {
+		try {
+			URL url = new URL(imageUrl);
+			URLConnection connection = url.openConnection();
+
+			// Content-Type 가져오기
+			String contentType = connection.getContentType();
+
+			// 파일 이름 추출 (URL의 마지막 부분 사용)
+			String filename =
+				providerInfo.getProfilePrefix() + UUID.randomUUID() + getExtensionByContentType(contentType);
+
+			// 이미지 데이터 읽기
+			try (InputStream inputStream = url.openStream();
+				 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+				byte[] buffer = new byte[4096];
+				int bytesRead;
+				while ((bytesRead = inputStream.read(buffer)) != -1) {
+					outputStream.write(buffer, 0, bytesRead);
+				}
+
+				byte[] imageBytes = outputStream.toByteArray();
+
+				return new CustomMultipartFile(
+					imageBytes,
+					"file",
+					contentType,
+					filename
+				);
+			}
+		} catch (IOException e) {
+			throw new BusinessException(e);
+		}
+	}
+
 	public static FileDTO getFileDTO(MultipartFile file, FileEnv env, FileType type, String upload_path) {
 		validateFile(file);
 
 		String originalName = file.getOriginalFilename();
-		String extension = extractExtension(originalName);
+		String extension = getExtensionByFilename(originalName);
 		String storedName = getStoredName(extension);
 
 		return FileDTO.builder()
@@ -46,7 +88,7 @@ public class FileUtil {
 		return uuid + "." + extension;
 	}
 
-	private static String extractExtension(String filename) {
+	private static String getExtensionByFilename(String filename) {
 		int splitIndex = filename.lastIndexOf(".");
 		if (splitIndex == -1) {
 			return "";
@@ -57,5 +99,26 @@ public class FileUtil {
 		}
 
 		return extension;
+	}
+
+	private static String getExtensionByContentType(String contentType) {
+		if (contentType == null) {
+			return ".jpg";
+		}
+
+		switch (contentType.toLowerCase()) {
+			case "image/jpeg" -> {
+				return ".jpeg";
+			}
+			case "image/png" -> {
+				return ".png";
+			}
+			case "image/gif" -> {
+				return ".gif";
+			}
+			default -> {
+				return ".jpg";
+			}
+		}
 	}
 }
