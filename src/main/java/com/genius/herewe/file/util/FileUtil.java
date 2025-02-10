@@ -10,6 +10,7 @@ import java.net.URLConnection;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.genius.herewe.file.domain.FileEnv;
@@ -20,6 +21,23 @@ import com.genius.herewe.util.exception.BusinessException;
 
 public class FileUtil {
 	private static final List<String> SUPPORT_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
+
+	public static MultipartFile getDefaultProfileImage() {
+		try {
+			ClassPathResource resource = new ClassPathResource("static/profile/default_profile.png");
+			InputStream inputStream = resource.getInputStream();
+			byte[] content = inputStream.readAllBytes();
+
+			return new CustomMultipartFile(
+				content,
+				"defaultProfile",
+				"image/png",
+				"default_profile.png"
+			);
+		} catch (IOException e) {
+			throw new BusinessException(LOAD_PROFILE_FAILED, e);
+		}
+	}
 
 	public static MultipartFile downloadFromUrl(String imageUrl, ProviderInfo providerInfo) {
 		try {
@@ -53,7 +71,8 @@ public class FileUtil {
 				);
 			}
 		} catch (IOException e) {
-			throw new BusinessException(e);
+			// 다운로드 실패한 경우 기본 이미지 불러오기
+			return getDefaultProfileImage();
 		}
 	}
 

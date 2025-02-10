@@ -1,7 +1,5 @@
 package com.genius.herewe.security.service;
 
-import static com.genius.herewe.file.domain.FileType.*;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,14 +10,9 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.genius.herewe.file.domain.FileEnv;
 import com.genius.herewe.file.domain.Files;
-import com.genius.herewe.file.dto.FileDTO;
-import com.genius.herewe.file.repository.FilesRepository;
-import com.genius.herewe.file.service.FilesStorage;
-import com.genius.herewe.file.util.FileUtil;
+import com.genius.herewe.file.service.FilesManager;
 import com.genius.herewe.security.domain.UserPrincipal;
 import com.genius.herewe.security.dto.OAuth2UserInfo;
 import com.genius.herewe.security.dto.OAuth2UserInfoFactory;
@@ -36,8 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 	private final UserRepository userRepository;
-	private final FilesRepository filesRepository;
-	private final FilesStorage filesStorage;
+	private final FilesManager filesManager;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -53,9 +45,10 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
 		String email = oAuth2UserInfo.getEmail();
 
 		User user = getUser(email, providerInfo);
+		
 		// 소셜로부터 받은 프로필 사진 저장
 		if (user.getFiles() == null) {
-			Files files = getFiles(oAuth2UserInfo.getProfileImage(), providerInfo);
+			Files files = filesManager.getProfileFromSocial(oAuth2UserInfo.getProfileImage(), providerInfo);
 			user.setFiles(files);
 			userRepository.save(user);
 		}
@@ -64,33 +57,6 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
 			.getUserNameAttributeName();
 
 		return new UserPrincipal(user, providerInfo, attributes, userNameAttributeName);
-	}
-
-	private Files getFiles(String imageUrl, ProviderInfo providerInfo) {
-		FileEnv fileEnv = filesStorage.getFileEnvironment();
-
-		if (imageUrl == null || imageUrl.isBlank()) {
-			return Files.builder()
-				.environment(fileEnv)
-				.type(PROFILE)
-				.originalName("")
-				.storedName("")
-				.fileURI("")
-				.build();
-		}
-
-		MultipartFile multipartFile = FileUtil.downloadFromUrl(imageUrl, providerInfo);
-		FileDTO fileDTO = filesStorage.upload(multipartFile, fileEnv, PROFILE);
-
-		Files files = Files.builder()
-			.environment(fileEnv)
-			.type(PROFILE)
-			.originalName(fileDTO.originalName())
-			.storedName(fileDTO.storedName())
-			.fileURI(fileDTO.fileURI())
-			.build();
-		files = filesRepository.save(files);
-		return files;
 	}
 
 	private User getUser(String email, ProviderInfo providerInfo) {

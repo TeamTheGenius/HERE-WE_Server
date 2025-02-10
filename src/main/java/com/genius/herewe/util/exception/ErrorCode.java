@@ -17,7 +17,9 @@ public enum ErrorCode {
 	NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 확장자입니다."),
 	FILE_NOT_SAVED(HttpStatus.BAD_REQUEST, "파일이 정상적으로 저장되지 않았습니다."),
 	FILE_NOT_DELETED(HttpStatus.BAD_REQUEST, "파일이 정상적으로 삭제되지 않았습니다."),
-	NOT_SUPPORTED_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요.");
+	NOT_SUPPORTED_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."),
+
+	LOAD_PROFILE_FAILED(HttpStatus.BAD_REQUEST, "기본 프로필 이미지를 불러오는데에 실패했습니다.");
 
 	private final HttpStatus status;
 	private final String message;
