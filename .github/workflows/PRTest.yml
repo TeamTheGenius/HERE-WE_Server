@@ -15,15 +15,17 @@ jobs:
           submodules: true
 
       - name: Create directories and copy yml files
-        run:  |
+        run: |
           mkdir -p src/main/resources
           cp HERE-WE-SECRET/main/resources/application.yml src/main/resources/
           cp HERE-WE-SECRET/main/resources/application-dev.yml src/main/resources/
-    
+          cp HERE-WE-SECRET/main/resources/application-oauth.yml src/main/resources/
+          cp HERE-WE-SECRET/main/resources/application-common.yml src/main/resources/
+          
           mkdir -p src/test/resources
           cp HERE-WE-SECRET/test/resources/application.yml src/test/resources/
           cp HERE-WE-SECRET/test/resources/application-test.yml src/test/resources/
-    
+          
           echo "Main resources contents:"
           ls -la src/main/resources/
           echo "Test resources contents:"
