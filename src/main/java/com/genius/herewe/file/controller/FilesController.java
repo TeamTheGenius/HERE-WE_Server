@@ -29,7 +29,7 @@ public class FilesController {
 	private final FilesManager filesManager;
 	private final FileHolderFinder holderFinder;
 
-	@GetMapping({"/auth/{id}", "/{id}"})
+	@GetMapping("/{id}")
 	public SingleResponse<FileResponse> getFile(
 		@PathVariable Long id,
 		@RequestParam("type") String type

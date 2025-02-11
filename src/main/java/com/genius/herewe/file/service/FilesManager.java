@@ -3,8 +3,6 @@ package com.genius.herewe.file.service;
 import static com.genius.herewe.file.domain.FileType.*;
 import static com.genius.herewe.util.exception.ErrorCode.*;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -92,15 +90,6 @@ public class FilesManager {
 
 	public FileResponse convertToFileResponse(Files files) {
 		String source = filesStorage.getSource(FileDTO.create(files));
-		return FileResponse.createExist(files, source);
-	}
-
-	public FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
-		return optionalFiles
-			.map(files -> {
-				String source = filesStorage.getSource(FileDTO.create(files));
-				return FileResponse.createExist(files, source);
-			})
-			.orElseGet(FileResponse::createNotExist);
+		return FileResponse.create(files, source);
 	}
 }

@@ -72,13 +72,6 @@ public class LocalFilesStorage implements FilesStorage {
 		return fileDTO;
 	}
 
-	private void createPath(String fileURI) {
-		File file = new File(fileURI);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-	}
-
 	@Override
 	public FileDTO update(FileDTO fileDTO, MultipartFile multipartFile) {
 		delete(fileDTO);
