@@ -69,6 +69,14 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 		this.participantCount = participantCount;
 	}
 
+	@Override
+	public Files getFiles() {
+		if (files == null) {
+			return Files.createDummy();
+		}
+		return this.files;
+	}
+
 	//== 비지니스 로직 ==//
 	@Override
 	public void setFiles(Files files) {

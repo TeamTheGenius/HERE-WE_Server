@@ -68,6 +68,14 @@ public class Moment implements FileHolder {
 		this.closedAt = closedAt;
 	}
 
+	@Override
+	public Files getFiles() {
+		if (files == null) {
+			return Files.createDummy();
+		}
+		return this.files;
+	}
+
 	//== 비지니스 로직 ==//
 	@Override
 	public void setFiles(Files files) {

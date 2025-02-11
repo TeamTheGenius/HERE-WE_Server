@@ -12,19 +12,11 @@ public record FileResponse(
 	FileEnv fileEnv
 ) {
 
-	public static FileResponse createExist(Files files, String source) {
+	public static FileResponse create(Files files, String source) {
 		return FileResponse.builder()
 			.fileId(files.getId())
 			.source(source)
 			.fileEnv(files.getEnvironment())
-			.build();
-	}
-
-	public static FileResponse createNotExist() {
-		return FileResponse.builder()
-			.fileId(0L)
-			.source("")
-			.fileEnv(null)
 			.build();
 	}
 }
