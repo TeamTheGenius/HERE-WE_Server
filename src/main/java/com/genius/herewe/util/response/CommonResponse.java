@@ -13,10 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommonResponse {
 	private int resultCode;
-	private HttpStatus code;
+	private String code;
 
 	public CommonResponse(HttpStatus code) {
-		this.code = code;
+		this.code = code.name();
 		this.resultCode = code.value();
 	}
 
