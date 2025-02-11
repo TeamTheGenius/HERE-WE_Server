@@ -48,6 +48,16 @@ public class Files {
 		this.fileURI = fileURI;
 	}
 
+	public static Files createDummy() {
+		return Files.builder()
+			.environment(null)
+			.type(null)
+			.originalName("")
+			.storedName("")
+			.fileURI("")
+			.build();
+	}
+
 	//== 비지니스 로직 ==//
 	public void updateFiles(FileDTO fileDTO) {
 		this.originalName = fileDTO.originalName();

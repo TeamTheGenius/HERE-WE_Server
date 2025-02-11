@@ -10,23 +10,19 @@ import com.genius.herewe.file.dto.FileDTO;
 import com.genius.herewe.file.util.FileUtil;
 import com.genius.herewe.util.exception.BusinessException;
 
+import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+@RequiredArgsConstructor
 public class S3FilesStorage implements FilesStorage {
 	private final S3Client s3Client;
 	private final String bucket;
 	private final String cloudFrontDomain;
-
-	public S3FilesStorage(S3Client s3Client, String bucket, String cloudFrontDomain) {
-		this.s3Client = s3Client;
-		this.bucket = bucket;
-		this.cloudFrontDomain = cloudFrontDomain;
-	}
-
+	
 	@Override
 	public FileEnv getFileEnvironment() {
 		return FileEnv.CLOUD;

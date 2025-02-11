@@ -5,6 +5,10 @@ import static com.genius.herewe.util.exception.ErrorCode.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -44,21 +48,28 @@ public class LocalFilesStorage implements FilesStorage {
 	public FileDTO upload(MultipartFile multipartFile, FileEnv fileEnv, FileType fileType) {
 		FileDTO fileDTO = FileUtil.getFileDTO(multipartFile, fileEnv, fileType, UPLOAD_PATH);
 		try {
-			File file = new File(fileDTO.fileURI());
-			createPath(fileDTO.fileURI());
-			multipartFile.transferTo(file);
+			Path filePath = Paths.get(fileDTO.fileURI());
+			Path parentPath = filePath.getParent();
+
+			// 1. 부모 디렉토리 생성
+			if (!Files.exists(parentPath)) {
+				Files.createDirectories(parentPath);
+			}
+
+			// 2. 해당 파일 경로에만 디렉토리가 있는지 확인
+			if (Files.exists(filePath) && Files.isDirectory(filePath)) {
+				// 이 특정 UUID 파일 경로가 디렉토리로 잘못 생성된 경우에만 삭제
+				Files.delete(filePath);
+			}
+
+			// 3. 파일 저장
+			Files.copy(multipartFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
 		} catch (IOException e) {
 			throw new BusinessException(FILE_NOT_SAVED);
 		}
 
 		return fileDTO;
-	}
-
-	private void createPath(String fileURI) {
-		File file = new File(fileURI);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
 	}
 
 	@Override
