@@ -1,15 +1,19 @@
 package com.genius.herewe.util.response;
 
-import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 
-@Getter
-public class SlicingResponse<T> extends CommonResponse {
-    private Slice<T> data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
-    public SlicingResponse(HttpStatus status, Slice<T> data) {
-        super(status);
-        this.data = data;
-    }
+@Getter
+@Schema(description = "슬라이스(무한 스크롤)형태의 응답 형식")
+public class SlicingResponse<T> extends CommonResponse {
+	@Schema(description = "무한 스크롤 형식의 데이터")
+	private Slice<T> data;
+
+	public SlicingResponse(HttpStatus status, Slice<T> data) {
+		super(status);
+		this.data = data;
+	}
 }
