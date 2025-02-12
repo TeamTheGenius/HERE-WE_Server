@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class UserController {
+public class UserController implements UserApi {
 	private final UserFacade userFacade;
 	private final FileHolderFinder holderFinder;
 	private final FilesManager filesManager;
@@ -56,7 +56,7 @@ public class UserController {
 	@PatchMapping("/auth/profile/{id}")
 	public SingleResponse<FileResponse> updateProfile(
 		@PathVariable Long id,
-		@RequestParam(value = "files", required = false) MultipartFile multipartFile
+		@RequestParam(value = "files") MultipartFile multipartFile
 	) {
 		FileHolder fileHolder = holderFinder.find(id, FileType.PROFILE);
 		Files files = filesManager.updateFile(fileHolder.getFiles(), multipartFile);

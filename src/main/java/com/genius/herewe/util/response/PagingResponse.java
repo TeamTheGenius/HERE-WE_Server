@@ -1,15 +1,19 @@
 package com.genius.herewe.util.response;
 
-import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
-@Getter
-public class PagingResponse<T> extends CommonResponse {
-    private Page<T> data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
-    public PagingResponse(HttpStatus status, Page<T> data) {
-        super(status);
-        this.data = data;
-    }
+@Getter
+@Schema(description = "페이징 형태의 응답 형식")
+public class PagingResponse<T> extends CommonResponse {
+	@Schema(description = "페이징 형식의 데이터")
+	private Page<T> data;
+
+	public PagingResponse(HttpStatus status, Page<T> data) {
+		super(status);
+		this.data = data;
+	}
 }
