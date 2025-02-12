@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/file")
 @RequiredArgsConstructor
-public class FilesController {
+public class FilesController implements FilesApi {
 	private final FilesManager filesManager;
 	private final FileHolderFinder holderFinder;
 
@@ -46,7 +46,7 @@ public class FilesController {
 	public SingleResponse<FileResponse> uploadFile(
 		@PathVariable Long id,
 		@RequestParam("type") String type,
-		@RequestParam(value = "files", required = false) MultipartFile multipartFile
+		@RequestParam(value = "files") MultipartFile multipartFile
 	) {
 		FileType fileType = FileType.findType(type);
 		FileHolder fileHolder = holderFinder.find(id, fileType);
@@ -54,14 +54,14 @@ public class FilesController {
 		Files files = filesManager.uploadFile(fileHolder, multipartFile, fileType);
 		FileResponse fileResponse = filesManager.convertToFileResponse(files);
 
-		return new SingleResponse<>(HttpStatus.OK, fileResponse);
+		return new SingleResponse<>(HttpStatus.CREATED, fileResponse);
 	}
 
 	@PatchMapping("/{id}")
 	public SingleResponse<FileResponse> updateFile(
 		@PathVariable Long id,
 		@RequestParam("type") String type,
-		@RequestParam(value = "files", required = false) MultipartFile multipartFile
+		@RequestParam(value = "files") MultipartFile multipartFile
 	) {
 		FileType fileType = FileType.findType(type);
 		FileHolder fileHolder = holderFinder.find(id, fileType);

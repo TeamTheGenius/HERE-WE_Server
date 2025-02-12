@@ -14,7 +14,7 @@ public record FileResponse(
 	@Schema(description = "파일에 접근할 수 있는 정보. LOCAL의 경우 Base64로 인코딩한 문자열, CLOUD의 경우 이미지 URL 제공"
 		, example = "{Base64로 인코딩 된 문자열}   or   https://{cloudfront 주소}/{파일 타입}/{파일 이름}")
 	String source,
-	@Schema(description = "해당 파일이 저장된 환경 정보", examples = {"LOCAL", "CLOUD"})
+	@Schema(description = "해당 파일이 저장된 환경 정보", example = "LOCAL   or   CLOUD")
 	FileEnv fileEnv
 ) {
 
