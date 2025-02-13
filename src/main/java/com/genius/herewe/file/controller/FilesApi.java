@@ -43,7 +43,7 @@ public interface FilesApi {
 					value = """
 						{
 						    "resultCode": 400,
-						    "code": "BAD_REQUEST",
+						    "code": "NOT_SUPPORTED_IMAGE_TYPE",
 						    "message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
 						}
 						"""
@@ -59,7 +59,7 @@ public interface FilesApi {
 					value = """
 						{
 						    "resultCode": 404,
-						    "code": "NOT_FOUND",
+						    "code": "MEMBER_NOT_FOUND",
 						    "message": "사용자를 찾을 수 없습니다."
 						}
 						"""
@@ -89,15 +89,26 @@ public interface FilesApi {
 				""",
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
-				examples = @ExampleObject(
-					value = """
-						{
-						    "resultCode": 400,
-						    "code": "BAD_REQUEST",
-						    "message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
-						}
-						"""
-				)
+				examples = {
+					@ExampleObject(
+						value = """
+							{
+							    "resultCode": 400,
+							    "code": "NOT_SUPPORTED_IMAGE_TYPE",
+							    "message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
+							}
+							"""
+					),
+					@ExampleObject(
+						value = """
+							{
+								"resultCode": 400,
+								"code": "FILE_NOT_SAVED",
+								"message": "파일이 정상적으로 저장되지 않았습니다."
+							}
+							"""
+					)
+				}
 			)
 		),
 		@ApiResponse(
@@ -109,7 +120,7 @@ public interface FilesApi {
 					value = """
 						{
 						    "resultCode": 404,
-						    "code": "NOT_FOUND",
+						    "code": "MEMBER_NOT_FOUND",
 						    "message": "사용자를 찾을 수 없습니다."
 						}
 						"""
@@ -137,15 +148,26 @@ public interface FilesApi {
 				""",
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
-				examples = @ExampleObject(
-					value = """
-						{
-							"resultCode": 400,
-							"code": "BAD_REQUEST",
-							"message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
-						}
-						"""
-				)
+				examples = {
+					@ExampleObject(
+						value = """
+							{
+								"resultCode": 400,
+								"code": "NOT_SUPPORTED_IMAGE_TYPE",
+								"message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
+							}
+							"""
+					),
+					@ExampleObject(
+						value = """
+							{
+								"resultCode": 400,
+								"code": "FILE_NOT_DELETED",
+								"message": "파일이 정상적으로 삭제되지 않았습니다."
+							}
+							"""
+					)
+				}
 			)
 		),
 		@ApiResponse(
@@ -157,7 +179,7 @@ public interface FilesApi {
 					value = """
 						{
 							"resultCode": 404,
-							"code": "NOT_FOUND",
+							"code": "MEMBER_NOT_FOUND",
 							"message": "사용자를 찾을 수 없습니다."
 						}
 						"""
@@ -186,13 +208,26 @@ public interface FilesApi {
 				""",
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
-				examples = @ExampleObject(value = """
-					{
-						"resultCode": 400,
-						"code": "BAD_REQUEST",
-						"message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
-					}
-					""")
+				examples = {
+					@ExampleObject(
+						value = """
+							{
+								"resultCode": 400,
+								"code": "NOT_SUPPORTED_IMAGE_TYPE",
+								"message": "파일을 받을 수 있는 종류가 아닙니다. profile, crew, moment 중 하나를 입력해주세요."
+							}
+							"""
+					),
+					@ExampleObject(
+						value = """
+							{
+								"resultCode": 400,
+								"code": "FILE_NOT_DELETED",
+								"message": "파일이 정상적으로 삭제되지 않았습니다."
+							}
+							"""
+					)
+				}
 			)
 		),
 		@ApiResponse(
@@ -203,9 +238,9 @@ public interface FilesApi {
 				examples = @ExampleObject(
 					value = """
 						{
-							"resultCode": 400,
-							"code": "NOT_FOUND",
-							"사용자를 찾을 수 없습니다"
+							"resultCode": 404,
+							"code": "MEMBER_NOT_FOUND",
+							"message": "사용자를 찾을 수 없습니다."
 						}
 						"""
 				)

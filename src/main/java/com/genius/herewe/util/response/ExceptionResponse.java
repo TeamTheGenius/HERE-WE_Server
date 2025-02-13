@@ -3,6 +3,7 @@ package com.genius.herewe.util.response;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.genius.herewe.util.exception.ErrorCode;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -17,5 +18,10 @@ public class ExceptionResponse extends CommonResponse {
 	public ExceptionResponse(HttpStatus status, String message) {
 		super(status);
 		this.message = message;
+	}
+
+	public ExceptionResponse(ErrorCode errorCode) {
+		super(errorCode.getStatus().value(), errorCode.name());
+		this.message = errorCode.getMessage();
 	}
 }

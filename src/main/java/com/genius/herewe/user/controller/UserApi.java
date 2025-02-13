@@ -36,10 +36,11 @@ public interface UserApi {
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = @ExampleObject(
+					name = "해당 닉네임이 이미 존재하는 경우",
 					value = """
 						{
 							"resultCode": "400",
-							"code": "BAD_REQUEST",
+							"code": "NICKNAME_DUPLICATED",
 							"message": "이미 존재하는 닉네임입니다. 닉네임은 중복될 수 없습니다."
 						}
 						"""
@@ -65,27 +66,41 @@ public interface UserApi {
 				""",
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
-				examples = @ExampleObject(
-					value = """
-						{
-							"resultCode": "400",
-							"code": "BAD_REQUEST",
-							"message": "이미 가입한 사용자입니다"
-						}
-						"""
-				)
+				examples = {
+					@ExampleObject(
+						name = "1. 이미 가입이 되어 있는 사용자인 경우",
+						value = """
+							{
+								"resultCode": 400,
+								"code": "ALREADY_REGISTERED",
+								"message": "이미 가입한 사용자입니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "2. 사용하고자하는 닉네임이 이미 존재하는 경우",
+						value = """
+							{
+								"resultCode": 400,
+								"code": "NICKNAME_DUPLICATED",
+								"message": "이미 존재하는 닉네임입니다. 닉네임은 중복될 수 없습니다."
+							}
+							"""
+					)
+				}
 			)
 		),
 		@ApiResponse(
 			responseCode = "404",
-			description = "signupRequest의 userId를 통해 유저 객체를 찾지 못한 경우 (MEMBER_NOT_FOUND)",
+			description = "RequestBody로 전달받은 userId를 통해 사용자를 찾지 못한 경우",
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = @ExampleObject(
+					name = "RequestBody로 전달받은 userId를 통해 사용자를 찾지 못한 경우",
 					value = """
 						{
 							"resultCode": "404",
-							"code": "NOT_FOUND",
+							"code": "MEMBER_NOT_FOUND",
 							"message": "사용자를 찾을 수 없습니다."
 						}
 						"""
@@ -109,10 +124,11 @@ public interface UserApi {
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = @ExampleObject(
+					name = "사용자를 찾을 수 없는 경우",
 					value = """
 						{
 							"resultCode": 404,
-							"code": "NOT_FOUND",
+							"code": "MEMBER_NOT_FOUND",
 							"message": "사용자를 찾을 수 없습니다."
 						}
 						"""
@@ -136,10 +152,11 @@ public interface UserApi {
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = @ExampleObject(
+					name = "파일 삭제가 정상적으로 이루어지지 않은 경우",
 					value = """
 						{
 							"resultCode": 400,
-							"code": "BAD_REQUEST",
+							"code": "FILE_NOT_DELETED",
 							"message": "파일이 정상적으로 삭제되지 않았습니다."
 						}
 						"""
@@ -152,10 +169,11 @@ public interface UserApi {
 			content = @Content(
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = @ExampleObject(
+					name = "사용자를 찾지 못한 경우",
 					value = """
 						{
 							"resultCode": 404,
-							"code": "NOT_FOUND",
+							"code": "MEMBER_NOT_FOUND",
 							"message": "사용자를 찾을 수 없습니다."
 						}
 						"""
