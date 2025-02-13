@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.genius.herewe.infra.file.dto.FileResponse;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
+import com.genius.herewe.infra.file.dto.FileResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -91,6 +91,7 @@ public interface FilesApi {
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = {
 					@ExampleObject(
+						name = "1. type에 profile/crew/moment 중 하나가 아닌 경우",
 						value = """
 							{
 							    "resultCode": 400,
@@ -100,6 +101,7 @@ public interface FilesApi {
 							"""
 					),
 					@ExampleObject(
+						name = "2. 파일 저장에 실패한 경우",
 						value = """
 							{
 								"resultCode": 400,
@@ -150,6 +152,7 @@ public interface FilesApi {
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = {
 					@ExampleObject(
+						name = "1. type이 profile/crew/moment 중 하나가 아닌 경우",
 						value = """
 							{
 								"resultCode": 400,
@@ -159,6 +162,7 @@ public interface FilesApi {
 							"""
 					),
 					@ExampleObject(
+						name = "2. 기존에 존재하던 파일의 삭제가 정상적으로 이루어지지 않은 경우",
 						value = """
 							{
 								"resultCode": 400,
@@ -210,6 +214,7 @@ public interface FilesApi {
 				schema = @Schema(implementation = ExceptionResponse.class),
 				examples = {
 					@ExampleObject(
+						name = "1. type이 profile/crew/moment 중 하나가 아닌 경우",
 						value = """
 							{
 								"resultCode": 400,
@@ -219,6 +224,7 @@ public interface FilesApi {
 							"""
 					),
 					@ExampleObject(
+						name = "2. 기존에 존재하던 파일의 삭제가 정상적으로 이루어지지 않은 경우",
 						value = """
 							{
 								"resultCode": 400,
@@ -248,7 +254,7 @@ public interface FilesApi {
 		)
 	})
 	@DeleteMapping("/{id}")
-	public CommonResponse deleteFile(
+	CommonResponse deleteFile(
 		@Parameter(description = "찾고자하는 객체의 식별자(PK)") @PathVariable Long id,
 		@Parameter(description = "조회하고자 하는 파일의 종류(profile, crew, moment 중 택 1)") @RequestParam("type") String type
 	);
