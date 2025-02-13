@@ -47,7 +47,7 @@ public class Moment implements FileHolder {
 	@JoinColumn(name = "files_id")
 	private Files files;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 20)
 	private String name;
 
 	@ColumnDefault("0")

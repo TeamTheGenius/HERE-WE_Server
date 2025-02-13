@@ -33,7 +33,7 @@ public class ChatMessage extends BaseTimeEntity {
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	@Column(columnDefinition = "TEXT", nullable = false) // length 지정 필요
+	@Column(columnDefinition = "TEXT", nullable = false, length = 1000)
 	private String message;
 
 	@Builder
