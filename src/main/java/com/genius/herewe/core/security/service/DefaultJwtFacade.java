@@ -1,8 +1,10 @@
 package com.genius.herewe.core.security.service;
 
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
 import static com.genius.herewe.core.security.constants.JwtRule.*;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,12 +13,14 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.util.JwtUtil;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -99,13 +103,25 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public String resolveAccessToken(HttpServletRequest request) {
-
-		return "";
+		String bearerHeader = request.getHeader(ACCESS_HEADER.getValue());
+		if (bearerHeader == null || bearerHeader.isBlank()) {
+			throw new BusinessException(JWT_NOT_FOUND_IN_HEADER);
+		}
+		return bearerHeader.trim().substring(7);
 	}
 
 	@Override
 	public String resolveRefreshToken(HttpServletRequest request) {
-		return "";
+		Cookie[] cookies = request.getCookies();
+		if (cookies == null) {
+			throw new BusinessException(JWT_NOT_FOUND_IN_COOKIE);
+		}
+
+		return Arrays.stream(cookies)
+			.filter(cookie -> cookie.getName().equals(REFRESH_PREFIX.getValue()))
+			.findFirst()
+			.map(Cookie::getValue)
+			.orElseThrow(() -> new BusinessException(JWT_NOT_FOUND_IN_COOKIE));
 	}
 
 	@Override

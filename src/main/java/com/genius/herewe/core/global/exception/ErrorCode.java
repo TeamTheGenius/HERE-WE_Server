@@ -12,6 +12,9 @@ public enum ErrorCode {
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 	NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다. 닉네임은 중복될 수 없습니다."),
 
+	JWT_NOT_FOUND_IN_HEADER(HttpStatus.NOT_FOUND, "Header에서 JWT를 찾을 수 없습니다."),
+	JWT_NOT_FOUND_IN_COOKIE(HttpStatus.NOT_FOUND, "Cookie에서 JWT를 찾을 수 없습니다."),
+
 	FILE_NOT_EXIST(HttpStatus.NOT_FOUND, "해당 파일이 존재하지 않습니다."),
 	FILE_INVALID(HttpStatus.BAD_REQUEST, "파일의 형태가 유효하지 않습니다."),
 	NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 확장자입니다."),
