@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.genius.herewe.core.user.domain.ProviderInfo;
@@ -14,7 +15,7 @@ import com.genius.herewe.core.user.domain.User;
 import lombok.Getter;
 
 @Getter
-public class UserPrincipal implements OAuth2User {
+public class UserPrincipal implements OAuth2User, UserDetails {
 	private User user;
 	private ProviderInfo providerInfo;
 	private String nameAttributeKey;
@@ -36,8 +37,24 @@ public class UserPrincipal implements OAuth2User {
 		this.nameAttributeKey = nameAttributeKey;
 	}
 
+	/**
+	 * OAuth2User method implements
+	 */
 	@Override
 	public String getName() {
 		return user.getEmail();
+	}
+
+	/**
+	 * UserDetails method implements
+	 */
+	@Override
+	public String getUsername() {
+		return String.valueOf(user.getId());
+	}
+
+	@Override
+	public String getPassword() {
+		return null;
 	}
 }
