@@ -46,9 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		String refreshToken = jwtFacade.resolveRefreshToken(request);
-		
-		if (jwtFacade.verifyRefreshToken(refreshToken)) {
-			User user = jwtFacade.getPKFromRefresh(refreshToken);
+		User user = jwtFacade.getPKFromRefresh(refreshToken);
+
+		if (jwtFacade.verifyRefreshToken(user.getId(), refreshToken)) {
 			String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
 			jwtFacade.generateRefreshToken(response, user);
 

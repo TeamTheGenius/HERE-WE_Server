@@ -35,6 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class DefaultJwtFacade implements JwtFacade {
 	private final CustomUserDetailsService customUserDetailsService;
 	private final UserService userService;
+	private final RefreshTokenService refreshTokenService;
 
 	private final String ISSUER;
 	private final Key ACCESS_SECRET_KEY;
@@ -43,7 +44,7 @@ public class DefaultJwtFacade implements JwtFacade {
 	private final long REFRESH_EXPIRATION;
 
 	public DefaultJwtFacade(CustomUserDetailsService customUserDetailsService,
-		UserService userService,
+		UserService userService, RefreshTokenService refreshTokenService,
 		@Value("${jwt.issuer}") String ISSUER,
 		@Value("${jwt.secret.access}") String ACCESS_SECRET_KEY,
 		@Value("${jwt.secret.refresh}") String REFRESH_SECRET_KEY,
@@ -51,6 +52,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		@Value("${jwt.expiration.refresh}") long REFRESH_EXPIRATION) {
 		this.customUserDetailsService = customUserDetailsService;
 		this.userService = userService;
+		this.refreshTokenService = refreshTokenService;
 		this.ISSUER = ISSUER;
 		this.ACCESS_SECRET_KEY = JwtUtil.getSigningKey(ACCESS_SECRET_KEY);
 		this.REFRESH_SECRET_KEY = JwtUtil.getSigningKey(REFRESH_SECRET_KEY);
@@ -92,7 +94,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
 		response.addHeader(REFRESH_ISSUE.getValue(), cookie.toString());
 
-		// redis or mongodb에 저장 필요 (RTR 전략)
+		refreshTokenService.saveRefreshToken(user.getId(), user.getNickname(), refreshToken);
 
 		return refreshToken;
 	}
@@ -146,13 +148,14 @@ public class DefaultJwtFacade implements JwtFacade {
 	}
 
 	@Override
-	public boolean verifyRefreshToken(String refreshToken) {
+	public boolean verifyRefreshToken(Long userId, String refreshToken) {
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(REFRESH_SECRET_KEY)
 				.build()
 				.parseClaimsJws(refreshToken);
-			return true;
+			boolean isHijacked = refreshTokenService.isRefreshHijacked(userId, refreshToken);
+			return !isHijacked;
 		} catch (JwtException e) {
 			throw new BusinessException(JWT_NOT_VALID);
 		}
