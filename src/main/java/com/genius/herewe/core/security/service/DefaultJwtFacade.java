@@ -146,13 +146,13 @@ public class DefaultJwtFacade implements JwtFacade {
 	}
 
 	@Override
-	public JwtStatus verifyRefreshToken(String refreshToken) {
+	public boolean verifyRefreshToken(String refreshToken) {
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(REFRESH_SECRET_KEY)
 				.build()
 				.parseClaimsJws(refreshToken);
-			return JwtStatus.VALID;
+			return true;
 		} catch (JwtException e) {
 			throw new BusinessException(JWT_NOT_VALID);
 		}

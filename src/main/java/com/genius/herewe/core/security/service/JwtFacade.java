@@ -19,7 +19,7 @@ public interface JwtFacade {
 
 	JwtStatus verifyAccessToken(String accessToken);
 
-	JwtStatus verifyRefreshToken(String refreshToken);
+	boolean verifyRefreshToken(String refreshToken);
 
 	User getPKFromRefresh(String refreshToken);
 

@@ -1,6 +1,5 @@
 package com.genius.herewe.core.security.filter;
 
-import static com.genius.herewe.core.global.exception.ErrorCode.*;
 import static com.genius.herewe.core.security.config.SecurityConfig.*;
 import static com.genius.herewe.core.security.constants.JwtStatus.*;
 
@@ -11,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.security.service.JwtFacade;
 import com.genius.herewe.core.user.domain.User;
@@ -45,24 +43,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			setAuthenticationToContext(accessToken);
 			filterChain.doFilter(request, response);
 			return;
-		} else if (accessStatus == INVALID) {
-			throw new BusinessException(JWT_NOT_VALID);
 		}
 
 		String refreshToken = jwtFacade.resolveRefreshToken(request);
-		JwtStatus refreshStatus = jwtFacade.verifyRefreshToken(refreshToken);
+		
+		if (jwtFacade.verifyRefreshToken(refreshToken)) {
+			User user = jwtFacade.getPKFromRefresh(refreshToken);
+			String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
+			jwtFacade.generateRefreshToken(response, user);
 
-		if (refreshStatus != VALID) {
-			// logout 처리 필요
-			throw new BusinessException(JWT_NOT_VALID);
+			setAuthenticationToContext(reissuedAccessToken);
+			filterChain.doFilter(request, response);
 		}
-
-		User user = jwtFacade.getPKFromRefresh(refreshToken);
-		String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
-		String reissuedRefreshToken = jwtFacade.generateRefreshToken(response, user);
-
-		setAuthenticationToContext(reissuedAccessToken);
-		filterChain.doFilter(request, response);
 	}
 
 	private void setAuthenticationToContext(String accessToken) {
