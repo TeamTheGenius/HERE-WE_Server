@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsUtils;
 
+import com.genius.herewe.core.security.filter.AuthenticationExceptionFilter;
 import com.genius.herewe.core.security.filter.JwtAuthenticationFilter;
 import com.genius.herewe.core.security.handler.OAuth2FailureHandler;
 import com.genius.herewe.core.security.handler.OAuth2SuccessHandler;
@@ -54,6 +55,7 @@ public class SecurityConfig {
 			.sessionManagement(configurer -> configurer
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.addFilterBefore(new JwtAuthenticationFilter(jwtFacade), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new AuthenticationExceptionFilter(), JwtAuthenticationFilter.class)
 
 			// OAuth2
 			.oauth2Login(customConfigure -> customConfigure
