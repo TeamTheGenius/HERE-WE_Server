@@ -75,6 +75,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		String accessToken = ACCESS_PREFIX.getValue() + token;
 
 		response.setHeader(ACCESS_HEADER.getValue(), accessToken);
+		response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "False");
 
 		return accessToken;
 	}
@@ -107,6 +108,11 @@ public class DefaultJwtFacade implements JwtFacade {
 			.sameSite(org.springframework.boot.web.server.Cookie.SameSite.STRICT.name())
 			.secure(true)
 			.build();
+	}
+
+	@Override
+	public void setReissuedHeader(HttpServletResponse response) {
+		response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "True");
 	}
 
 	@Override
@@ -175,8 +181,10 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public Authentication createAuthentication(String accessToken) {
-		String token = accessToken.trim().substring(7);
-		UserDetails userDetails = customUserDetailsService.loadUserByUsername(extractUserPK(token));
+		if (accessToken.startsWith(ACCESS_PREFIX.getValue())) {
+			accessToken = accessToken.trim().substring(7);
+		}
+		UserDetails userDetails = customUserDetailsService.loadUserByUsername(extractUserPK(accessToken));
 		return new UsernamePasswordAuthenticationToken(
 			userDetails, "", userDetails.getAuthorities()
 		);

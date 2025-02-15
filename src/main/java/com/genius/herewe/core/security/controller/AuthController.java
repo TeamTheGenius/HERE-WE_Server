@@ -31,6 +31,7 @@ public class AuthController implements AuthApi {
 
 		jwtFacade.generateAccessToken(response, user);
 		jwtFacade.generateRefreshToken(response, user);
+		jwtFacade.setReissuedHeader(response);
 
 		AuthResponse authResponse = userFacade.getAuthInfo(user.getId());
 		return new SingleResponse<>(HttpStatus.OK, authResponse);

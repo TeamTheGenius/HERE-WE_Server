@@ -13,6 +13,8 @@ public interface JwtFacade {
 
 	String generateRefreshToken(HttpServletResponse response, User user);
 
+	void setReissuedHeader(HttpServletResponse response);
+
 	String resolveAccessToken(HttpServletRequest request);
 
 	String resolveRefreshToken(HttpServletRequest request);
