@@ -1,5 +1,7 @@
 package com.genius.herewe.core.security.domain;
 
+import java.util.Map;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
@@ -12,8 +14,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RedisHash
-public class RefreshToken {
+@RedisHash(value = "token")
+public class Token {
 	@Id
 	private Long userId;
 
@@ -26,10 +28,18 @@ public class RefreshToken {
 	private long ttl;
 
 	@Builder
-	public RefreshToken(Long userId, String nickname, String token, long ttl) {
+	public Token(Long userId, String nickname, String token, long ttl) {
 		this.userId = userId;
 		this.nickname = nickname;
 		this.token = token;
 		this.ttl = ttl;
+	}
+
+	public static Token create(Map<Object, Object> entries) {
+		return Token.builder()
+			.userId(Long.valueOf((String)entries.get("userId")))
+			.nickname((String)entries.get("nickname"))
+			.token((String)entries.get("token"))
+			.build();
 	}
 }

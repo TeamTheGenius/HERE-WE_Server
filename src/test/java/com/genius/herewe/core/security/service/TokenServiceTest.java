@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.genius.herewe.core.security.domain.RefreshToken;
+import com.genius.herewe.core.security.domain.Token;
 
 @SpringBootTest
-class RefreshTokenServiceTest {
+class TokenServiceTest {
 	@Autowired
-	private RefreshTokenService refreshTokenService;
+	private TokenService tokenService;
 
 	@Test
 	void saveAndFindRefreshTokenTest() {
@@ -21,8 +21,8 @@ class RefreshTokenServiceTest {
 		String token = "testToken";
 
 		// when
-		refreshTokenService.saveRefreshToken(userId, nickname, token);
-		RefreshToken found = refreshTokenService.findByUserId(userId);
+		tokenService.saveRefreshToken(userId, nickname, token);
+		Token found = tokenService.findByUserId(userId);
 
 		// then
 		assertThat(found.getUserId()).isEqualTo(userId);
