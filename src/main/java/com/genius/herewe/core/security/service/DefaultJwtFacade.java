@@ -10,14 +10,20 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.security.util.JwtUtil;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
@@ -125,12 +131,60 @@ public class DefaultJwtFacade implements JwtFacade {
 	}
 
 	@Override
-	public void validateAccessToken() {
-
+	public JwtStatus verifyAccessToken(String accessToken) {
+		try {
+			Jwts.parserBuilder()
+				.setSigningKey(ACCESS_SECRET_KEY)
+				.build()
+				.parseClaimsJws(accessToken);
+			return JwtStatus.VALID;
+		} catch (ExpiredJwtException e) {
+			return JwtStatus.EXPIRED;
+		} catch (JwtException e) {
+			throw new BusinessException(JWT_NOT_VALID);
+		}
 	}
 
 	@Override
-	public void validateRefreshToken() {
+	public JwtStatus verifyRefreshToken(String refreshToken) {
+		try {
+			Jwts.parserBuilder()
+				.setSigningKey(REFRESH_SECRET_KEY)
+				.build()
+				.parseClaimsJws(refreshToken);
+			return JwtStatus.VALID;
+		} catch (JwtException e) {
+			throw new BusinessException(JWT_NOT_VALID);
+		}
+	}
 
+	@Override
+	public User getPKFromRefresh(String refreshToken) {
+		String pk = Jwts.parserBuilder()
+			.setSigningKey(REFRESH_SECRET_KEY)
+			.build()
+			.parseClaimsJws(refreshToken)
+			.getBody()
+			.getSubject();
+		Long userId = Long.valueOf(pk);
+		return userService.findById(userId);
+	}
+
+	@Override
+	public Authentication createAuthentication(String accessToken) {
+		String token = accessToken.trim().substring(7);
+		UserDetails userDetails = customUserDetailsService.loadUserByUsername(extractUserPK(token));
+		return new UsernamePasswordAuthenticationToken(
+			userDetails, "", userDetails.getAuthorities()
+		);
+	}
+
+	private String extractUserPK(String accessToken) {
+		return Jwts.parserBuilder()
+			.setSigningKey(ACCESS_SECRET_KEY)
+			.build()
+			.parseClaimsJws(accessToken)
+			.getBody()
+			.getSubject();
 	}
 }

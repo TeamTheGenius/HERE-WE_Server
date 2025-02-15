@@ -1,17 +1,29 @@
 package com.genius.herewe.core.security.filter;
 
-import java.io.IOException;
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
+import static com.genius.herewe.core.security.config.SecurityConfig.*;
+import static com.genius.herewe.core.security.constants.JwtStatus.*;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.security.service.JwtFacade;
+import com.genius.herewe.core.user.domain.User;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtFacade jwtFacade;
@@ -20,19 +32,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		// 1. 허용되는 URL(Permitted URL)인 경우 검증을 거치지 않고 doFilter
-		//?? 생각해보면 이미 SecurityConfig에서 permitAll을 하는데 여기서 굳이 doFilter를 할 이유가?
+		if (isPermittedURI(request.getRequestURI())) {
+			SecurityContextHolder.getContext().setAuthentication(null);
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-		// 2. header에서 access-token 추출 후, 검증(validate)
+		String accessToken = jwtFacade.resolveAccessToken(request);
+		JwtStatus accessStatus = jwtFacade.verifyAccessToken(accessToken);
 
-		// 3. access-token이 expired 상태라면 refresh-token 추출
+		if (accessStatus == VALID) {
+			setAuthenticationToContext(accessToken);
+			filterChain.doFilter(request, response);
+			return;
+		} else if (accessStatus == INVALID) {
+			throw new BusinessException(JWT_NOT_VALID);
+		}
 
-		// 4. refresh-token 검증
+		String refreshToken = jwtFacade.resolveRefreshToken(request);
+		JwtStatus refreshStatus = jwtFacade.verifyRefreshToken(refreshToken);
 
-		// 5. refresh-token이 유효하다면, access & refresh 모두 재발급
+		if (refreshStatus != VALID) {
+			// logout 처리 필요
+			throw new BusinessException(JWT_NOT_VALID);
+		}
 
-		// 6. access or refresh가 유효하지 않다면 logout 처리
+		User user = jwtFacade.getPKFromRefresh(refreshToken);
+		String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
+		String reissuedRefreshToken = jwtFacade.generateRefreshToken(response, user);
 
+		setAuthenticationToContext(reissuedAccessToken);
 		filterChain.doFilter(request, response);
+	}
+
+	private void setAuthenticationToContext(String accessToken) {
+		Authentication authentication = jwtFacade.createAuthentication(accessToken);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+	}
+
+	private boolean isPermittedURI(String requestURI) {
+		return Arrays.stream(PERMITTED_URI)
+			.anyMatch(permitted -> {
+				String replace = permitted.replace("*", "");
+				return requestURI.contains(replace) || replace.contains(requestURI);
+			});
 	}
 }

@@ -1,5 +1,8 @@
 package com.genius.herewe.core.security.service;
 
+import org.springframework.security.core.Authentication;
+
+import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.user.domain.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,8 +17,11 @@ public interface JwtFacade {
 
 	String resolveRefreshToken(HttpServletRequest request);
 
-	void validateAccessToken();
+	JwtStatus verifyAccessToken(String accessToken);
 
-	void validateRefreshToken();
+	JwtStatus verifyRefreshToken(String refreshToken);
 
+	User getPKFromRefresh(String refreshToken);
+
+	Authentication createAuthentication(String accessToken);
 }

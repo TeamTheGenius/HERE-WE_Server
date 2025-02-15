@@ -24,10 +24,9 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private static final String[] PERMITTED_URI = {"/favicon.ico", "/api/auth/**"};
-	private static final String[] SWAGGER_URI = {"/v3/api-docs/**", "/swagger-ui/**",
+	public static final String[] PERMITTED_URI = {"/v3/api-docs/**", "/swagger-ui/**",
 		"/swagger-ui.html", "/swagger-resources/**",
-		"/api-docs/**", "/webjars/**"};
+		"/api-docs/**", "/webjars/**", "/favicon.ico", "/api/auth/**"};
 	private static final String[] PERMITTED_ROLES = {"USER", "ADMIN"};
 
 	private final CustomCorsConfiguration customCorsConfiguration;
@@ -48,7 +47,6 @@ public class SecurityConfig {
 			//권한 설정
 			.authorizeHttpRequests(request -> request
 				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-				.requestMatchers(SWAGGER_URI).permitAll()
 				.requestMatchers(PERMITTED_URI).permitAll()
 				.anyRequest().hasAnyRole(PERMITTED_ROLES))
 
