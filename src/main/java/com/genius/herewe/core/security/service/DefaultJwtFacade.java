@@ -64,7 +64,7 @@ public class DefaultJwtFacade implements JwtFacade {
 			.setId(UUID.randomUUID().toString())
 			.signWith(ACCESS_SECRET_KEY, SignatureAlgorithm.HS256)
 			.compact();
-		String accessToken = ACCESS_PREFIX + token;
+		String accessToken = ACCESS_PREFIX.getValue() + token;
 
 		response.setHeader(ACCESS_HEADER.getValue(), accessToken);
 
@@ -86,7 +86,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
 		response.addHeader(REFRESH_ISSUE.getValue(), cookie.toString());
 
-		// redis/mongodb에 저장 필요
+		// redis or mongodb에 저장 필요 (RTR 전략)
 
 		return refreshToken;
 	}
@@ -96,7 +96,7 @@ public class DefaultJwtFacade implements JwtFacade {
 			.path("/")
 			.maxAge(maxAgeSeconds)
 			.httpOnly(true)
-			.sameSite("Strict")
+			.sameSite(org.springframework.boot.web.server.Cookie.SameSite.STRICT.name())
 			.secure(true)
 			.build();
 	}
