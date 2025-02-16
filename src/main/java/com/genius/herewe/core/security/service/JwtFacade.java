@@ -21,7 +21,9 @@ public interface JwtFacade {
 
 	JwtStatus verifyAccessToken(String accessToken);
 
-	boolean verifyRefreshToken(Long userId, String refreshToken);
+	void verifyRefreshToken(String refreshToken);
+
+	boolean isRefreshHijacked(Long userId, String refreshToken);
 
 	User getPKFromRefresh(String refreshToken);
 

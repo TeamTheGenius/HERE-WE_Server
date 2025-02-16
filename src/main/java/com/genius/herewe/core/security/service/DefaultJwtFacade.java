@@ -29,7 +29,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class DefaultJwtFacade implements JwtFacade {
@@ -154,17 +156,20 @@ public class DefaultJwtFacade implements JwtFacade {
 	}
 
 	@Override
-	public boolean verifyRefreshToken(Long userId, String refreshToken) {
+	public void verifyRefreshToken(String refreshToken) {
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(REFRESH_SECRET_KEY)
 				.build()
 				.parseClaimsJws(refreshToken);
-			boolean isHijacked = tokenService.isRefreshHijacked(userId, refreshToken);
-			return !isHijacked;
 		} catch (JwtException e) {
 			throw new BusinessException(JWT_NOT_VALID);
 		}
+	}
+
+	@Override
+	public boolean isRefreshHijacked(Long userId, String refreshToken) {
+		return tokenService.isRefreshHijacked(userId, refreshToken);
 	}
 
 	@Override

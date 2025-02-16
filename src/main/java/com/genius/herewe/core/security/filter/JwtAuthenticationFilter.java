@@ -1,5 +1,6 @@
 package com.genius.herewe.core.security.filter;
 
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
 import static com.genius.herewe.core.security.config.SecurityConfig.*;
 import static com.genius.herewe.core.security.constants.JwtStatus.*;
 
@@ -10,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.security.service.JwtFacade;
 import com.genius.herewe.core.user.domain.User;
@@ -46,16 +48,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		String refreshToken = jwtFacade.resolveRefreshToken(request);
+		jwtFacade.verifyRefreshToken(refreshToken);
 		User user = jwtFacade.getPKFromRefresh(refreshToken);
 
-		if (jwtFacade.verifyRefreshToken(user.getId(), refreshToken)) {
-			String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
-			jwtFacade.generateRefreshToken(response, user);
-			jwtFacade.setReissuedHeader(response);
-
-			setAuthenticationToContext(reissuedAccessToken);
-			filterChain.doFilter(request, response);
+		boolean isHijacked = jwtFacade.isRefreshHijacked(user.getId(), refreshToken);
+		if (isHijacked) {
+			jwtFacade.logout(response, user.getId());
+			throw new BusinessException(TOKEN_HIJACKED);
 		}
+
+		String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
+		jwtFacade.generateRefreshToken(response, user);
+		jwtFacade.setReissuedHeader(response);
+
+		setAuthenticationToContext(reissuedAccessToken);
+		filterChain.doFilter(request, response);
 	}
 
 	private void setAuthenticationToContext(String accessToken) {
