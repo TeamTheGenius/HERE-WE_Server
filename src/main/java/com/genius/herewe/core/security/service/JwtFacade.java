@@ -26,4 +26,6 @@ public interface JwtFacade {
 	User getPKFromRefresh(String refreshToken);
 
 	Authentication createAuthentication(String accessToken);
+
+	void logout(HttpServletResponse response, Long userId);
 }

@@ -190,6 +190,17 @@ public class DefaultJwtFacade implements JwtFacade {
 		);
 	}
 
+	@Override
+	public void logout(HttpServletResponse response, Long userId) {
+		tokenService.delete(userId);
+
+		Cookie cookie = new Cookie(REFRESH_PREFIX.getValue(), null);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+
+		response.addCookie(cookie);
+	}
+
 	private String extractUserPK(String accessToken) {
 		return Jwts.parserBuilder()
 			.setSigningKey(ACCESS_SECRET_KEY)

@@ -29,7 +29,7 @@ public class TokenRepository {
 	}
 
 	public Token save(Token token) {
-		String key = "refresh_token:" + token.getUserId();
+		String key = KEY_PREFIX + token.getUserId();
 
 		Map<String, String> map = new HashMap<>();
 		map.put("userId", String.valueOf(token.getUserId()));
@@ -40,5 +40,10 @@ public class TokenRepository {
 		redisTemplate.expire(key, token.getTtl(), TimeUnit.SECONDS);
 
 		return token;
+	}
+
+	public void delete(Long userId) {
+		String key = KEY_PREFIX + userId;
+		redisTemplate.delete(key);
 	}
 }

@@ -60,4 +60,8 @@ public class TokenService {
 		Token storedToken = findByUserId(userId);
 		return !storedToken.getToken().equals(token);
 	}
+
+	public void delete(Long userId) {
+		tokenRepository.delete(userId);
+	}
 }
