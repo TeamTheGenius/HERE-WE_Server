@@ -77,7 +77,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		String accessToken = ACCESS_PREFIX.getValue() + token;
 
 		response.setHeader(ACCESS_HEADER.getValue(), accessToken);
-		response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "False");
+		response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "false");
 
 		return accessToken;
 	}
@@ -114,7 +114,7 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public void setReissuedHeader(HttpServletResponse response) {
-		response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "True");
+		response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "true");
 	}
 
 	@Override

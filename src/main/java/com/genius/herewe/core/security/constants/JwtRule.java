@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum JwtRule {
 	ACCESS_HEADER("Authorization"),
 	ACCESS_PREFIX("Bearer "),
-	ACCESS_REISSUED_HEADER("token-reissued"),
+	ACCESS_REISSUED_HEADER("X-Token-Reissued"),
 
 	REFRESH_PREFIX("refresh"),
 

@@ -10,8 +10,10 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsUtils;
 
+import com.genius.herewe.core.security.constants.JwtRule;
 import com.genius.herewe.core.security.filter.AuthenticationExceptionFilter;
 import com.genius.herewe.core.security.filter.JwtAuthenticationFilter;
 import com.genius.herewe.core.security.handler.OAuth2FailureHandler;
@@ -44,6 +46,9 @@ public class SecurityConfig {
 			.csrf(CsrfConfigurer::disable)
 			.httpBasic(HttpBasicConfigurer::disable)
 			.formLogin(FormLoginConfigurer::disable)
+			.headers(headers -> headers
+				.addHeaderWriter(new StaticHeadersWriter(JwtRule.ACCESS_REISSUED_HEADER.getValue(), "false"))
+			)
 
 			//권한 설정
 			.authorizeHttpRequests(request -> request
