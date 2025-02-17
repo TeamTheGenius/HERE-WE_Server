@@ -1,6 +1,6 @@
 package com.genius.herewe.core.security.config;
 
-import jakarta.servlet.http.HttpServletRequest;
+import static com.genius.herewe.core.security.constants.JwtRule.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration
 @Component
@@ -29,8 +31,8 @@ public class CustomCorsConfiguration implements CorsConfigurationSource {
 		config.setAllowCredentials(true);
 		config.setAllowedHeaders(Collections.singletonList("*"));
 
-		//        config.setExposedHeaders(Collections.singletonList(ACCESS_HEADER.getValue()));
-		//        config.addExposedHeader(ACCESS_REISSUED_HEADER.getValue());
+		config.setExposedHeaders(Collections.singletonList(ACCESS_HEADER.getValue()));
+		config.addExposedHeader(ACCESS_REISSUED_HEADER.getValue());
 
 		config.setMaxAge(3600L);
 		return config;

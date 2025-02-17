@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.security.dto.AuthResponse;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.dto.SignupRequest;
@@ -24,6 +25,11 @@ import lombok.RequiredArgsConstructor;
 public class DefaultUserFacade implements UserFacade {
 	private final UserService userService;
 	private final FilesManager filesManager;
+
+	@Override
+	public User findUser(Long userId) {
+		return userService.findById(userId);
+	}
 
 	@Override
 	public void isNicknameDuplicated(String nickname) {
@@ -49,5 +55,13 @@ public class DefaultUserFacade implements UserFacade {
 
 		FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
 		return new SignupResponse(user.getId(), user.getNickname(), fileResponse);
+	}
+
+	@Override
+	public AuthResponse getAuthInfo(Long userId) {
+		User user = userService.findById(userId);
+		FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
+
+		return new AuthResponse(user.getId(), user.getNickname(), fileResponse);
 	}
 }
