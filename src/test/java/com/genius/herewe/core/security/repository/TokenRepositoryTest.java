@@ -36,7 +36,7 @@ public class TokenRepositoryTest {
 
 	@Nested
 	@DisplayName("저장되어 있는 Token 엔티티에 대해")
-	class Describe_saved_token {
+	class Context_saved_token {
 		Token token = TokenFixture.createDefault();
 
 		@BeforeEach
@@ -46,7 +46,7 @@ public class TokenRepositoryTest {
 
 		@Nested
 		@DisplayName("userId를 통해 Token 조회를 시도할 때")
-		class Context_try_find_token {
+		class Describe_try_find_token {
 			@Test
 			@DisplayName("token이 존재하지 않는다면 Optional.empty()를 반환한다.")
 			public void it_return_empty_entity() {
@@ -69,7 +69,7 @@ public class TokenRepositoryTest {
 
 		@Nested
 		@DisplayName("delete() 메서드를 통해 삭제를 시도할 때")
-		class Context_try_delete_token {
+		class Describe_try_delete_token {
 			@Test
 			@DisplayName("userId에 해당하는 Key가 있다면 삭제가 완료된다.")
 			public void it_delete_successfully() {

@@ -18,9 +18,9 @@ public class TokenFixture {
 			.build();
 	}
 
-	public static Token createWithNickname(String nickname) {
+	public static Token createWithToken(String token) {
 		return builder()
-			.nickname(nickname)
+			.token(token)
 			.build();
 	}
 
