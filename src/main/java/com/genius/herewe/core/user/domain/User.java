@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.genius.herewe.business.crew.domain.CrewMember;
+import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.infra.file.domain.FileHolder;
 import com.genius.herewe.infra.file.domain.Files;
-import com.genius.herewe.business.moment.domain.MomentMember;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -61,7 +61,8 @@ public class User implements FileHolder {
 	private String nickname;
 
 	@Builder
-	public User(ProviderInfo providerInfo, Role role, String email, String nickname) {
+	public User(Long id, ProviderInfo providerInfo, Role role, String email, String nickname) {
+		this.id = id;
 		this.providerInfo = providerInfo;
 		this.role = role;
 		this.email = email;
