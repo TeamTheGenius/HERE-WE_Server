@@ -38,7 +38,7 @@ public class TokenService {
 			.orElseThrow(() -> new BusinessException(REFRESH_NOT_FOUND_IN_DB));
 	}
 
-	public void updateRefreshToken(Long userId, String newToken) {
+	public Token updateRefreshToken(Long userId, String newToken) {
 		Optional<Token> existingToken = tokenRepository.findById(userId);
 
 		if (existingToken.isPresent()) {
@@ -50,7 +50,7 @@ public class TokenService {
 				.ttl(TTL)
 				.build();
 
-			tokenRepository.save(updatedToken);
+			return tokenRepository.save(updatedToken);
 		} else {
 			throw new BusinessException(REFRESH_NOT_FOUND_IN_DB);
 		}

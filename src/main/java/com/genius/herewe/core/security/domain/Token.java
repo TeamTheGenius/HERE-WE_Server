@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RedisHash(value = "token")
+@RedisHash(value = "refresh_token")
 public class Token {
 	@Id
 	private Long userId;
