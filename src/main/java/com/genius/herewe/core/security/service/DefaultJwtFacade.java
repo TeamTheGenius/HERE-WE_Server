@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.security.util.JwtUtil;
+import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
@@ -60,6 +61,13 @@ public class DefaultJwtFacade implements JwtFacade {
 		this.REFRESH_SECRET_KEY = JwtUtil.getSigningKey(REFRESH_SECRET_KEY);
 		this.ACCESS_EXPIRATION = ACCESS_EXPIRATION;
 		this.REFRESH_EXPIRATION = REFRESH_EXPIRATION;
+	}
+
+	@Override
+	public void verifyIssueCondition(User user) {
+		if (user.getRole() == Role.NOT_REGISTERED) {
+			throw new BusinessException(UNAUTHORIZED_ISSUE);
+		}
 	}
 
 	@Override

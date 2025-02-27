@@ -28,6 +28,7 @@ public class AuthController implements AuthApi {
 		@RequestBody AuthRequest authRequest) {
 
 		User user = userFacade.findUser(authRequest.userId());
+		jwtFacade.verifyIssueCondition(user);
 
 		jwtFacade.generateAccessToken(response, user);
 		jwtFacade.generateRefreshToken(response, user);

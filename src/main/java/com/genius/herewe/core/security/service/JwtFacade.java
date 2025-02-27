@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface JwtFacade {
+	void verifyIssueCondition(User user);
+
 	String generateAccessToken(HttpServletResponse response, User user);
 
 	String generateRefreshToken(HttpServletResponse response, User user);
