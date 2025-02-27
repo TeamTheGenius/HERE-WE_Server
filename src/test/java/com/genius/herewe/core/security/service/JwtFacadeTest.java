@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,6 +19,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
+import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.fixture.UserFixture;
 import com.genius.herewe.core.user.service.UserService;
@@ -57,6 +60,33 @@ class JwtFacadeTest {
 	@Nested
 	@DisplayName("access-token 생성 시")
 	class Context_create_access_token {
+		@Nested
+		@DisplayName("사용자의 ROLE 확인 시")
+		class Describe_check_user_role {
+			@Test
+			@DisplayName("NOT_REGISTERED라면 UNAUTHORIZED_ISSUE 예외가 발생해야 한다.")
+			public void it_throws_UNAUTHORIZED_ISSUE_exception_when_NOT_REGISTERED() {
+				//given
+				User notRegistered = UserFixture.createByRole(Role.NOT_REGISTERED);
+
+				//when & then
+				assertThatThrownBy(() -> jwtFacade.verifyIssueCondition(notRegistered))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(UNAUTHORIZED_ISSUE.getMessage());
+			}
+
+			@ParameterizedTest
+			@DisplayName("USER 또는 ADMIN인 경우 예외가 발생하지 않는다.")
+			@EnumSource(names = {"USER", "ADMIN"})
+			public void it_does_not_throw_exception(Role role) {
+				//given
+				User user = UserFixture.createByRole(role);
+
+				//when & then
+				assertThatNoException()
+					.isThrownBy(() -> jwtFacade.verifyIssueCondition(user));
+			}
+		}
 
 		@Nested
 		@DisplayName("사용자 정보를 전달하면")
@@ -81,6 +111,34 @@ class JwtFacadeTest {
 	@Nested
 	@DisplayName("refresh-token 생성 시")
 	class Context_create_refresh_token {
+		@Nested
+		@DisplayName("사용자의 ROLE 확인 시")
+		class Describe_check_user_role {
+			@Test
+			@DisplayName("NOT_REGISTERED라면 UNAUTHORIZED_ISSUE 예외가 발생해야 한다.")
+			public void it_throws_UNAUTHORIZED_ISSUE_exception_when_NOT_REGISTERED() {
+				//given
+				User notRegistered = UserFixture.createByRole(Role.NOT_REGISTERED);
+
+				//when & then
+				assertThatThrownBy(() -> jwtFacade.verifyIssueCondition(notRegistered))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(UNAUTHORIZED_ISSUE.getMessage());
+			}
+
+			@ParameterizedTest
+			@DisplayName("USER 또는 ADMIN인 경우 예외가 발생하지 않는다.")
+			@EnumSource(names = {"USER", "ADMIN"})
+			public void it_does_not_throw_exception(Role role) {
+				//given
+				User user = UserFixture.createByRole(role);
+
+				//when & then
+				assertThatNoException()
+					.isThrownBy(() -> jwtFacade.verifyIssueCondition(user));
+			}
+		}
+		
 		@Nested
 		@DisplayName("사용자 정보를 전달하면")
 		class Describe_pass_user_info {

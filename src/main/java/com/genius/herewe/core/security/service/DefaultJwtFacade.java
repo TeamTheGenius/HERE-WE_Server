@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
 import com.genius.herewe.core.security.util.JwtUtil;
+import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
@@ -63,7 +64,16 @@ public class DefaultJwtFacade implements JwtFacade {
 	}
 
 	@Override
+	public void verifyIssueCondition(User user) {
+		if (user.getRole() == Role.NOT_REGISTERED) {
+			throw new BusinessException(UNAUTHORIZED_ISSUE);
+		}
+	}
+
+	@Override
 	public String generateAccessToken(HttpServletResponse response, User user) {
+		verifyIssueCondition(user);
+
 		Long now = System.currentTimeMillis();
 		String token = Jwts.builder()
 			.setHeader(JwtUtil.createHeader())
@@ -84,6 +94,8 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public String generateRefreshToken(HttpServletResponse response, User user) {
+		verifyIssueCondition(user);
+
 		Long now = System.currentTimeMillis();
 		String refreshToken = Jwts.builder()
 			.setHeader(JwtUtil.createHeader())
