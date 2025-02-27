@@ -72,6 +72,8 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public String generateAccessToken(HttpServletResponse response, User user) {
+		verifyIssueCondition(user);
+
 		Long now = System.currentTimeMillis();
 		String token = Jwts.builder()
 			.setHeader(JwtUtil.createHeader())
@@ -92,6 +94,8 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public String generateRefreshToken(HttpServletResponse response, User user) {
+		verifyIssueCondition(user);
+
 		Long now = System.currentTimeMillis();
 		String refreshToken = Jwts.builder()
 			.setHeader(JwtUtil.createHeader())
