@@ -46,4 +46,16 @@ public class CrewMember {
 		this.role = role;
 		this.joinedAt = joinedAt;
 	}
+
+	//== 연관관계 편의 메서드 ==//
+	public void joinCrew(User user, Crew crew) {
+		this.user = user;
+		this.crew = crew;
+		if (!user.getCrewMembers().contains(this)) {
+			user.getCrewMembers().add(this);
+		}
+		if (!crew.getCrewMembers().contains(this)) {
+			crew.getCrewMembers().add(this);
+		}
+	}
 }
