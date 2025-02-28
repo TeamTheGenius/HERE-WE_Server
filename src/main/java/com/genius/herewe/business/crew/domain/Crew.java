@@ -6,10 +6,10 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.business.chat.domain.ChatRoom;
-import com.genius.herewe.infra.file.domain.FileHolder;
-import com.genius.herewe.infra.file.domain.Files;
 import com.genius.herewe.business.notice.domain.Notice;
 import com.genius.herewe.core.global.domain.BaseTimeEntity;
+import com.genius.herewe.infra.file.domain.FileHolder;
+import com.genius.herewe.infra.file.domain.Files;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -81,5 +81,12 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 	@Override
 	public void setFiles(Files files) {
 		this.files = files;
+	}
+
+	public void modify(String name, String introduce) {
+		if (name != null)
+			this.name = name;
+		if (introduce != null)
+			this.introduce = introduce;
 	}
 }

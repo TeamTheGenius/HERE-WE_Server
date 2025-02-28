@@ -9,9 +9,12 @@ import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.crew.domain.CrewMember;
 import com.genius.herewe.business.crew.domain.CrewRole;
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
-import com.genius.herewe.business.crew.dto.CrewCreateResponse;
+import com.genius.herewe.business.crew.dto.CrewModifyRequest;
+import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
+import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.global.exception.ErrorCode;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
@@ -27,7 +30,7 @@ public class DefaultCrewFacade implements CrewFacade {
 
 	@Override
 	@Transactional
-	public CrewCreateResponse createCrew(Long userId, CrewCreateRequest request) {
+	public CrewResponse createCrew(Long userId, CrewCreateRequest request) {
 		User user = userService.findById(userId);
 		Crew crew = Crew.builder()
 			.leaderName(user.getNickname())
@@ -45,6 +48,20 @@ public class DefaultCrewFacade implements CrewFacade {
 		Crew savedCrew = crewService.save(crew);
 		crewMemberService.save(crewMember);
 
-		return new CrewCreateResponse(savedCrew.getId());
+		return CrewResponse.create(savedCrew);
+	}
+
+	@Override
+	@Transactional
+	public CrewResponse modifyCrew(Long userId, CrewModifyRequest request) {
+		Crew crew = crewService.findById(request.crewId());
+		CrewMember crewMember = crewMemberService.find(userId, crew.getId());
+
+		if (crewMember.getRole() != CrewRole.LEADER) {
+			throw new BusinessException(ErrorCode.ONLY_LEADER_OPERATION);
+		}
+
+		crew.modify(request.name(), request.introduce());
+		return CrewResponse.create(crew);
 	}
 }
