@@ -10,6 +10,6 @@ import com.genius.herewe.business.crew.domain.CrewMember;
 
 public interface CrewMemberRepository extends JpaRepository<CrewMember, Long> {
 
-	@Query("select cm from CrewMember cm where cm.userId = :userId and cm.crewId = :crewId")
+	@Query("SELECT cm FROM CrewMember cm WHERE cm.user.id = :userId AND cm.crew.id = :crewId")
 	Optional<CrewMember> find(@Param("userId") Long userId, @Param("crewId") Long crewId);
 }

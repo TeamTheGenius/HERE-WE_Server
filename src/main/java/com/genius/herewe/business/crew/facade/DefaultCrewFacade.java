@@ -1,6 +1,8 @@
 package com.genius.herewe.business.crew.facade;
 
-import java.time.LocalDate;
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,10 +41,7 @@ public class DefaultCrewFacade implements CrewFacade {
 			.participantCount(1)
 			.build();
 
-		CrewMember crewMember = CrewMember.builder()
-			.role(CrewRole.LEADER)
-			.joinedAt(LocalDate.now())
-			.build();
+		CrewMember crewMember = CrewMember.createByRole(CrewRole.LEADER);
 		crewMember.joinCrew(user, crew);
 
 		Crew savedCrew = crewService.save(crew);
@@ -53,8 +52,8 @@ public class DefaultCrewFacade implements CrewFacade {
 
 	@Override
 	@Transactional
-	public CrewResponse modifyCrew(Long userId, CrewModifyRequest request) {
-		Crew crew = crewService.findById(request.crewId());
+	public CrewResponse modifyCrew(Long userId, Long crewId, CrewModifyRequest request) {
+		Crew crew = crewService.findById(crewId);
 		CrewMember crewMember = crewMemberService.find(userId, crew.getId());
 
 		if (crewMember.getRole() != CrewRole.LEADER) {
@@ -63,5 +62,22 @@ public class DefaultCrewFacade implements CrewFacade {
 
 		crew.modify(request.name(), request.introduce());
 		return CrewResponse.create(crew);
+	}
+
+	@Override
+	@Transactional
+	public void joinCrew(Long userId, Long crewId) {
+		User user = userService.findById(userId);
+		Crew crew = crewService.findById(crewId);
+
+		Optional<CrewMember> optionalCrewMember = crewMemberService.findOptional(userId, crewId);
+		if (optionalCrewMember.isPresent()) {
+			throw new BusinessException(ALREADY_JOINED_CREW);
+		}
+
+		CrewMember crewMember = CrewMember.createByRole(CrewRole.MEMBER);
+		crewMember.joinCrew(user, crew);
+
+		crewMemberService.save(crewMember);
 	}
 }

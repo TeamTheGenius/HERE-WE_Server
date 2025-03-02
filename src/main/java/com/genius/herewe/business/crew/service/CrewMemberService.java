@@ -2,6 +2,8 @@ package com.genius.herewe.business.crew.service;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,5 +27,9 @@ public class CrewMemberService {
 	public CrewMember find(Long userId, Long crewId) {
 		return crewMemberRepository.find(userId, crewId)
 			.orElseThrow(() -> new BusinessException(CREW_JOIN_INFO_NOT_FOUND));
+	}
+
+	public Optional<CrewMember> findOptional(Long userId, Long crewId) {
+		return crewMemberRepository.find(userId, crewId);
 	}
 }

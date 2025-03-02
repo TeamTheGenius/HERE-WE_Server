@@ -16,6 +16,7 @@ public enum ErrorCode {
 	ONLY_LEADER_OPERATION(HttpStatus.FORBIDDEN, "CREW LEADER만 할 수 있는 행동입니다."),
 
 	CREW_JOIN_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 크루에 대한 참여 정보가 없습니다."),
+	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),
 
 	UNAUTHORIZED_ISSUE(HttpStatus.UNAUTHORIZED, "회원가입이 되어 있지 않은 사용자의 경우 JWT를 발급할 수 없습니다."),
 	JWT_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),

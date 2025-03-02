@@ -47,6 +47,10 @@ public class CrewMember {
 		this.joinedAt = joinedAt;
 	}
 
+	public static CrewMember createByRole(CrewRole role) {
+		return new CrewMember(role, LocalDate.now());
+	}
+
 	//== 연관관계 편의 메서드 ==//
 	public void joinCrew(User user, Crew crew) {
 		this.user = user;
