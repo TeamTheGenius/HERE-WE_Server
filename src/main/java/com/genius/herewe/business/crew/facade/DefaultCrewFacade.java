@@ -12,6 +12,7 @@ import com.genius.herewe.business.crew.domain.CrewMember;
 import com.genius.herewe.business.crew.domain.CrewRole;
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
+import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
@@ -31,8 +32,21 @@ public class DefaultCrewFacade implements CrewFacade {
 	private final CrewMemberService crewMemberService;
 
 	@Override
+	public CrewResponse inquiryCrew(Long userId, Long crewId) {
+		Crew crew = crewService.findById(crewId);
+		CrewMember crewMember = crewMemberService.find(userId, crewId);
+
+		return CrewResponse.create(crew, crewMember.getRole());
+	}
+
+	// @Override
+	// public Page<CrewMemberResponse> inquiryMembers(Long crewId) {
+	// 	return null;
+	// }
+
+	@Override
 	@Transactional
-	public CrewResponse createCrew(Long userId, CrewCreateRequest request) {
+	public CrewPreviewResponse createCrew(Long userId, CrewCreateRequest request) {
 		User user = userService.findById(userId);
 		Crew crew = Crew.builder()
 			.leaderName(user.getNickname())
@@ -47,12 +61,12 @@ public class DefaultCrewFacade implements CrewFacade {
 		Crew savedCrew = crewService.save(crew);
 		crewMemberService.save(crewMember);
 
-		return CrewResponse.create(savedCrew);
+		return CrewPreviewResponse.create(savedCrew);
 	}
 
 	@Override
 	@Transactional
-	public CrewResponse modifyCrew(Long userId, Long crewId, CrewModifyRequest request) {
+	public CrewPreviewResponse modifyCrew(Long userId, Long crewId, CrewModifyRequest request) {
 		Crew crew = crewService.findById(crewId);
 		CrewMember crewMember = crewMemberService.find(userId, crew.getId());
 
@@ -61,7 +75,7 @@ public class DefaultCrewFacade implements CrewFacade {
 		}
 
 		crew.modify(request.name(), request.introduce());
-		return CrewResponse.create(crew);
+		return CrewPreviewResponse.create(crew);
 	}
 
 	@Override
