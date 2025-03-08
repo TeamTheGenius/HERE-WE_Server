@@ -4,6 +4,8 @@ import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +33,9 @@ public class CrewMemberService {
 
 	public Optional<CrewMember> findOptional(Long userId, Long crewId) {
 		return crewMemberRepository.find(userId, crewId);
+	}
+
+	public Page<CrewMember> findAllByCrewId(Long crewId, Pageable pageable) {
+		return crewMemberRepository.findAllByCrewId(crewId, pageable);
 	}
 }

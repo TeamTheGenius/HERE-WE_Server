@@ -1,5 +1,8 @@
 package com.genius.herewe.business.crew.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -10,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.facade.CrewFacade;
 import com.genius.herewe.core.global.response.CommonResponse;
+import com.genius.herewe.core.global.response.PagingResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
 import com.genius.herewe.core.user.domain.User;
@@ -34,11 +39,15 @@ public class CrewController {
 		return new SingleResponse<>(HttpStatus.OK, crewResponse);
 	}
 
-	// @GetMapping("/{crewId}/members")
-	// public PagingResponse<CrewMemberResponse> getMemberInfo(@PathVariable Long crewId) {
-	//
-	// 	return new PagingResponse<>(HttpStatus.OK, );
-	// }
+	@GetMapping("/{crewId}/members")
+	public PagingResponse<CrewMemberResponse> getMemberInfo(
+		@PathVariable Long crewId,
+		@PageableDefault(size = 10, page = 0) Pageable pageable) {
+
+		Page<CrewMemberResponse> crewMemberResponses = crewFacade.inquiryMembers(crewId, pageable);
+
+		return new PagingResponse<>(HttpStatus.OK, crewMemberResponses);
+	}
 
 	@PostMapping
 	public SingleResponse<CrewPreviewResponse> createCrew(

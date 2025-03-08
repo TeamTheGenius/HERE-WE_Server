@@ -4,6 +4,8 @@ import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,7 @@ import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.crew.domain.CrewMember;
 import com.genius.herewe.business.crew.domain.CrewRole;
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
@@ -39,10 +42,12 @@ public class DefaultCrewFacade implements CrewFacade {
 		return CrewResponse.create(crew, crewMember.getRole());
 	}
 
-	// @Override
-	// public Page<CrewMemberResponse> inquiryMembers(Long crewId) {
-	// 	return null;
-	// }
+	@Override
+	public Page<CrewMemberResponse> inquiryMembers(Long crewId, Pageable pageable) {
+		Page<CrewMember> crewMembers = crewMemberService.findAllByCrewId(crewId, pageable);
+
+		return crewMembers.map(CrewMemberResponse::create);
+	}
 
 	@Override
 	@Transactional
