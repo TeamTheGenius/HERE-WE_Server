@@ -24,6 +24,7 @@ import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
 import com.genius.herewe.core.user.domain.User;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -52,7 +53,7 @@ public class CrewController {
 	@PostMapping
 	public SingleResponse<CrewPreviewResponse> createCrew(
 		@HereWeUser User user,
-		@RequestBody CrewCreateRequest crewCreateRequest) {
+		@Valid @RequestBody CrewCreateRequest crewCreateRequest) {
 
 		CrewPreviewResponse response = crewFacade.createCrew(user.getId(), crewCreateRequest);
 
@@ -67,7 +68,7 @@ public class CrewController {
 
 		CrewPreviewResponse response = crewFacade.modifyCrew(user.getId(), crewId, crewModifyRequest);
 
-		return new SingleResponse<>(HttpStatus.CREATED, response);
+		return new SingleResponse<>(HttpStatus.OK, response);
 	}
 
 	@PostMapping("/{crewId}/members")

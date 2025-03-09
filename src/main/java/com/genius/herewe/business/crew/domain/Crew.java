@@ -52,7 +52,7 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 	@Column(nullable = false)
 	private String leaderName;
 
-	@Column(unique = true, length = 20)
+	@Column(nullable = false, length = 20)
 	private String name;
 
 	@Column(columnDefinition = "TEXT", length = 1000)
