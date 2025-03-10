@@ -76,7 +76,7 @@ public class DefaultCrewFacade implements CrewFacade {
 		CrewMember crewMember = crewMemberService.find(userId, crew.getId());
 
 		if (crewMember.getRole() != CrewRole.LEADER) {
-			throw new BusinessException(ErrorCode.ONLY_LEADER_OPERATION);
+			throw new BusinessException(ErrorCode.LEADER_PERMISSION_DENIED);
 		}
 
 		crew.modify(request.name(), request.introduce());

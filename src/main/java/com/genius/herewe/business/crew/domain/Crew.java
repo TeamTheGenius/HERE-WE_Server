@@ -62,7 +62,8 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 	private int participantCount;
 
 	@Builder
-	public Crew(String leaderName, String name, String introduce, int participantCount) {
+	public Crew(Long id, String leaderName, String name, String introduce, int participantCount) {
+		this.id = id;
 		this.leaderName = leaderName;
 		this.name = name;
 		this.introduce = introduce;
