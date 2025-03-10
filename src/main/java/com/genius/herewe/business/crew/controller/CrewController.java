@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/crew")
 @RequiredArgsConstructor
-public class CrewController {
+public class CrewController implements CrewApi {
 	private final CrewFacade crewFacade;
 
 	@GetMapping("/{crewId}")
