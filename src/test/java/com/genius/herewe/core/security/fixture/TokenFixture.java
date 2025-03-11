@@ -1,26 +1,32 @@
 package com.genius.herewe.core.security.fixture;
 
 import com.genius.herewe.core.security.domain.Token;
+import com.genius.herewe.core.security.domain.TokenType;
 
 public class TokenFixture {
-	public static Token createDefault() {
+	public static Token createRefreshToken() {
 		return builder()
 			.userId(1L)
 			.nickname("nickname")
 			.token("token")
+			.tokenType(TokenType.REFRESH_TOKEN)
 			.ttl(3600)
 			.build();
 	}
 
-	public static Token createWithUserId(Long userId) {
+	public static Token createRefreshWithUserId(Long userId) {
 		return builder()
 			.userId(userId)
 			.build();
 	}
 
-	public static Token createWithToken(String token) {
+	public static Token createRegToken() {
 		return builder()
-			.token(token)
+			.userId(1L)
+			.nickname("nickname")
+			.token("registration token")
+			.tokenType(TokenType.REGISTRATION_TOKEN)
+			.ttl(1800)
 			.build();
 	}
 
@@ -32,6 +38,7 @@ public class TokenFixture {
 		private Long userId = 1L;
 		private String nickname = "nickname";
 		private String token = "token";
+		private TokenType tokenType = TokenType.REFRESH_TOKEN;
 		private long ttl = 3600;
 
 		public TokenBuilder userId(Long userId) {
@@ -49,6 +56,11 @@ public class TokenFixture {
 			return this;
 		}
 
+		public TokenBuilder tokenType(TokenType tokenType) {
+			this.tokenType = tokenType;
+			return this;
+		}
+
 		public TokenBuilder ttl(long ttl) {
 			this.ttl = ttl;
 			return this;
@@ -59,6 +71,7 @@ public class TokenFixture {
 				.userId(userId)
 				.nickname(nickname)
 				.token(token)
+				.tokenType(tokenType)
 				.ttl(ttl)
 				.build();
 		}

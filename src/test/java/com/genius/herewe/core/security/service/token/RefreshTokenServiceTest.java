@@ -1,4 +1,4 @@
-package com.genius.herewe.core.security.service;
+package com.genius.herewe.core.security.service.token;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
@@ -19,7 +19,6 @@ import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.domain.Token;
 import com.genius.herewe.core.security.fixture.TokenFixture;
 import com.genius.herewe.core.security.repository.TokenRepository;
-import com.genius.herewe.core.security.service.token.RefreshTokenService;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceTest {
@@ -61,8 +60,8 @@ class RefreshTokenServiceTest {
 	}
 
 	@Nested
-	@DisplayName("token 조회 시도 시")
-	class Context_token_already_saved {
+	@DisplayName("refresh token 조회 시도 시")
+	class Context_try_inquiry_refresh_token {
 		@Nested
 		@DisplayName("userId를 전달했을 때")
 		class Describe_pass_userId {
@@ -70,7 +69,7 @@ class RefreshTokenServiceTest {
 			@DisplayName("userId가 존재한다면 Token을 반환한다.")
 			public void it_returns_token() {
 				// given
-				Token token = TokenFixture.createDefault();
+				Token token = TokenFixture.createRefreshToken();
 				given(tokenRepository.findRefreshToken(token.getUserId()))
 					.willReturn(Optional.of(token));
 
@@ -124,7 +123,7 @@ class RefreshTokenServiceTest {
 			public void it_changes_token() {
 				// given
 				Long userId = 1L;
-				Token token = TokenFixture.createWithUserId(userId);
+				Token token = TokenFixture.createRefreshWithUserId(userId);
 
 				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.of(token));
 				given(tokenRepository.saveRefreshToken(any(Token.class)))
@@ -156,7 +155,7 @@ class RefreshTokenServiceTest {
 			@Test
 			@DisplayName("userId가 존재한다면 Token을 반환한다.")
 			public void it_returns_token() {
-				Token token = TokenFixture.createDefault();
+				Token token = TokenFixture.createRefreshToken();
 				given(tokenRepository.findRefreshToken(token.getUserId()))
 					.willReturn(Optional.of(token));
 
@@ -207,7 +206,7 @@ class RefreshTokenServiceTest {
 			public void it_return_true_when_not_same() {
 				//given
 				Long userId = 1L;
-				Token token = TokenFixture.createWithUserId(userId);
+				Token token = TokenFixture.createRefreshWithUserId(userId);
 				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.ofNullable(token));
 
 				//when
