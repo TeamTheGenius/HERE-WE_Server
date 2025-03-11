@@ -19,20 +19,21 @@ import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.domain.Token;
 import com.genius.herewe.core.security.fixture.TokenFixture;
 import com.genius.herewe.core.security.repository.TokenRepository;
+import com.genius.herewe.core.security.service.token.RefreshTokenService;
 
 @ExtendWith(MockitoExtension.class)
-class TokenServiceTest {
+class RefreshTokenServiceTest {
 	@Mock
 	private TokenRepository tokenRepository;
 
-	private TokenService tokenService;
+	private RefreshTokenService refreshTokenService;
 
 	@Value("${jwt.expiration.refresh}")
 	private long TTL;
 
 	@BeforeEach
 	void init() {
-		tokenService = new TokenService(tokenRepository, TTL);
+		refreshTokenService = new RefreshTokenService(tokenRepository, TTL);
 	}
 
 	@Nested
@@ -48,7 +49,7 @@ class TokenServiceTest {
 			@Test
 			@DisplayName("성공적으로 저장할 수 있다.")
 			public void it_can_save_successfully() {
-				tokenService.saveRefreshToken(userId, nickname, token);
+				refreshTokenService.generateToken(userId, nickname, token);
 
 				verify(tokenRepository, times(1)).saveRefreshToken(argThat(savedToken ->
 					savedToken.getUserId().equals(userId) &&
@@ -74,7 +75,7 @@ class TokenServiceTest {
 					.willReturn(Optional.of(token));
 
 				// when
-				Token foundToken = tokenService.findByUserId(token.getUserId());
+				Token foundToken = refreshTokenService.findByKey(token.getUserId());
 
 				// then
 				assertThat(foundToken).isNotNull();
@@ -90,7 +91,7 @@ class TokenServiceTest {
 					.willReturn(Optional.empty());
 
 				// when & then
-				assertThatThrownBy(() -> tokenService.findByUserId(nonExistId))
+				assertThatThrownBy(() -> refreshTokenService.findByKey(nonExistId))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(REFRESH_NOT_FOUND_IN_DB.getMessage());
 			}
@@ -113,7 +114,7 @@ class TokenServiceTest {
 				given(tokenRepository.findRefreshToken(nonExistId)).willReturn(Optional.empty());
 
 				// when & then
-				assertThatThrownBy(() -> tokenService.updateRefreshToken(nonExistId, newToken))
+				assertThatThrownBy(() -> refreshTokenService.updateRefreshToken(nonExistId, newToken))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(REFRESH_NOT_FOUND_IN_DB.getMessage());
 			}
@@ -130,7 +131,7 @@ class TokenServiceTest {
 					.willAnswer(invocation -> invocation.getArgument(0));
 
 				// when
-				Token updatedToken = tokenService.updateRefreshToken(userId, newToken);
+				Token updatedToken = refreshTokenService.updateRefreshToken(userId, newToken);
 
 				// then
 				assertThat(updatedToken.getUserId()).isEqualTo(userId);
@@ -159,7 +160,7 @@ class TokenServiceTest {
 				given(tokenRepository.findRefreshToken(token.getUserId()))
 					.willReturn(Optional.of(token));
 
-				Token foundToken = tokenService.findByUserId(token.getUserId());
+				Token foundToken = refreshTokenService.findByKey(token.getUserId());
 
 				assertThat(foundToken).isNotNull();
 				assertThat(foundToken.getUserId()).isEqualTo(token.getUserId());
@@ -172,7 +173,7 @@ class TokenServiceTest {
 				given(tokenRepository.findRefreshToken(nonExistId))
 					.willReturn(Optional.empty());
 
-				assertThatThrownBy(() -> tokenService.findByUserId(nonExistId))
+				assertThatThrownBy(() -> refreshTokenService.findByKey(nonExistId))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(REFRESH_NOT_FOUND_IN_DB.getMessage());
 			}
@@ -195,7 +196,7 @@ class TokenServiceTest {
 				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.ofNullable(token));
 
 				//when
-				boolean isHijacked = tokenService.isRefreshHijacked(userId, targetToken);
+				boolean isHijacked = refreshTokenService.isRefreshHijacked(userId, targetToken);
 
 				//then
 				assertThat(isHijacked).isFalse();
@@ -210,7 +211,7 @@ class TokenServiceTest {
 				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.ofNullable(token));
 
 				//when
-				boolean isHijacked = tokenService.isRefreshHijacked(userId, targetToken);
+				boolean isHijacked = refreshTokenService.isRefreshHijacked(userId, targetToken);
 
 				//then
 				assertThat(isHijacked).isTrue();
