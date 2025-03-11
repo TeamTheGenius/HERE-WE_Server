@@ -50,7 +50,7 @@ class TokenServiceTest {
 			public void it_can_save_successfully() {
 				tokenService.saveRefreshToken(userId, nickname, token);
 
-				verify(tokenRepository, times(1)).save(argThat(savedToken ->
+				verify(tokenRepository, times(1)).saveRefreshToken(argThat(savedToken ->
 					savedToken.getUserId().equals(userId) &&
 						savedToken.getNickname().equals(nickname) &&
 						savedToken.getToken().equals(token)
@@ -70,7 +70,7 @@ class TokenServiceTest {
 			public void it_returns_token() {
 				// given
 				Token token = TokenFixture.createDefault();
-				given(tokenRepository.findById(token.getUserId()))
+				given(tokenRepository.findRefreshToken(token.getUserId()))
 					.willReturn(Optional.of(token));
 
 				// when
@@ -86,7 +86,7 @@ class TokenServiceTest {
 			public void it_throws_REFRESH_NOT_FOUND_IN_DB_exception() {
 				// given
 				Long nonExistId = 999L;
-				given(tokenRepository.findById(nonExistId))
+				given(tokenRepository.findRefreshToken(nonExistId))
 					.willReturn(Optional.empty());
 
 				// when & then
@@ -110,7 +110,7 @@ class TokenServiceTest {
 			public void it_throws_REFRESH_NOT_FOUND_IN_DB_exception() {
 				// given
 				Long nonExistId = 999L;
-				given(tokenRepository.findById(nonExistId)).willReturn(Optional.empty());
+				given(tokenRepository.findRefreshToken(nonExistId)).willReturn(Optional.empty());
 
 				// when & then
 				assertThatThrownBy(() -> tokenService.updateRefreshToken(nonExistId, newToken))
@@ -125,8 +125,8 @@ class TokenServiceTest {
 				Long userId = 1L;
 				Token token = TokenFixture.createWithUserId(userId);
 
-				given(tokenRepository.findById(userId)).willReturn(Optional.of(token));
-				given(tokenRepository.save(any(Token.class)))
+				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.of(token));
+				given(tokenRepository.saveRefreshToken(any(Token.class)))
 					.willAnswer(invocation -> invocation.getArgument(0));
 
 				// when
@@ -138,7 +138,7 @@ class TokenServiceTest {
 				assertThat(updatedToken.getTtl()).isEqualTo(TTL);
 				assertThat(updatedToken.getToken()).isEqualTo(newToken);
 
-				verify(tokenRepository).save(argThat(target ->
+				verify(tokenRepository).saveRefreshToken(argThat(target ->
 					target.getUserId().equals(userId) &&
 						target.getToken().equals(newToken)
 				));
@@ -156,7 +156,7 @@ class TokenServiceTest {
 			@DisplayName("userId가 존재한다면 Token을 반환한다.")
 			public void it_returns_token() {
 				Token token = TokenFixture.createDefault();
-				given(tokenRepository.findById(token.getUserId()))
+				given(tokenRepository.findRefreshToken(token.getUserId()))
 					.willReturn(Optional.of(token));
 
 				Token foundToken = tokenService.findByUserId(token.getUserId());
@@ -169,7 +169,7 @@ class TokenServiceTest {
 			@DisplayName("존재하지 않는 userId로 조회하면 REFRESH_NOT_FOUND_IN_DB 예외를 발생한다.")
 			public void it_throws_REFRESH_NOT_FOUND_IN_DB_exception() {
 				Long nonExistId = 999L;
-				given(tokenRepository.findById(nonExistId))
+				given(tokenRepository.findRefreshToken(nonExistId))
 					.willReturn(Optional.empty());
 
 				assertThatThrownBy(() -> tokenService.findByUserId(nonExistId))
@@ -192,7 +192,7 @@ class TokenServiceTest {
 					.userId(userId)
 					.token(targetToken)
 					.build();
-				given(tokenRepository.findById(userId)).willReturn(Optional.ofNullable(token));
+				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.ofNullable(token));
 
 				//when
 				boolean isHijacked = tokenService.isRefreshHijacked(userId, targetToken);
@@ -207,7 +207,7 @@ class TokenServiceTest {
 				//given
 				Long userId = 1L;
 				Token token = TokenFixture.createWithUserId(userId);
-				given(tokenRepository.findById(userId)).willReturn(Optional.ofNullable(token));
+				given(tokenRepository.findRefreshToken(userId)).willReturn(Optional.ofNullable(token));
 
 				//when
 				boolean isHijacked = tokenService.isRefreshHijacked(userId, targetToken);

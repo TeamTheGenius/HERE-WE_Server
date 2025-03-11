@@ -41,7 +41,7 @@ public class TokenRepositoryTest {
 
 		@BeforeEach
 		void init() {
-			tokenRepository.save(token);
+			tokenRepository.saveRefreshToken(token);
 		}
 
 		@Nested
@@ -50,14 +50,14 @@ public class TokenRepositoryTest {
 			@Test
 			@DisplayName("token이 존재하지 않는다면 Optional.empty()를 반환한다.")
 			public void it_return_empty_entity() {
-				Optional<Token> foundToken = tokenRepository.findById(2L);
+				Optional<Token> foundToken = tokenRepository.findRefreshToken(2L);
 				assertThat(foundToken).isEmpty();
 			}
 
 			@Test
 			@DisplayName("token이 존재한다면 Optional로 감싸서 반환한다.")
 			public void it_return_present_entity() {
-				Optional<Token> foundToken = tokenRepository.findById(token.getUserId());
+				Optional<Token> foundToken = tokenRepository.findRefreshToken(token.getUserId());
 
 				//then
 				assertThat(foundToken).isPresent();
@@ -73,9 +73,9 @@ public class TokenRepositoryTest {
 			@Test
 			@DisplayName("userId에 해당하는 Key가 있다면 삭제가 완료된다.")
 			public void it_delete_successfully() {
-				tokenRepository.delete(token.getUserId());
+				tokenRepository.deleteRefreshToken(token.getUserId());
 
-				Optional<Token> foundToken = tokenRepository.findById(token.getUserId());
+				Optional<Token> foundToken = tokenRepository.findRefreshToken(token.getUserId());
 				assertThat(foundToken).isEmpty();
 			}
 		}

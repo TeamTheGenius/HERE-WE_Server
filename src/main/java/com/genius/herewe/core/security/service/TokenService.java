@@ -30,16 +30,16 @@ public class TokenService {
 			.ttl(TTL)
 			.build();
 
-		tokenRepository.save(refreshToken);
+		tokenRepository.saveRefreshToken(refreshToken);
 	}
 
 	public Token findByUserId(Long userId) {
-		return tokenRepository.findById(userId)
+		return tokenRepository.findRefreshToken(userId)
 			.orElseThrow(() -> new BusinessException(REFRESH_NOT_FOUND_IN_DB));
 	}
 
 	public Token updateRefreshToken(Long userId, String newToken) {
-		Optional<Token> existingToken = tokenRepository.findById(userId);
+		Optional<Token> existingToken = tokenRepository.findRefreshToken(userId);
 
 		if (existingToken.isPresent()) {
 			Token token = existingToken.get();
@@ -50,7 +50,7 @@ public class TokenService {
 				.ttl(TTL)
 				.build();
 
-			return tokenRepository.save(updatedToken);
+			return tokenRepository.saveRefreshToken(updatedToken);
 		} else {
 			throw new BusinessException(REFRESH_NOT_FOUND_IN_DB);
 		}
@@ -62,6 +62,6 @@ public class TokenService {
 	}
 
 	public void delete(Long userId) {
-		tokenRepository.delete(userId);
+		tokenRepository.deleteRefreshToken(userId);
 	}
 }
