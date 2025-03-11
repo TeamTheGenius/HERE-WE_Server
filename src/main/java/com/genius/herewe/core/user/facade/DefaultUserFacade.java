@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.dto.AuthResponse;
+import com.genius.herewe.core.security.service.token.RegistrationTokenService;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.dto.SignupRequest;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultUserFacade implements UserFacade {
 	private final UserService userService;
+	private final RegistrationTokenService registrationTokenService;
 	private final FilesManager filesManager;
 
 	@Override
@@ -42,7 +44,9 @@ public class DefaultUserFacade implements UserFacade {
 	@Override
 	@Transactional
 	public SignupResponse signup(SignupRequest signupRequest) {
-		User user = userService.findById(signupRequest.userId());
+		Long userId = registrationTokenService.getUserIdFromToken(signupRequest.token());
+		User user = userService.findById(userId);
+
 		String nickname = signupRequest.nickname();
 
 		if (user.getRole() != Role.NOT_REGISTERED) {

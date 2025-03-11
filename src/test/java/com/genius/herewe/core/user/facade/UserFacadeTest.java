@@ -19,7 +19,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.security.domain.Token;
 import com.genius.herewe.core.security.dto.AuthResponse;
+import com.genius.herewe.core.security.fixture.TokenFixture;
+import com.genius.herewe.core.security.service.token.RegistrationTokenService;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.dto.SignupRequest;
@@ -34,12 +37,13 @@ class UserFacadeTest {
 	private FilesManager filesManager;
 	@Mock
 	private UserService userService;
-
+	@Mock
+	private RegistrationTokenService registrationTokenService;
 	private UserFacade userFacade;
 
 	@BeforeEach
 	public void init() {
-		userFacade = new DefaultUserFacade(userService, filesManager);
+		userFacade = new DefaultUserFacade(userService, registrationTokenService, filesManager);
 	}
 
 	@Nested
@@ -140,6 +144,9 @@ class UserFacadeTest {
 	@Nested
 	@DisplayName("회원가입 요청 시")
 	class Context_request_signup {
+		Token token = TokenFixture.createRegToken();
+		String registrationToken = token.getToken();
+
 		@Nested
 		@DisplayName("사용자의 닉네임 중복을 확인할 때")
 		class Describe_check_nickname_duplicated {
@@ -167,8 +174,10 @@ class UserFacadeTest {
 				//given
 				String targetNickname = "other nickname";
 				SignupRequest signupRequest = new SignupRequest(
-					user.getId(), targetNickname
+					registrationToken, targetNickname
 				);
+
+				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when & then
 				assertThatNoException()
@@ -180,8 +189,9 @@ class UserFacadeTest {
 			public void it_throw_NICKNAME_DUPLICATED_exception() {
 				// given
 				SignupRequest signupRequest = new SignupRequest(
-					user.getId(), existNickname
+					registrationToken, existNickname
 				);
+				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when & then
 				assertThatThrownBy(() -> userFacade.signup(signupRequest))
@@ -198,9 +208,10 @@ class UserFacadeTest {
 			public void it_signup_successfully() {
 				//given
 				User user = UserFixture.createByRole(Role.NOT_REGISTERED);
-				SignupRequest signupRequest = new SignupRequest(user.getId(), user.getNickname());
+				SignupRequest signupRequest = new SignupRequest(registrationToken, user.getNickname());
 
 				given(userService.findById(user.getId())).willReturn(user);
+				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when
 				SignupResponse signupResponse = userFacade.signup(signupRequest);
@@ -216,9 +227,10 @@ class UserFacadeTest {
 			public void it_throws_ALREADY_REGISTERED_exception(Role role) {
 				//given
 				User user = UserFixture.createByRole(role);
-				SignupRequest signupRequest = new SignupRequest(user.getId(), user.getNickname());
+				SignupRequest signupRequest = new SignupRequest(registrationToken, user.getNickname());
 
 				given(userService.findById(user.getId())).willReturn(user);
+				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when & then
 				assertThatThrownBy(() -> userFacade.signup(signupRequest))

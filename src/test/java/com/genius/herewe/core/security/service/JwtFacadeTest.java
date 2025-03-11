@@ -19,6 +19,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
+import com.genius.herewe.core.security.service.token.RefreshTokenService;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.fixture.UserFixture;
@@ -41,7 +42,7 @@ class JwtFacadeTest {
 	@Mock
 	private UserService userService;
 	@Mock
-	private TokenService tokenService;
+	private RefreshTokenService refreshTokenService;
 	@Mock
 	private HttpServletRequest request;
 	@Mock
@@ -51,7 +52,7 @@ class JwtFacadeTest {
 	@BeforeEach
 	void init() {
 		jwtFacade = new DefaultJwtFacade(
-			customUserDetailsService, userService, tokenService,
+			customUserDetailsService, userService, refreshTokenService,
 			TEST_ISSUER, TEST_ACCESS_SECRET, TEST_REFRESH_SECRET,
 			TEST_ACCESS_EXPIRATION, TEST_REFRESH_EXPIRATION
 		);
@@ -138,7 +139,7 @@ class JwtFacadeTest {
 					.isThrownBy(() -> jwtFacade.verifyIssueCondition(user));
 			}
 		}
-		
+
 		@Nested
 		@DisplayName("사용자 정보를 전달하면")
 		class Describe_pass_user_info {
@@ -162,7 +163,7 @@ class JwtFacadeTest {
 					.contains("Secure")
 					.contains("SameSite=STRICT");
 
-				verify(tokenService).saveRefreshToken(
+				verify(refreshTokenService).generateToken(
 					eq(user.getId()),
 					eq(user.getNickname()),
 					eq(refreshToken)
@@ -283,7 +284,7 @@ class JwtFacadeTest {
 			public void it_return_EXPIRED() {
 				//given
 				JwtFacade expiredJwtFacade = new DefaultJwtFacade(
-					customUserDetailsService, userService, tokenService,
+					customUserDetailsService, userService, refreshTokenService,
 					TEST_ISSUER, TEST_ACCESS_SECRET, TEST_REFRESH_SECRET,
 					0L, TEST_REFRESH_EXPIRATION
 				);
@@ -331,7 +332,7 @@ class JwtFacadeTest {
 				//given
 				User user = UserFixture.createDefault();
 				JwtFacade expiredJwtFacade = new DefaultJwtFacade(
-					customUserDetailsService, userService, tokenService,
+					customUserDetailsService, userService, refreshTokenService,
 					TEST_ISSUER, TEST_ACCESS_SECRET, TEST_REFRESH_SECRET,
 					TEST_ACCESS_EXPIRATION, 0L
 				);

@@ -1,4 +1,4 @@
-package com.genius.herewe.core.security.service;
+package com.genius.herewe.core.security.service.token;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
@@ -12,17 +12,17 @@ import com.genius.herewe.core.security.domain.Token;
 import com.genius.herewe.core.security.repository.TokenRepository;
 
 @Service
-public class TokenService {
+public class RefreshTokenService {
 	private final TokenRepository tokenRepository;
 	private final long TTL;
 
-	public TokenService(TokenRepository tokenRepository,
+	public RefreshTokenService(TokenRepository tokenRepository,
 		@Value("${jwt.expiration.refresh}") long TTL) {
 		this.tokenRepository = tokenRepository;
 		this.TTL = TTL;
 	}
 
-	public void saveRefreshToken(Long userId, String nickname, String token) {
+	public void generateToken(Long userId, String nickname, String token) {
 		Token refreshToken = Token.builder()
 			.userId(userId)
 			.nickname(nickname)
@@ -30,16 +30,16 @@ public class TokenService {
 			.ttl(TTL)
 			.build();
 
-		tokenRepository.save(refreshToken);
+		tokenRepository.saveRefreshToken(refreshToken);
 	}
 
-	public Token findByUserId(Long userId) {
-		return tokenRepository.findById(userId)
+	public Token findByKey(Long userId) {
+		return tokenRepository.findRefreshToken(userId)
 			.orElseThrow(() -> new BusinessException(REFRESH_NOT_FOUND_IN_DB));
 	}
 
 	public Token updateRefreshToken(Long userId, String newToken) {
-		Optional<Token> existingToken = tokenRepository.findById(userId);
+		Optional<Token> existingToken = tokenRepository.findRefreshToken(userId);
 
 		if (existingToken.isPresent()) {
 			Token token = existingToken.get();
@@ -50,18 +50,18 @@ public class TokenService {
 				.ttl(TTL)
 				.build();
 
-			return tokenRepository.save(updatedToken);
+			return tokenRepository.saveRefreshToken(updatedToken);
 		} else {
 			throw new BusinessException(REFRESH_NOT_FOUND_IN_DB);
 		}
 	}
 
 	public boolean isRefreshHijacked(Long userId, String token) {
-		Token storedToken = findByUserId(userId);
+		Token storedToken = findByKey(userId);
 		return !storedToken.getToken().equals(token);
 	}
 
 	public void delete(Long userId) {
-		tokenRepository.delete(userId);
+		tokenRepository.deleteRefreshToken(userId);
 	}
 }

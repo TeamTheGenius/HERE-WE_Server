@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
+import com.genius.herewe.core.security.service.token.RefreshTokenService;
 import com.genius.herewe.core.security.util.JwtUtil;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
@@ -38,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultJwtFacade implements JwtFacade {
 	private final CustomUserDetailsService customUserDetailsService;
 	private final UserService userService;
-	private final TokenService tokenService;
+	private final RefreshTokenService refreshTokenService;
 
 	private final String ISSUER;
 	private final Key ACCESS_SECRET_KEY;
@@ -47,7 +48,7 @@ public class DefaultJwtFacade implements JwtFacade {
 	private final long REFRESH_EXPIRATION;
 
 	public DefaultJwtFacade(CustomUserDetailsService customUserDetailsService,
-		UserService userService, TokenService tokenService,
+		UserService userService, RefreshTokenService refreshTokenService,
 		@Value("${jwt.issuer}") String ISSUER,
 		@Value("${jwt.secret.access}") String ACCESS_SECRET_KEY,
 		@Value("${jwt.secret.refresh}") String REFRESH_SECRET_KEY,
@@ -55,7 +56,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		@Value("${jwt.expiration.refresh}") long REFRESH_EXPIRATION) {
 		this.customUserDetailsService = customUserDetailsService;
 		this.userService = userService;
-		this.tokenService = tokenService;
+		this.refreshTokenService = refreshTokenService;
 		this.ISSUER = ISSUER;
 		this.ACCESS_SECRET_KEY = JwtUtil.getSigningKey(ACCESS_SECRET_KEY);
 		this.REFRESH_SECRET_KEY = JwtUtil.getSigningKey(REFRESH_SECRET_KEY);
@@ -109,7 +110,7 @@ public class DefaultJwtFacade implements JwtFacade {
 		ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
 		response.addHeader(REFRESH_ISSUE.getValue(), cookie.toString());
 
-		tokenService.saveRefreshToken(user.getId(), user.getNickname(), refreshToken);
+		refreshTokenService.generateToken(user.getId(), user.getNickname(), refreshToken);
 
 		return refreshToken;
 	}
@@ -181,7 +182,7 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public boolean isRefreshHijacked(Long userId, String refreshToken) {
-		return tokenService.isRefreshHijacked(userId, refreshToken);
+		return refreshTokenService.isRefreshHijacked(userId, refreshToken);
 	}
 
 	@Override
@@ -209,7 +210,7 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public void logout(HttpServletResponse response, Long userId) {
-		tokenService.delete(userId);
+		refreshTokenService.delete(userId);
 
 		Cookie cookie = new Cookie(REFRESH_PREFIX.getValue(), null);
 		cookie.setMaxAge(0);
