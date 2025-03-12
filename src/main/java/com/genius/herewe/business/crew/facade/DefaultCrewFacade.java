@@ -35,6 +35,13 @@ public class DefaultCrewFacade implements CrewFacade {
 	private final CrewMemberService crewMemberService;
 
 	@Override
+	public Page<CrewPreviewResponse> inquiryMyCrews(Long userId, Pageable pageable) {
+		Page<CrewPreviewResponse> allJoinCrews = crewMemberService.findAllJoinCrews(userId, pageable);
+
+		return allJoinCrews;
+	}
+
+	@Override
 	public CrewResponse inquiryCrew(Long userId, Long crewId) {
 		Crew crew = crewService.findById(crewId);
 		CrewMember crewMember = crewMemberService.find(userId, crewId);

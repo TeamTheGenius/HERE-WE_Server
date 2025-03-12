@@ -10,6 +10,8 @@ import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 
 public interface CrewFacade {
+	Page<CrewPreviewResponse> inquiryMyCrews(Long userId, Pageable pageable);
+
 	CrewResponse inquiryCrew(Long userId, Long crewId);
 
 	Page<CrewMemberResponse> inquiryMembers(Long crewId, Pageable pageable);

@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.crew.domain.CrewMember;
+import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.repository.CrewMemberRepository;
+import com.genius.herewe.business.crew.repository.query.CrewMemberQueryRepository;
 import com.genius.herewe.core.global.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewMemberService {
 	private final CrewMemberRepository crewMemberRepository;
+	private final CrewMemberQueryRepository queryRepository;
 
 	@Transactional
 	public CrewMember save(CrewMember crewMember) {
@@ -37,5 +40,9 @@ public class CrewMemberService {
 
 	public Page<CrewMember> findAllByCrewId(Long crewId, Pageable pageable) {
 		return crewMemberRepository.findAllByCrewId(crewId, pageable);
+	}
+
+	public Page<CrewPreviewResponse> findAllJoinCrews(Long userId, Pageable pageable) {
+		return queryRepository.findAllJoinCrews(userId, pageable);
 	}
 }
