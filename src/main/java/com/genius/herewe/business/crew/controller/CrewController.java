@@ -33,6 +33,15 @@ import lombok.RequiredArgsConstructor;
 public class CrewController implements CrewApi {
 	private final CrewFacade crewFacade;
 
+	@GetMapping("/my")
+	public PagingResponse<CrewPreviewResponse> inquiryMyCrews(
+		@HereWeUser User user,
+		@PageableDefault(size = 10, page = 0) Pageable pageable) {
+
+		Page<CrewPreviewResponse> crewPreviewResponses = crewFacade.inquiryMyCrews(user.getId(), pageable);
+		return new PagingResponse<>(HttpStatus.OK, crewPreviewResponses);
+	}
+
 	@GetMapping("/{crewId}")
 	public SingleResponse<CrewResponse> inquiryCrewInfo(@HereWeUser User user, @PathVariable Long crewId) {
 		CrewResponse crewResponse = crewFacade.inquiryCrew(user.getId(), crewId);
