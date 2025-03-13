@@ -50,6 +50,12 @@ dependencies {
     //AWS
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.0'
 
+    //thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    
+    //JavaMailSender
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     //Websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
