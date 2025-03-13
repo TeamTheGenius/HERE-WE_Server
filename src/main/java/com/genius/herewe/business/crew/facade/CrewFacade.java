@@ -19,6 +19,4 @@ public interface CrewFacade {
 	CrewPreviewResponse createCrew(Long userId, CrewCreateRequest request);
 
 	CrewPreviewResponse modifyCrew(Long userId, Long crewId, CrewModifyRequest request);
-
-	void joinCrew(Long userId, Long crewId);
 }

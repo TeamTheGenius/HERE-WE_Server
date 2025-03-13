@@ -18,6 +18,8 @@ import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.facade.CrewFacade;
+import com.genius.herewe.business.invitation.dto.InvitationRequest;
+import com.genius.herewe.business.invitation.facade.InvitationFacade;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.PagingResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
@@ -32,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewController implements CrewApi {
 	private final CrewFacade crewFacade;
+	private final InvitationFacade invitationFacade;
 
 	@GetMapping("/my")
 	public PagingResponse<CrewPreviewResponse> inquiryMyCrews(
@@ -80,9 +83,18 @@ public class CrewController implements CrewApi {
 		return new SingleResponse<>(HttpStatus.OK, response);
 	}
 
-	@PostMapping("/{crewId}/members")
-	public CommonResponse joinCrew(@HereWeUser User user, @PathVariable Long crewId) {
-		crewFacade.joinCrew(user.getId(), crewId);
+	@PostMapping("/invite/{token}")
+	public CommonResponse joinCrew(@HereWeUser User user, @PathVariable String inviteToken) {
+		invitationFacade.joinCrew(inviteToken);
+
+		return CommonResponse.ok();
+	}
+
+	@PostMapping("/invite")
+	public CommonResponse inviteCrew(
+		@Valid @RequestBody InvitationRequest invitationRequest) {
+
+		invitationFacade.inviteCrew(invitationRequest);
 
 		return CommonResponse.ok();
 	}

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.infra.mail.dto.MailRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -26,18 +27,22 @@ public class MailManager {
 		context.setVariable("memberCount", mailRequest.memberCount());
 		context.setVariable("inviteUrl", mailRequest.inviteUrl());
 
-		MimeMessagePreparator preparatory = mimeMessage -> {
-			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+		try {
+			MimeMessagePreparator preparatory = mimeMessage -> {
+				MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-			String content = templateEngine.process("crew-invitation", context);
+				String content = templateEngine.process("crew-invitation", context);
 
-			helper.setTo(mailRequest.receiver());
-			helper.setFrom("genius.herewe@gmail.com", "HERE:WE");
-			helper.setSubject("[HERE:WE] 크루 초대가 도착했습니다 :)");
+				helper.setTo(mailRequest.receiverMail());
+				helper.setFrom("genius.herewe@gmail.com", "HERE:WE");
+				helper.setSubject("[HERE:WE] 크루 초대가 도착했습니다 :)");
 
-			helper.setText(content, true);
-		};
+				helper.setText(content, true);
+			};
 
-		mailSender.send(preparatory);
+			mailSender.send(preparatory);
+		} catch (Exception e) {
+			throw new BusinessException(e);
+		}
 	}
 }

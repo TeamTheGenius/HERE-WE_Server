@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record MailRequest(
-	String receiver,
+	String receiverMail,
 	String nickname,
 	String crewName,
 	String introduce,

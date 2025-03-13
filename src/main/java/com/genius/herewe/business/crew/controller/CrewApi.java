@@ -10,7 +10,6 @@ import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
-import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
 import com.genius.herewe.core.global.response.PagingResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
@@ -173,14 +172,5 @@ public interface CrewApi {
 		@HereWeUser User user,
 		@PathVariable Long crewId,
 		@RequestBody CrewModifyRequest crewModifyRequest);
-
-	@Operation(summary = "크루 참여 - 임시 API (추가 업데이트 예정)", description = "특정 사용자가 특정 크루에 참여할 때 사용")
-	@ApiResponses({
-		@ApiResponse(
-			responseCode = "200",
-			description = "해당 크루에 참여 완료"
-		)
-	})
-	CommonResponse joinCrew(@HereWeUser User user, @PathVariable Long crewId);
 }
 

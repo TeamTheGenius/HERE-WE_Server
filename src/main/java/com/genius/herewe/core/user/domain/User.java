@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.genius.herewe.business.crew.domain.CrewMember;
+import com.genius.herewe.business.invitation.domain.Invitation;
 import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.infra.file.domain.FileHolder;
 import com.genius.herewe.infra.file.domain.Files;
@@ -41,6 +42,9 @@ public class User implements FileHolder {
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MomentMember> momentMembers = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Invitation> invitations = new ArrayList<>();
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "files_id")
