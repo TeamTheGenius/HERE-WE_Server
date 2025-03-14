@@ -103,7 +103,8 @@ public class DefaultInvitationFacade implements InvitationFacade {
 		// 3-1. 없거나 expiredAt이 현재 시간을 이미 지난 경우 -> 예외 발생, 유효기간이 지났습니다 + 엔티티 삭제
 		// 3-2. 있으며 expiredAt이 현재 시간을 안 지난 경우 -> 다음 로직 실행
 		Invitation invitation = invitationService.findByToken(inviteToken);
-		if (invitation.getExpiredAt().isAfter(LocalDateTime.now())) {
+		if (invitation.getExpiredAt().isBefore(LocalDateTime.now())) {
+			invitationService.delete(invitation);
 			throw new BusinessException(INVITATION_EXPIRED);
 		}
 		// N+1 problem 확인해보기
