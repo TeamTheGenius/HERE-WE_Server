@@ -1,9 +1,5 @@
 package com.genius.herewe.business.crew.facade;
 
-import static com.genius.herewe.core.global.exception.ErrorCode.*;
-
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -88,22 +84,5 @@ public class DefaultCrewFacade implements CrewFacade {
 
 		crew.modify(request.name(), request.introduce());
 		return CrewPreviewResponse.create(crew);
-	}
-
-	@Override
-	@Transactional
-	public void joinCrew(Long userId, Long crewId) {
-		User user = userService.findById(userId);
-		Crew crew = crewService.findById(crewId);
-
-		Optional<CrewMember> optionalCrewMember = crewMemberService.findOptional(userId, crewId);
-		if (optionalCrewMember.isPresent()) {
-			throw new BusinessException(ALREADY_JOINED_CREW);
-		}
-
-		CrewMember crewMember = CrewMember.createByRole(CrewRole.MEMBER);
-		crewMember.joinCrew(user, crew);
-
-		crewMemberService.save(crewMember);
 	}
 }
