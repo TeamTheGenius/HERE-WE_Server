@@ -24,6 +24,9 @@ import com.genius.herewe.core.user.service.UserService;
 import com.genius.herewe.infra.mail.dto.MailRequest;
 import com.genius.herewe.infra.mail.service.MailManager;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class DefaultInvitationFacade implements InvitationFacade {
@@ -69,10 +72,13 @@ public class DefaultInvitationFacade implements InvitationFacade {
 				);
 				return existingInvitation;
 			})
-			.orElseGet(() -> Invitation.create(
-				invitationInfo.token(), invitationInfo.invitedAt(), invitationInfo.expiredAt()));
+			.orElseGet(() -> {
+				Invitation newInvitation = Invitation.create(
+					invitationInfo.token(), invitationInfo.invitedAt(), invitationInfo.expiredAt());
+				newInvitation.inviteUser(user, crew);
+				return invitationService.save(newInvitation);
+			});
 
-		//TODO: 추후 비동기 처리 필요 -> 콜백 여부에 따라 Invitation 추가 처리 필요
 		MailRequest mailRequest = MailRequest.builder()
 			.receiverMail(user.getEmail())
 			.nickname(nickname)
@@ -81,18 +87,22 @@ public class DefaultInvitationFacade implements InvitationFacade {
 			.memberCount(crew.getParticipantCount())
 			.inviteUrl(BASE_URL + INVITE_URL + invitation.getToken())
 			.build();
-		mailManager.send(mailRequest);
 
-		// NOTE: (동기) 메일 전송이 완료되면 Invitation 엔티티 저장
-		invitationService.save(invitation);
+		mailManager.sendAsync(mailRequest).thenAccept(result -> {
+			if (!result) {
+				log.warn("Email sending failed for invitation: {}", invitation.getToken());
+				invitationService.deleteInNewTransaction(invitation);
+			} else {
+				log.info("Email sent successfully for invitation: {}", invitation.getToken());
+			}
+		});
 	}
 
 	@Transactional
 	public void joinCrew(String inviteToken) {
 		Invitation invitation = invitationService.findByToken(inviteToken);
 		if (invitation.getExpiredAt().isBefore(LocalDateTime.now())) {
-			//TODO: 트랜잭션으로 인해 예외만 전달되고 엔티티 삭제가 안됨. 수정하기
-			invitationService.delete(invitation);
+			invitationService.deleteInNewTransaction(invitation);
 			throw new BusinessException(INVITATION_EXPIRED);
 		}
 		//NOTE: N+1 problem 확인해보기

@@ -1,9 +1,12 @@
 package com.genius.herewe.infra.mail.service;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -11,6 +14,9 @@ import org.thymeleaf.context.Context;
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.infra.mail.dto.MailRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class MailManager {
 	private final String MAIL_ADDRESS;
@@ -24,7 +30,22 @@ public class MailManager {
 		this.templateEngine = templateEngine;
 	}
 
-	public void send(MailRequest mailRequest) {
+	@Async("threadExecutor")
+	public CompletableFuture<Boolean> sendAsync(MailRequest mailRequest) {
+		return CompletableFuture.supplyAsync(() -> {
+				try {
+					send(mailRequest);
+					log.info("Email sent successfully to: {}", mailRequest.receiverMail());
+					return true;
+				} catch (Exception e) {
+					log.error("Failed to send email to: {}, reason: {}", mailRequest.receiverMail(), e.getMessage(), e);
+					return false;
+				}
+			}
+		);
+	}
+
+	private void send(MailRequest mailRequest) {
 		Context context = new Context();
 
 		context.setVariable("nickname", mailRequest.nickname());
