@@ -1,7 +1,6 @@
 package com.genius.herewe.business.invitation.domain;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.core.user.domain.User;
@@ -50,13 +49,11 @@ public class Invitation {
 		this.token = token;
 	}
 
-	public static Invitation create(long expirationDays) {
-		LocalDateTime now = LocalDateTime.now();
-		String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+	public static Invitation create(String token, LocalDateTime invitedAt, LocalDateTime expiredAt) {
 		return Invitation.builder()
-			.invitedAt(now)
-			.expiredAt(now.plusDays(expirationDays))
-			.token(uuid)
+			.invitedAt(invitedAt)
+			.expiredAt(expiredAt)
+			.token(token)
 			.build();
 	}
 
@@ -73,9 +70,9 @@ public class Invitation {
 	}
 
 	//== 비지니스 로직 ==//
-	public void update(Invitation updated) {
-		this.token = updated.getToken();
-		this.invitedAt = updated.getInvitedAt();
-		this.expiredAt = updated.getExpiredAt();
+	public void update(String token, LocalDateTime invitedAt, LocalDateTime expiredAt) {
+		this.token = token;
+		this.invitedAt = invitedAt;
+		this.expiredAt = expiredAt;
 	}
 }

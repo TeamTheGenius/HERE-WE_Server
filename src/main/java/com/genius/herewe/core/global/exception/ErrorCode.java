@@ -21,7 +21,7 @@ public enum ErrorCode {
 	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),
 
 	ALREADY_INVITED(HttpStatus.BAD_REQUEST, "이미 해당 크루에 초대되었습니다."),
-	INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "크루 초대 정보를 찾을 수 없습니다. 초대를 다시 요청해주세요."),
+	INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "크루 초대 정보를 찾을 수 없습니다. 초대 정보를 다시 확인해주세요."),
 	INVITATION_EXPIRED(HttpStatus.BAD_REQUEST, "크루 초대가 만료되었습니다."),
 
 	UNAUTHORIZED_ISSUE(HttpStatus.UNAUTHORIZED, "회원가입이 되어 있지 않은 사용자의 경우 JWT를 발급할 수 없습니다."),
