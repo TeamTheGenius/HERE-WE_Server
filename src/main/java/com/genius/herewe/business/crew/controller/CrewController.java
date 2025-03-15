@@ -83,18 +83,18 @@ public class CrewController implements CrewApi {
 		return new SingleResponse<>(HttpStatus.OK, response);
 	}
 
-	@PostMapping("/invite/{token}")
-	public CommonResponse joinCrew(@HereWeUser User user, @PathVariable String inviteToken) {
-		invitationFacade.joinCrew(inviteToken);
-
-		return CommonResponse.ok();
-	}
-
 	@PostMapping("/invite")
 	public CommonResponse inviteCrew(
 		@Valid @RequestBody InvitationRequest invitationRequest) {
 
 		invitationFacade.inviteCrew(invitationRequest);
+
+		return CommonResponse.ok();
+	}
+
+	@PostMapping("/invite/{token}")
+	public CommonResponse joinCrew(@PathVariable(name = "token") String inviteToken) {
+		invitationFacade.joinCrew(inviteToken);
 
 		return CommonResponse.ok();
 	}
