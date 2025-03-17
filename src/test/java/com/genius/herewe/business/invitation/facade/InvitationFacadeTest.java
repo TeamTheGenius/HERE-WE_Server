@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +32,7 @@ import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.fixture.UserFixture;
 import com.genius.herewe.core.user.service.UserService;
+import com.genius.herewe.infra.mail.dto.MailRequest;
 import com.genius.herewe.infra.mail.service.MailManager;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,6 +140,9 @@ class InvitationFacadeTest {
 				given(userService.findByNickname(user.getNickname())).willReturn(Optional.of(user));
 				given(crewService.findById(crew.getId())).willReturn(crew);
 				given(crewMemberService.findOptional(userId, crewId)).willReturn(Optional.empty());
+
+				given(mailManager.sendAsync(any(MailRequest.class)))
+					.willReturn(CompletableFuture.completedFuture(true));
 			}
 
 			@Test
@@ -145,6 +150,9 @@ class InvitationFacadeTest {
 			public void it_return_new_invitation_entity() {
 				//given
 				given(invitationService.findOptional(userId, crewId)).willReturn(Optional.empty());
+				given(invitationService.save(any(Invitation.class))).willAnswer(
+					invocation -> invocation.getArgument(0)
+				);
 
 				//when
 				invitationFacade.inviteCrew(invitationRequest);
@@ -174,13 +182,13 @@ class InvitationFacadeTest {
 				invitationFacade.inviteCrew(invitationRequest);
 
 				//then
-				verify(invitationService).save(invitationCaptor.capture());
-				Invitation updatedInvitation = invitationCaptor.getValue();
+				verify(invitationService, never()).save(any(Invitation.class));
 
-				assertThat(updatedInvitation.getToken()).isNotEqualTo(inviteToken);
-				assertThat(updatedInvitation.getInvitedAt()).isNotEqualTo(invitedAt);
-				assertThat(updatedInvitation.getExpiredAt()).isNotEqualTo(expiredAt);
-				assertThat(updatedInvitation.getExpiredAt()).isAfter(LocalDateTime.now());
+				// 기존 초대 객체의 필드 값이 업데이트되었는지 검증
+				assertThat(existInvitation.getToken()).isNotEqualTo(inviteToken);
+				assertThat(existInvitation.getInvitedAt()).isNotEqualTo(invitedAt);
+				assertThat(existInvitation.getExpiredAt()).isNotEqualTo(expiredAt);
+				assertThat(existInvitation.getExpiredAt()).isAfter(LocalDateTime.now());
 			}
 
 			@Test
@@ -192,6 +200,10 @@ class InvitationFacadeTest {
 				String inviteToken = existInvitation.getToken();
 				LocalDateTime invitedAt = existInvitation.getInvitedAt();
 				LocalDateTime expiredAt = existInvitation.getExpiredAt();
+
+				given(invitationService.save(any(Invitation.class))).willAnswer(
+					invocation -> invocation.getArgument(0)
+				);
 
 				//when
 				invitationFacade.inviteCrew(invitationRequest);

@@ -5,6 +5,7 @@ import static com.genius.herewe.core.global.exception.ErrorCode.*;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.invitation.domain.Invitation;
@@ -35,6 +36,11 @@ public class InvitationService {
 
 	@Transactional
 	public void delete(Invitation invitation) {
+		invitationRepository.delete(invitation);
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void deleteInNewTransaction(Invitation invitation) {
 		invitationRepository.delete(invitation);
 	}
 }
