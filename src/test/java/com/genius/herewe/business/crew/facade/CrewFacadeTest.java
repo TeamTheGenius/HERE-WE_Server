@@ -4,6 +4,8 @@ import static com.genius.herewe.core.global.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +18,7 @@ import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.crew.domain.CrewMember;
 import com.genius.herewe.business.crew.domain.CrewRole;
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewExpelRequest;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
@@ -235,6 +238,139 @@ class CrewFacadeTest {
 				assertThat(crewResponse.leaderName()).isEqualTo(crew.getLeaderName());
 				assertThat(crewResponse.role()).isEqualTo(crewMember.getRole());
 				assertThat(crewResponse.participantCount()).isEqualTo(crew.getParticipantCount());
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("특정 사용자를 크루에서 내보낼 때")
+	class Context_expel_from_crew {
+		User user = UserFixture.createDefault();
+		User targetUser = UserFixture.builder().id(2L).nickname("expel target").build();
+		Crew crew = CrewFixture.createDefault();
+		Long userId = user.getId();
+		Long crewId = crew.getId();
+		CrewExpelRequest expelRequest = new CrewExpelRequest(crewId, targetUser.getNickname());
+
+		@Nested
+		@DisplayName("요청한 사용자의 정보를 전달받았을 때")
+		class Describe_pass_request_user_info {
+			@Test
+			@DisplayName("사용자 식별자를 통해 조회했을 때 사용자가 존재하지 않는다면 MEMBER_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_MEMBER_NOT_FOUND_exception() {
+				//given
+				Long fakeUserId = 999L;
+				given(userService.findById(argThat(id -> !id.equals(userId))))
+					.willThrow(new BusinessException(MEMBER_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.expelCrew(fakeUserId, expelRequest))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MEMBER_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("크루 식별자를 통해 크루를 조회할 때, 존재하지 않으면 CREW_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_CREW_NOT_FOUND_exception() {
+				//given
+				Long fakeCrewId = 999L;
+				given(crewService.findById(argThat(id -> !id.equals(expelRequest.crewId()))))
+					.willThrow(new BusinessException(CREW_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(
+					() -> crewFacade.expelCrew(userId, new CrewExpelRequest(fakeCrewId, user.getNickname())))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(CREW_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("사용자가 크루에 대해 크루 가입 정보가 없을 때 CREW_JOIN_INFO_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_CREW_JOIN_INFO_NOT_FOUND_exception() {
+				//given
+				given(userService.findById(userId)).willReturn(user);
+				given(crewService.findById(crewId)).willReturn(crew);
+				given(crewMemberService.find(userId, crewId))
+					.willReturn(CrewMember.createByRole(CrewRole.LEADER));
+				given(crewMemberService.find(userId, crewId))
+					.willThrow(new BusinessException(CREW_JOIN_INFO_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.expelCrew(userId, expelRequest))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(CREW_JOIN_INFO_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("사용자의 ROLE을 확인했을 때 LEADER가 아니라면 LEADER_PERMISSION_DENIED 예외가 발생한다.")
+			public void it_throws_LEADER_PERMISSION_DENIED_exception() {
+				//given
+				given(userService.findById(userId)).willReturn(user);
+				given(crewService.findById(crewId)).willReturn(crew);
+				given(crewMemberService.find(userId, crewId))
+					.willReturn(CrewMember.createByRole(CrewRole.MEMBER));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.expelCrew(userId, expelRequest))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(LEADER_PERMISSION_DENIED.getMessage());
+			}
+		}
+
+		@Nested
+		@DisplayName("크루에서 내보낼 사용자의 정보를 받아서 조회했을 때")
+		class Describe_pass_target_nickname {
+			@BeforeEach
+			void init() {
+				given(userService.findById(userId)).willReturn(user);
+				given(crewService.findById(crewId)).willReturn(crew);
+			}
+
+			@Test
+			@DisplayName("닉네임을 통해 사용자를 조회할 수 없을 때 MEMBER_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_MEMBER_NOT_FOUND_exception() {
+				//given
+				String fakeNickname = "fake nickname";
+				given(crewMemberService.find(userId, crewId)).willReturn(CrewMember.createByRole(CrewRole.LEADER));
+				given(userService.findByNickname(argThat(nickname -> !nickname.equals(user.getNickname()))))
+					.willThrow(new BusinessException(MEMBER_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.expelCrew(userId, new CrewExpelRequest(crewId, fakeNickname)))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MEMBER_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("사용자가 해당 크루의 멤버가 아닌 경우 CREW_JOIN_INFO_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_CREW_JOIN_INFO_NOT_FOUND_exception() {
+				//given
+				given(crewMemberService.find(userId, crewId))
+					.willReturn(CrewMember.createByRole(CrewRole.LEADER));
+				given(userService.findByNickname(targetUser.getNickname())).willReturn(Optional.of(targetUser));
+				given(crewMemberService.find(targetUser.getId(), crewId)).willThrow(
+					new BusinessException(CREW_JOIN_INFO_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.expelCrew(userId, expelRequest))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(CREW_JOIN_INFO_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("사용자가 해당 크루의 리더인 경우 LEADER_CANNOT_EXPEL 예외가 발생한다.")
+			public void it_throws_LEADER_CANNOT_EXPEL_exception() {
+				//given
+				given(userService.findByNickname(targetUser.getNickname())).willReturn(Optional.of(targetUser));
+				given(crewMemberService.find(userId, crewId))
+					.willReturn(CrewMember.createByRole(CrewRole.LEADER));
+				given(crewMemberService.find(targetUser.getId(), crewId))
+					.willReturn(CrewMember.createByRole(CrewRole.LEADER));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.expelCrew(userId, expelRequest))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(LEADER_CANNOT_EXPEL.getMessage());
 			}
 		}
 	}

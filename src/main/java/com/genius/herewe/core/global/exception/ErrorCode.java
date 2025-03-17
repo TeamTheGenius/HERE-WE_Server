@@ -16,6 +16,7 @@ public enum ErrorCode {
 
 	CREW_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 CREW를 찾을 수 없습니다."),
 	LEADER_PERMISSION_DENIED(HttpStatus.FORBIDDEN, "CREW LEADER의 권한이 필요합니다."),
+	LEADER_CANNOT_EXPEL(HttpStatus.BAD_REQUEST, "CREW LEADER는 CREW에서 탈퇴할 수 없습니다."),
 
 	CREW_JOIN_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 크루에 대한 참여 정보가 없습니다."),
 	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),

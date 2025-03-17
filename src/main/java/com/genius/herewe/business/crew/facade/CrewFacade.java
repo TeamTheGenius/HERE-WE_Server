@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewExpelRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
@@ -19,4 +20,6 @@ public interface CrewFacade {
 	CrewPreviewResponse createCrew(Long userId, CrewCreateRequest request);
 
 	CrewPreviewResponse modifyCrew(Long userId, Long crewId, CrewModifyRequest request);
+
+	void expelCrew(Long userId, CrewExpelRequest expelRequest);
 }
