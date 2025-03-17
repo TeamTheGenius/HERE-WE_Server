@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.genius.herewe.infra.file.dto.FileResponse;
-import com.genius.herewe.core.user.dto.SignupRequest;
-import com.genius.herewe.core.user.dto.SignupResponse;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
+import com.genius.herewe.core.user.dto.SignupRequest;
+import com.genius.herewe.core.user.dto.SignupResponse;
+import com.genius.herewe.infra.file.dto.FileResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

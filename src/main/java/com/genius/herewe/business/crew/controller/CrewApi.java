@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
@@ -331,5 +332,92 @@ public interface CrewApi {
 	})
 	CommonResponse joinCrew(@PathVariable String inviteToken);
 
+	@Operation(summary = "크루원 내보내기", description = "크루에서 특정 크루원 내보내기")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "크루에서 특정 크루원 내보내기 성공"
+		),
+		@ApiResponse(
+			responseCode = "400",
+			description = "크루 리더에 대해 크루 내보내기를 요청했을 때",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = @ExampleObject(
+					name = "크루 리더에 대해 크루 내보내기를 요청했을 때",
+					value = """
+						{
+							"resultCode": 400,
+							"code": "LEADER_CANNOT_EXPEL",
+							"message"; "CREW LEADER는 CREW에서 탈퇴할 수 없습니다."
+						}
+						"""
+				)
+			)
+		),
+		@ApiResponse(
+			responseCode = "403",
+			description = "크루 리더가 아닌데, 크루 리더의 권한을 행하려고 하는 경우",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = @ExampleObject(
+					name = "",
+					value = """
+						{
+							"resultCode": 403,
+							"code": "LEADER_PERMISSION_DENIED",
+							"message"; "CREW LEADER의 권한이 필요합니다."
+						}
+						"""
+				)
+			)
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = """
+				1. 사용자 식별자를 통해 사용자를 조회하지 못했을 때
+				2. 크루 식별자를 통해 크루를 조회하지 못했을 때
+				3. 닉네임을 통해 사용자를 조회하지 못했을 때
+				""",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "사용자 식별자를 통해 사용자를 조회하지 못했을 때",
+						value = """
+							{
+								"resultCode": 404,
+								"code": "MEMBER_NOT_FOUND",
+								"message"; "사용자를 찾을 수 없습니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "크루 식별자를 통해 크루를 조회하지 못했을 때",
+						value = """
+							{
+								"resultCode": 404,
+								"code": "CREW_NOT_FOUND",
+								"message"; "해당 CREW를 찾을 수 없습니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "닉네임을 통해 사용자를 조회하지 못했을 때",
+						value = """
+							{
+								"resultCode": 404,
+								"code": "MEMBER_NOT_FOUND",
+								"message"; "사용자를 찾을 수 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	CommonResponse expelCrew(
+		@HereWeUser User user, @PathVariable Long crewId,
+		@RequestParam(name = "nickname") String nickname);
 }
 
