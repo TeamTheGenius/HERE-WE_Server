@@ -59,7 +59,6 @@ public class CrewMember {
 			user.getCrewMembers().add(this);
 		}
 		if (!crew.getCrewMembers().contains(this)) {
-			crew.updateParticipantCount(1);
 			crew.getCrewMembers().add(this);
 		}
 	}
