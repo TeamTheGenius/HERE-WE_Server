@@ -45,4 +45,9 @@ public class CrewMemberService {
 	public Page<CrewPreviewResponse> findAllJoinCrews(Long userId, Pageable pageable) {
 		return queryRepository.findAllJoinCrews(userId, pageable);
 	}
+
+	@Transactional
+	public void delete(CrewMember crewMember) {
+		crewMemberRepository.delete(crewMember);
+	}
 }

@@ -94,4 +94,11 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 		if (introduce != null)
 			this.introduce = introduce;
 	}
+
+	public void updateParticipantCount(int amount) {
+		if (amount < 0 && this.participantCount + amount < 0) {
+			return;
+		}
+		this.participantCount += amount;
+	}
 }

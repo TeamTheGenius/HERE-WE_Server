@@ -1,5 +1,7 @@
 package com.genius.herewe.business.crew.facade;
 
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.crew.domain.CrewMember;
 import com.genius.herewe.business.crew.domain.CrewRole;
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewExpelRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
@@ -16,7 +19,6 @@ import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
 import com.genius.herewe.core.global.exception.BusinessException;
-import com.genius.herewe.core.global.exception.ErrorCode;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
@@ -79,10 +81,29 @@ public class DefaultCrewFacade implements CrewFacade {
 		CrewMember crewMember = crewMemberService.find(userId, crew.getId());
 
 		if (crewMember.getRole() != CrewRole.LEADER) {
-			throw new BusinessException(ErrorCode.LEADER_PERMISSION_DENIED);
+			throw new BusinessException(LEADER_PERMISSION_DENIED);
 		}
 
 		crew.modify(request.name(), request.introduce());
 		return CrewPreviewResponse.create(crew);
+	}
+
+	@Override
+	@Transactional
+	public void expelCrew(Long userId, CrewExpelRequest expelRequest) {
+		User leader = userService.findById(userId);
+		Crew crew = crewService.findById(expelRequest.crewId());
+		if (crewMemberService.find(leader.getId(), crew.getId()).getRole() != CrewRole.LEADER) {
+			throw new BusinessException(LEADER_PERMISSION_DENIED);
+		}
+
+		User targetUser = userService.findByNickname(expelRequest.targetName())
+			.orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
+		CrewMember crewMember = crewMemberService.find(targetUser.getId(), crew.getId());
+		if (crewMember.getRole() == CrewRole.LEADER) {
+			throw new BusinessException(LEADER_CANNOT_EXPEL);
+		}
+		crewMemberService.delete(crewMember);
+		crew.updateParticipantCount(-1);
 	}
 }
