@@ -35,10 +35,7 @@ public class RegistrationTokenService {
 		if (registrationToken.isEmpty()) {
 			throw new BusinessException(REGISTRATION_TOKEN_NOT_FOUND);
 		}
-		Long userId = registrationToken.get().getUserId();
-		deleteToken(token);
-
-		return userId;
+		return registrationToken.get().getUserId();
 	}
 
 	public void deleteToken(String token) {

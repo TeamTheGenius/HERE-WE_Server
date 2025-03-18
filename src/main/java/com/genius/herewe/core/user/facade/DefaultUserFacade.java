@@ -45,6 +45,7 @@ public class DefaultUserFacade implements UserFacade {
 	@Transactional
 	public SignupResponse signup(SignupRequest signupRequest) {
 		Long userId = registrationTokenService.getUserIdFromToken(signupRequest.token());
+		registrationTokenService.deleteToken(signupRequest.token());
 		User user = userService.findById(userId);
 
 		String nickname = signupRequest.nickname();
