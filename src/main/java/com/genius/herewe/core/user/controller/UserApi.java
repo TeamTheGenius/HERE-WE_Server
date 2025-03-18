@@ -2,7 +2,6 @@ package com.genius.herewe.core.user.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -138,7 +137,7 @@ public interface UserApi {
 	})
 	@GetMapping("/auth/profile/{id}")
 	SingleResponse<FileResponse> getProfile(
-		@Parameter(description = "찾고자하는 객체의 식별자(PK)") @PathVariable Long id);
+		@Parameter(description = "사용자의 회원가입 토큰") @RequestParam("token") String token);
 
 	@Operation(summary = "사용자 프로필 갱신", description = "회원가입 과정에서 사용자의 프로필 갱신")
 	@ApiResponses({
@@ -183,7 +182,7 @@ public interface UserApi {
 	})
 	@PatchMapping("/auth/profile/{id}")
 	SingleResponse<FileResponse> updateProfile(
-		@Parameter(description = "찾고자하는 객체의 식별자(PK)") @PathVariable Long id,
+		@Parameter(description = "사용자의 회원가입 토큰") @RequestParam("token") String token,
 		@Parameter(description = "저장하고자하는 파일을 form-data의 files 항목으로 전달") @RequestParam(value = "files") MultipartFile multipartFile
 	);
 }
