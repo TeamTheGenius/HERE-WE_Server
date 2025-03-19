@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
 	VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "데이터 전달 관련 유효성 검사에 실패했습니다."),
-	INVALID_PAGINATION_PARAM(HttpStatus.BAD_REQUEST, "페이지 번호와 페이지 사이즈는 0보다 커야 합니다."),
+	INVALID_PAGINATION_PARAM(HttpStatus.BAD_REQUEST, "페이지 번호는 0 이상이어야 하며, 페이지 사이즈는 1~15 중 하나여야 합니다."),
 
 	INVALID_KEYWORD(HttpStatus.BAD_REQUEST, "검색어는 필수 항목입니다."),
 	INVALID_REQUEST_PARAM(HttpStatus.BAD_REQUEST, "요청 파라미터 확인 후 재시도해주세요."),

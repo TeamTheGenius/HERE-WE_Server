@@ -51,7 +51,7 @@ public class KakaoSearchClient {
 		if (keyword == null || keyword.isBlank()) {
 			throw new BusinessException(INVALID_KEYWORD);
 		}
-		if (size <= 0 || page < 0) {
+		if (size <= 0 || size > 15 || page < 0) {
 			throw new BusinessException(INVALID_PAGINATION_PARAM);
 		}
 	}

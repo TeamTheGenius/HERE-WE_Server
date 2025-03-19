@@ -22,7 +22,7 @@ public class LocalController implements LocalApi {
 	@GetMapping("/search/location")
 	public SlicingResponse<Place> search(@RequestParam("keyword") String keyword,
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size) {
+		@RequestParam(defaultValue = "15") int size) {
 
 		Slice<Place> places = kakaoSearchClient.searchByKeyword(keyword, size, page);
 
