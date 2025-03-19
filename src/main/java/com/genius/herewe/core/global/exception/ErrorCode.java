@@ -30,7 +30,7 @@ public enum ErrorCode {
 	JWT_NOT_FOUND_IN_HEADER(HttpStatus.UNAUTHORIZED, "Header에서 JWT를 찾을 수 없습니다."),
 	JWT_NOT_FOUND_IN_COOKIE(HttpStatus.UNAUTHORIZED, "Cookie에서 JWT를 찾을 수 없습니다."),
 	REFRESH_NOT_FOUND_IN_DB(HttpStatus.NOT_FOUND, "DB에서 사용자의 Refresh token 정보를 찾을 수 없습니다."),
-	TOKEN_HIJACKED(HttpStatus.UNAUTHORIZED, "토큰 탈취가 감지되었습니다."),
+	TOKEN_HIJACKED(HttpStatus.UNAUTHORIZED, "토큰 탈취가 감지되었습니다. 다시 로그인해주세요."),
 
 	REGISTRATION_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "회원가입 토큰을 찾을 수 없습니다."),
 
