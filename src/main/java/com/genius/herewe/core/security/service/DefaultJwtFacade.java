@@ -133,7 +133,9 @@ public class DefaultJwtFacade implements JwtFacade {
 	@Override
 	public String resolveAccessToken(HttpServletRequest request) {
 		String bearerHeader = request.getHeader(ACCESS_HEADER.getValue());
-		if (bearerHeader == null || bearerHeader.isBlank()) {
+		if (bearerHeader == null || bearerHeader.isEmpty()) {
+			return "";
+		} else if (!bearerHeader.startsWith(ACCESS_PREFIX.getValue())) {
 			throw new BusinessException(JWT_NOT_FOUND_IN_HEADER);
 		}
 		return bearerHeader.trim().substring(7);
@@ -155,6 +157,9 @@ public class DefaultJwtFacade implements JwtFacade {
 
 	@Override
 	public JwtStatus verifyAccessToken(String accessToken) {
+		if (accessToken.isEmpty()) {
+			return JwtStatus.NEED_CHECK_RT;
+		}
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(ACCESS_SECRET_KEY)

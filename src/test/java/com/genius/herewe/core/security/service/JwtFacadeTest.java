@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -201,22 +203,26 @@ class JwtFacadeTest {
 				assertThat(resolvedAccessToken).isEqualTo(accessToken);
 			}
 
-			@Test
-			@DisplayName("Authorization 헤더가 빈 문자열이라면 예외가 발생한다.")
-			public void it_throws_JWT_NOT_FOUND_IN_HEADER_exception() {
+			@ParameterizedTest
+			@DisplayName("Authorization 헤더가 null이거나 빈 문자열이라면 \"\"을 반환한다")
+			@EmptySource
+			public void it_throws_JWT_NOT_FOUND_IN_HEADER_exception(String headerValue) {
 				//given
-				mockRequest.addHeader(ACCESS_HEADER.getValue(), "   ");
+				mockRequest.addHeader(ACCESS_HEADER.getValue(), headerValue);
 
-				//when & then
-				assertThatThrownBy(() -> jwtFacade.resolveAccessToken(mockRequest))
-					.isInstanceOf(BusinessException.class)
-					.hasMessageContaining(JWT_NOT_FOUND_IN_HEADER.getMessage());
+				//when
+				String resolvedToken = jwtFacade.resolveAccessToken(mockRequest);
+
+				//then
+				assertThat(resolvedToken).isEqualTo("");
 			}
 
-			@Test
-			@DisplayName("Authorization 헤더가 없으면 예외가 발생한다.")
-			public void it_throws_exception_when_header_not_exist() {
+			@ParameterizedTest
+			@DisplayName("Authorization 헤더(Bearer )로 시작하는 헤더가 없으면 JWT_NOT_FOUND_IN_HEADER 예외가 발생한다.")
+			@ValueSource(strings = {"   ", "\t", "\n", "  token   "})
+			public void it_throws_exception_when_header_not_exist(String headerValue) {
 				//given
+				mockRequest.addHeader(ACCESS_HEADER.getValue(), headerValue);
 
 				//when & then
 				assertThatThrownBy(() -> jwtFacade.resolveAccessToken(mockRequest))
@@ -296,6 +302,20 @@ class JwtFacadeTest {
 
 				//then
 				assertThat(status).isEqualTo(JwtStatus.EXPIRED);
+			}
+
+			@Test
+			@DisplayName("토큰이 빈 문자열이라면 NEED_CHECK_RT를 반환해야 한다.")
+			public void it_return_NEED_CHECK_RT() {
+				//given
+				User user = UserFixture.createDefault();
+				String emptyToken = "";
+
+				//when
+				JwtStatus jwtStatus = jwtFacade.verifyAccessToken(emptyToken);
+
+				//then
+				assertThat(jwtStatus).isEqualTo(JwtStatus.NEED_CHECK_RT);
 			}
 
 			@Test
