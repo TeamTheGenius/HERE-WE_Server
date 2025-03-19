@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class LocalController {
+public class LocalController implements LocalApi {
 	private final KakaoSearchClient kakaoSearchClient;
 
 	@GetMapping("/search/location")
