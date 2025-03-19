@@ -1,11 +1,17 @@
 package com.genius.herewe.core.global.config;
 
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+
+import com.genius.herewe.core.global.exception.BusinessException;
 
 @Configuration
 public class RestClientConfig {
@@ -24,6 +30,17 @@ public class RestClientConfig {
 			.baseUrl(BASE_URL)
 			.defaultHeader("Authorization", "KakaoAK " + KAKAO_AUTH_KEY)
 			.requestFactory(clientHttpRequestFactory())
+			.defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
+				if (response.getStatusCode() == HttpStatus.BAD_REQUEST) {
+					throw new BusinessException(INVALID_REQUEST_PARAM);
+				}
+				if (response.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+					throw new BusinessException(SERVICE_IN_MAINTENANCE);
+				}
+				if (response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+					throw new BusinessException(INTERNAL_SERVER_ERROR);
+				}
+			})
 			.build();
 	}
 
