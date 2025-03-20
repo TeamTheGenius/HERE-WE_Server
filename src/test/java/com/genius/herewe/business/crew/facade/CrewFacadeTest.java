@@ -29,6 +29,7 @@ import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.fixture.UserFixture;
 import com.genius.herewe.core.user.service.UserService;
+import com.genius.herewe.infra.file.service.FilesStorage;
 
 @ExtendWith(MockitoExtension.class)
 class CrewFacadeTest {
@@ -39,10 +40,12 @@ class CrewFacadeTest {
 	private CrewService crewService;
 	@Mock
 	private CrewMemberService crewMemberService;
+	@Mock
+	private FilesStorage filesStorage;
 
 	@BeforeEach
 	void init() {
-		crewFacade = new DefaultCrewFacade(userService, crewService, crewMemberService);
+		crewFacade = new DefaultCrewFacade(userService, crewService, crewMemberService, filesStorage);
 	}
 
 	@Nested
@@ -238,6 +241,27 @@ class CrewFacadeTest {
 				assertThat(crewResponse.leaderName()).isEqualTo(crew.getLeaderName());
 				assertThat(crewResponse.role()).isEqualTo(crewMember.getRole());
 				assertThat(crewResponse.participantCount()).isEqualTo(crew.getParticipantCount());
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("크루 삭제 시")
+	class Context_delete_crew {
+		@Nested
+		@DisplayName("크루의 식별자(PK)를 전달했을 때")
+		class Describe_pass_crew_pk {
+			@Test
+			@DisplayName("크루의 식별자를 통해 크루를 찾지 못하면 CREW_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_CREW_NOT_FOUND_exception() {
+				//given
+				Long fakeCrewId = 999L;
+				given(crewService.findById(fakeCrewId)).willThrow(new BusinessException(CREW_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.deleteCrew(fakeCrewId))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(CREW_NOT_FOUND.getMessage());
 			}
 		}
 	}

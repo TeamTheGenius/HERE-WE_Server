@@ -25,4 +25,9 @@ public class CrewService {
 	public Crew save(Crew crew) {
 		return crewRepository.save(crew);
 	}
+
+	@Transactional
+	public void delete(Crew crew) {
+		crewRepository.delete(crew);
+	}
 }

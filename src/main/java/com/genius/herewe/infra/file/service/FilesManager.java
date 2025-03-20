@@ -61,6 +61,10 @@ public class FilesManager {
 		FileEnv fileEnv = filesStorage.getFileEnvironment();
 		FileDTO fileDTO = filesStorage.upload(multipartFile, fileEnv, fileType);
 
+		if (fileHolder.getFiles().getId() != null) {
+			filesStorage.delete(FileDTO.create(fileHolder.getFiles()));
+		}
+
 		Files files = Files.builder()
 			.environment(fileEnv)
 			.type(fileType)
