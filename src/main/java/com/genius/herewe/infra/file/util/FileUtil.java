@@ -20,7 +20,7 @@ import com.genius.herewe.infra.file.domain.FileType;
 import com.genius.herewe.infra.file.dto.FileDTO;
 
 public class FileUtil {
-	private static final List<String> SUPPORT_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
+	private static final List<String> SUPPORT_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif", "webp");
 
 	public static MultipartFile getDefaultProfileImage() {
 		try {
