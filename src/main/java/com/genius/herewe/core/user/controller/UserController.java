@@ -36,7 +36,7 @@ public class UserController implements UserApi {
 
 	@GetMapping("/auth/check-nickname")
 	public CommonResponse checkNicknameDuplicated(@RequestParam(value = "nickname") String nickname) {
-		userFacade.isNicknameDuplicated(nickname);
+		userFacade.validateNickname(nickname);
 		return CommonResponse.ok();
 	}
 

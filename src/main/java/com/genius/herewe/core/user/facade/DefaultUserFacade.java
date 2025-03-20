@@ -3,6 +3,7 @@ package com.genius.herewe.core.user.facade;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DefaultUserFacade implements UserFacade {
+	private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9가-힣]{2,20}$");
+
 	private final UserService userService;
 	private final RegistrationTokenService registrationTokenService;
 	private final FilesManager filesManager;
@@ -34,7 +37,11 @@ public class DefaultUserFacade implements UserFacade {
 	}
 
 	@Override
-	public void isNicknameDuplicated(String nickname) {
+	public void validateNickname(String nickname) {
+		if (nickname == null || !NICKNAME_PATTERN.matcher(nickname).matches()) {
+			throw new BusinessException(INVALID_NICKNAME);
+		}
+
 		Optional<User> optionalUser = userService.findByNickname(nickname);
 		if (optionalUser.isPresent()) {
 			throw new BusinessException(NICKNAME_DUPLICATED);
@@ -45,18 +52,17 @@ public class DefaultUserFacade implements UserFacade {
 	@Transactional
 	public SignupResponse signup(SignupRequest signupRequest) {
 		Long userId = registrationTokenService.getUserIdFromToken(signupRequest.token());
-		registrationTokenService.deleteToken(signupRequest.token());
 		User user = userService.findById(userId);
-
 		String nickname = signupRequest.nickname();
 
+		validateNickname(nickname);
 		if (user.getRole() != Role.NOT_REGISTERED) {
 			throw new BusinessException(ALREADY_REGISTERED);
 		}
 
-		isNicknameDuplicated(nickname);
 		user.updateNickname(nickname);
 		user.updateRole(Role.USER);
+		registrationTokenService.deleteToken(signupRequest.token());
 
 		FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
 		return new SignupResponse(user.getId(), user.getNickname(), fileResponse);

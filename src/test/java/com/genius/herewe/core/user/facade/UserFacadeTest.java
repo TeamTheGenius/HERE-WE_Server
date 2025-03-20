@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -108,8 +110,11 @@ class UserFacadeTest {
 			String existNickname = "nickname";
 			User user = UserFixture.createByNickname(existNickname);
 
-			@BeforeEach
-			void init() {
+			@Test
+			@DisplayName("기존 회원들과 닉네임이 겹치치 않으면 예외를 발생시키지 않는다.")
+			public void it_does_not_throw_NICKNAME_DUPLICATED_exception() {
+				//given
+				String targetNickname = "otherNickname";
 				given(userService.findByNickname(anyString()))
 					.willAnswer(invocation -> {
 						String target = invocation.getArgument(0);
@@ -117,26 +122,46 @@ class UserFacadeTest {
 							return Optional.ofNullable(user);
 						return Optional.empty();
 					});
-			}
-
-			@Test
-			@DisplayName("기존 회원들과 닉네임이 겹치치 않으면 예외를 발생시키지 않는다.")
-			public void it_does_not_throw_NICKNAME_DUPLICATED_exception() {
-				//given
-				String targetNickname = "other nickname";
 
 				//when & then
 				assertThatNoException()
-					.isThrownBy(() -> userFacade.isNicknameDuplicated(targetNickname));
+					.isThrownBy(() -> userFacade.validateNickname(targetNickname));
 			}
 
 			@Test
 			@DisplayName("기존 회원들과 한 명이라도 닉네임이 겹치면 NICKNAME_DUPLICATED 예외를 발생시킨다.")
 			public void it_throw_NICKNAME_DUPLICATED_exception() {
+				//given
+				given(userService.findByNickname(anyString()))
+					.willAnswer(invocation -> {
+						String target = invocation.getArgument(0);
+						if (target.equals(existNickname))
+							return Optional.ofNullable(user);
+						return Optional.empty();
+					});
+
 				//when & then
-				assertThatThrownBy(() -> userFacade.isNicknameDuplicated(existNickname))
+				assertThatThrownBy(() -> userFacade.validateNickname(existNickname))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(NICKNAME_DUPLICATED.getMessage());
+			}
+
+			@ParameterizedTest
+			@DisplayName("닉네임이 null이거나 빈 문자열인 경우 INVALID_NICKNAME 예외를 발생시킨다.")
+			@NullAndEmptySource
+			public void it_throw_INVALID_NICKNAME_exception_when_null_or_empty(String nickname) {
+				assertThatThrownBy(() -> userFacade.validateNickname(nickname))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(INVALID_NICKNAME.getMessage());
+			}
+
+			@ParameterizedTest
+			@DisplayName("닉네임이 2~20자 사이가 아니거나, 한글&영문자&숫자 외에 다른 문자로 이루어져있다면 INVALID_NICKNAME 예외를 발생시킨다.")
+			@ValueSource(strings = {"a", "abcdefghijklmnopsdfds", "도토리@"})
+			public void it_throw_INVALID_NICKNAME_exception_when_length_invalid(String nickname) {
+				assertThatThrownBy(() -> userFacade.validateNickname(nickname))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(INVALID_NICKNAME.getMessage());
 			}
 		}
 	}
@@ -172,7 +197,7 @@ class UserFacadeTest {
 			@DisplayName("기존 회원들과 닉네임이 겹치치 않으면 예외를 발생시키지 않는다.")
 			public void it_does_not_throw_NICKNAME_DUPLICATED_exception() {
 				//given
-				String targetNickname = "other nickname";
+				String targetNickname = "otherNickname";
 				SignupRequest signupRequest = new SignupRequest(
 					registrationToken, targetNickname
 				);

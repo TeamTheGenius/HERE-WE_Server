@@ -8,7 +8,7 @@ import com.genius.herewe.core.user.dto.SignupResponse;
 public interface UserFacade {
 	User findUser(Long userId);
 
-	void isNicknameDuplicated(String nickname);
+	void validateNickname(String nickname);
 
 	SignupResponse signup(SignupRequest signupRequest);
 
