@@ -9,6 +9,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
 	VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "데이터 전달 관련 유효성 검사에 실패했습니다."),
+	INVALID_PAGINATION_PARAM(HttpStatus.BAD_REQUEST, "페이지 번호는 0 이상이어야 하며, 페이지 사이즈는 1~15 중 하나여야 합니다."),
+
+	INVALID_KEYWORD(HttpStatus.BAD_REQUEST, "검색어는 필수 항목입니다."),
+	INVALID_REQUEST_PARAM(HttpStatus.BAD_REQUEST, "요청 파라미터 확인 후 재시도해주세요."),
+	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "외부 API(Kakao) 서버 에러. 잠시 후 다시 시도해주세요."),
+	SERVICE_IN_MAINTENANCE(HttpStatus.SERVICE_UNAVAILABLE, "외부 API(Kakao) 서버가 점검 중입니다."),
 
 	ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 가입한 사용자입니다."),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
@@ -21,7 +27,6 @@ public enum ErrorCode {
 	CREW_JOIN_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 크루에 대한 참여 정보가 없습니다."),
 	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),
 
-	ALREADY_INVITED(HttpStatus.BAD_REQUEST, "이미 해당 크루에 초대되었습니다."),
 	INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "크루 초대 정보를 찾을 수 없습니다. 초대 정보를 다시 확인해주세요."),
 	INVITATION_EXPIRED(HttpStatus.BAD_REQUEST, "크루 초대가 만료되었습니다."),
 
