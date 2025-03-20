@@ -187,6 +187,31 @@ public interface CrewApi {
 		@PathVariable Long crewId,
 		@RequestBody CrewModifyRequest crewModifyRequest);
 
+	@Operation(summary = "크루 삭제", description = "crewId(식별자)를 통해 특정 크루 삭제")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "크루 삭제 성공"
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "crewId(PK - 식별자)를 통해 해당 크루를 찾지 못한 경우",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = @ExampleObject(
+					value = """
+						{
+						    "resultCode": 404,
+						    "code": "CREW_NOT_FOUND",
+						    "message": "해당 CREW를 찾을 수 없습니다."
+						}
+						"""
+				)
+			)
+		)
+	})
+	CommonResponse deleteCrew(@PathVariable Long crewId);
+
 	@Operation(summary = "크루 초대", description = "특정 사용자에게 크루 초대 요청 (초대 링크가 담긴 메일 전송)")
 	@ApiResponses({
 		@ApiResponse(

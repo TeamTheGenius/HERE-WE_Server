@@ -21,6 +21,8 @@ import com.genius.herewe.business.crew.service.CrewService;
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
+import com.genius.herewe.infra.file.dto.FileDTO;
+import com.genius.herewe.infra.file.service.FilesStorage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,7 @@ public class DefaultCrewFacade implements CrewFacade {
 	private final UserService userService;
 	private final CrewService crewService;
 	private final CrewMemberService crewMemberService;
+	private final FilesStorage filesStorage;
 
 	@Override
 	public Page<CrewPreviewResponse> inquiryMyCrews(Long userId, Pageable pageable) {
@@ -86,6 +89,16 @@ public class DefaultCrewFacade implements CrewFacade {
 
 		crew.modify(request.name(), request.introduce());
 		return CrewPreviewResponse.create(crew);
+	}
+
+	@Override
+	@Transactional
+	public void deleteCrew(Long crewId) {
+		Crew crew = crewService.findById(crewId);
+		if (crew.getFiles() != null) {
+			filesStorage.delete(FileDTO.create(crew.getFiles()));
+		}
+		crewService.delete(crew);
 	}
 
 	@Override

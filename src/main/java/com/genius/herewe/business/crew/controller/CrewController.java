@@ -86,6 +86,12 @@ public class CrewController implements CrewApi {
 		return new SingleResponse<>(HttpStatus.OK, response);
 	}
 
+	@DeleteMapping("/{crewId}")
+	public CommonResponse deleteCrew(@PathVariable Long crewId) {
+		crewFacade.deleteCrew(crewId);
+		return CommonResponse.ok();
+	}
+
 	@PostMapping("/invite")
 	public CommonResponse inviteCrew(
 		@Valid @RequestBody InvitationRequest invitationRequest) {
@@ -102,7 +108,7 @@ public class CrewController implements CrewApi {
 		return CommonResponse.ok();
 	}
 
-	@DeleteMapping("/{crewId}")
+	@DeleteMapping("/{crewId}/members")
 	public CommonResponse expelCrew(
 		@HereWeUser User user, @PathVariable Long crewId,
 		@RequestParam(name = "nickname") String nickname) {

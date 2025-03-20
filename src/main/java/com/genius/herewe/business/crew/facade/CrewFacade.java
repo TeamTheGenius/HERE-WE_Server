@@ -21,5 +21,7 @@ public interface CrewFacade {
 
 	CrewPreviewResponse modifyCrew(Long userId, Long crewId, CrewModifyRequest request);
 
+	void deleteCrew(Long crewId);
+
 	void expelCrew(Long userId, CrewExpelRequest expelRequest);
 }
