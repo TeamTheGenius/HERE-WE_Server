@@ -3,6 +3,7 @@ package com.genius.herewe.business.moment.facade;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ import com.genius.herewe.business.location.domain.Location;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
-import com.genius.herewe.business.moment.dto.MomentCreateRequest;
+import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.service.MomentService;
 import com.genius.herewe.core.global.exception.BusinessException;
@@ -31,28 +32,20 @@ public class DefaultMomentFacade implements MomentFacade {
 	private final MomentService momentService;
 	private final LocationService locationService;
 
-	/**
-	 * 모먼트 생성 시 설정해야하는 항목들
-	 * 1. 모먼트 정보 생성
-	 * 1-1. 모먼트랑 crew 연결
-	 * 2. Place 정보 받아서 Location 생성 후 저장 & Moment에 연결하기
-	 * 3. MomentMember를 통해 참여 정보 저장하기
-	 * NOTE: meetAt, capacity, closedAt 유효성 확인하기
-	 */
 	@Override
 	@Transactional
-	public MomentResponse createMoment(Long userId, MomentCreateRequest momentCreateRequest) {
-		validateMomentRequest(momentCreateRequest);
+	public MomentResponse createMoment(Long userId, Long crewId, MomentRequest momentRequest) {
+		validateMomentRequest(momentRequest);
 
 		User user = userService.findById(userId);
-		Crew crew = crewService.findById(momentCreateRequest.crewId());
+		Crew crew = crewService.findById(crewId);
 
 		Moment moment = Moment.builder()
-			.name(momentCreateRequest.momentName())
+			.name(momentRequest.momentName())
 			.participantCount(1)
-			.capacity(momentCreateRequest.capacity())
-			.meetAt(momentCreateRequest.meetAt())
-			.closedAt(momentCreateRequest.closedAt())
+			.capacity(momentRequest.capacity())
+			.meetAt(momentRequest.meetAt())
+			.closedAt(momentRequest.closedAt())
 			.build();
 		moment.addCrew(crew);
 		momentService.save(moment);
@@ -60,18 +53,37 @@ public class DefaultMomentFacade implements MomentFacade {
 		MomentMember momentMember = MomentMember.create();
 		momentMember.joinMoment(user, moment);
 
-		Location location = locationService.saveFromPlace(momentCreateRequest.meetPlace(), 1);
+		Location location = locationService.saveFromPlace(momentRequest.place(), 1);
 		location.addMoment(moment);
 
 		return MomentResponse.createJoined(moment, true);
 	}
 
-	private void validateMomentRequest(MomentCreateRequest momentCreateRequest) {
+	@Override
+	@Transactional
+	public MomentResponse modifyMoment(Long momentId, MomentRequest momentRequest) {
+		validateMomentRequest(momentRequest);
+		Moment moment = momentService.findById(momentId);
+
+		Optional.ofNullable(momentRequest.momentName()).ifPresent(moment::updateName);
+		Optional.ofNullable(momentRequest.meetAt()).ifPresent(moment::updateMeetAt);
+		Optional.ofNullable(momentRequest.closedAt()).ifPresent(moment::updateClosedAt);
+		Optional.of(momentRequest.capacity()).ifPresent(moment::updateCapacity);
+
+		Optional.ofNullable(momentRequest.place()).ifPresent(place -> {
+			Location meetLocation = locationService.findMeetLocation(momentId);
+			meetLocation.update(place);
+		});
+
+		return MomentResponse.createJoined(moment, true);
+	}
+
+	private void validateMomentRequest(MomentRequest momentRequest) {
 		LocalDateTime now = LocalDateTime.now();
 
-		int capacity = momentCreateRequest.capacity();
-		LocalDateTime meetAt = momentCreateRequest.meetAt();
-		LocalDateTime closedAt = momentCreateRequest.closedAt();
+		int capacity = momentRequest.capacity();
+		LocalDateTime meetAt = momentRequest.meetAt();
+		LocalDateTime closedAt = momentRequest.closedAt();
 
 		if (capacity < 2) {
 			throw new BusinessException(INVALID_MOMENT_CAPACITY);

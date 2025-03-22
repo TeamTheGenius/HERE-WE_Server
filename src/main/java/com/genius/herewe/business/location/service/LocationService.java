@@ -1,11 +1,14 @@
 package com.genius.herewe.business.location.service;
 
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.location.domain.Location;
 import com.genius.herewe.business.location.repository.LocationRepository;
 import com.genius.herewe.business.location.search.dto.Place;
+import com.genius.herewe.core.global.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,16 +20,12 @@ public class LocationService {
 
 	@Transactional
 	public Location saveFromPlace(Place place, int index) {
-		Location location = Location.builder()
-			.locationIndex(index)
-			.name(place.name())
-			.address(place.address())
-			.roadAddress(place.roadAddress())
-			.url(place.placeUrl())
-			.x(place.x())
-			.y(place.y())
-			.phone(place.phone())
-			.build();
+		Location location = Location.createFromPlace(place, index);
 		return locationRepository.save(location);
+	}
+
+	public Location findMeetLocation(Long momentId) {
+		return locationRepository.findByIndex(momentId, 1)
+			.orElseThrow(() -> new BusinessException(NEED_MEET_PLACE));
 	}
 }

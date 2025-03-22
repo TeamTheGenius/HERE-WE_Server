@@ -92,4 +92,20 @@ public class Moment implements FileHolder {
 	public void setFiles(Files files) {
 		this.files = files;
 	}
+
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+
+	public void updateMeetAt(LocalDateTime meetAt) {
+		this.meetAt = meetAt;
+	}
+
+	public void updateClosedAt(LocalDateTime closedAt) {
+		this.closedAt = closedAt;
+	}
 }

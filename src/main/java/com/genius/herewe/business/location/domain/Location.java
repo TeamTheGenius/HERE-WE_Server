@@ -1,5 +1,6 @@
 package com.genius.herewe.business.location.domain;
 
+import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.moment.domain.Moment;
 
 import jakarta.persistence.Column;
@@ -61,11 +62,35 @@ public class Location {
 		this.phone = phone;
 	}
 
+	public static Location createFromPlace(Place place, int index) {
+		return Location.builder()
+			.locationIndex(index)
+			.name(place.name())
+			.address(place.address())
+			.roadAddress(place.roadAddress())
+			.url(place.placeUrl())
+			.x(place.x())
+			.y(place.y())
+			.phone(place.phone())
+			.build();
+	}
+
 	//== 연관관계 편의 메서드 ==//
 	public void addMoment(Moment moment) {
 		this.moment = moment;
 		if (!moment.getLocations().contains(this)) {
 			moment.getLocations().add(this);
 		}
+	}
+
+	//== 비지니스 로직 ==//
+	public void update(Place place) {
+		this.name = place.name();
+		this.address = place.address();
+		this.roadAddress = place.roadAddress();
+		this.url = place.placeUrl();
+		this.x = place.x();
+		this.y = place.y();
+		this.phone = place.phone();
 	}
 }
