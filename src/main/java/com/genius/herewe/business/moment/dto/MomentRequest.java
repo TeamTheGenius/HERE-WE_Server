@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import com.genius.herewe.business.location.search.dto.Place;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "모먼트 생성/수정 시 request body")
 public record MomentRequest(
 	@Schema(description = "모먼트 이름")
