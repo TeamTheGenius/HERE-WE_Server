@@ -1,6 +1,5 @@
 package com.genius.herewe.business.moment.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.genius.herewe.business.location.search.dto.Place;
@@ -20,6 +19,6 @@ public record MomentCreateRequest(
 	@Schema(description = "마감 인원 수")
 	int capacity,
 	@Schema(description = "마감 날짜/시간")
-	LocalDate closedAt
+	LocalDateTime closedAt
 ) {
 }

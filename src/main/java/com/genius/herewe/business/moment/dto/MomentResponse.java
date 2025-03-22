@@ -1,6 +1,6 @@
 package com.genius.herewe.business.moment.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.genius.herewe.business.moment.domain.Moment;
 
@@ -13,7 +13,7 @@ public record MomentResponse(
 	String name,
 	int participantCount,
 	int capacity,
-	LocalDate closedAt
+	LocalDateTime closedAt
 ) {
 
 	public static MomentResponse createJoined(Moment moment, boolean isJoined) {

@@ -1,6 +1,5 @@
 package com.genius.herewe.business.moment.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +60,10 @@ public class Moment implements FileHolder {
 
 	private LocalDateTime meetAt;
 
-	private LocalDate closedAt;
+	private LocalDateTime closedAt;
 
 	@Builder
-	public Moment(String name, int participantCount, int capacity, LocalDateTime meetAt, LocalDate closedAt) {
+	public Moment(String name, int participantCount, int capacity, LocalDateTime meetAt, LocalDateTime closedAt) {
 		this.name = name;
 		this.participantCount = participantCount;
 		this.capacity = capacity;

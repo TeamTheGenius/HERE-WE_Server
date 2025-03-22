@@ -26,6 +26,6 @@ public class MomentController {
 		@RequestBody MomentCreateRequest momentCreateRequest) {
 
 		MomentResponse momentResponse = momentFacade.createMoment(user.getId(), momentCreateRequest);
-		return new SingleResponse<>(HttpStatus.OK, momentResponse);
+		return new SingleResponse<>(HttpStatus.CREATED, momentResponse);
 	}
 }

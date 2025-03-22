@@ -1,5 +1,9 @@
 package com.genius.herewe.business.moment.facade;
 
+import static com.genius.herewe.core.global.exception.ErrorCode.*;
+
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +16,7 @@ import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.business.moment.dto.MomentCreateRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.service.MomentService;
+import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 
@@ -37,6 +42,8 @@ public class DefaultMomentFacade implements MomentFacade {
 	@Override
 	@Transactional
 	public MomentResponse createMoment(Long userId, MomentCreateRequest momentCreateRequest) {
+		validateMomentRequest(momentCreateRequest);
+
 		User user = userService.findById(userId);
 		Crew crew = crewService.findById(momentCreateRequest.crewId());
 
@@ -57,5 +64,20 @@ public class DefaultMomentFacade implements MomentFacade {
 		location.addMoment(moment);
 
 		return MomentResponse.createJoined(moment, true);
+	}
+
+	private void validateMomentRequest(MomentCreateRequest momentCreateRequest) {
+		LocalDateTime now = LocalDateTime.now();
+
+		int capacity = momentCreateRequest.capacity();
+		LocalDateTime meetAt = momentCreateRequest.meetAt();
+		LocalDateTime closedAt = momentCreateRequest.closedAt();
+
+		if (capacity < 2) {
+			throw new BusinessException(INVALID_MOMENT_CAPACITY);
+		}
+		if (!meetAt.isAfter(now) || !closedAt.isAfter(now) || !meetAt.isAfter(closedAt)) {
+			throw new BusinessException(INVALID_MOMENT_DATE);
+		}
 	}
 }
