@@ -62,13 +62,20 @@ public class DefaultMomentFacade implements MomentFacade {
 	@Override
 	@Transactional
 	public MomentResponse modifyMoment(Long momentId, MomentRequest momentRequest) {
-		validateMomentRequest(momentRequest);
 		Moment moment = momentService.findById(momentId);
 
 		Optional.ofNullable(momentRequest.momentName()).ifPresent(moment::updateName);
-		Optional.ofNullable(momentRequest.meetAt()).ifPresent(moment::updateMeetAt);
-		Optional.ofNullable(momentRequest.closedAt()).ifPresent(moment::updateClosedAt);
-		Optional.of(momentRequest.capacity()).ifPresent(moment::updateCapacity);
+		Optional.ofNullable(moment.getCapacity()).ifPresent(val -> {
+			validateCapacity(val);
+			moment.updateCapacity(val);
+		});
+
+		LocalDateTime createdAt = moment.getCreatedAt();
+		LocalDateTime meetAt = momentRequest.meetAt() != null ? momentRequest.meetAt() : moment.getMeetAt();
+		LocalDateTime closedAt = momentRequest.closedAt() != null ? momentRequest.closedAt() : moment.getClosedAt();
+		validateDate(createdAt, meetAt, closedAt);
+		moment.updateMeetAt(meetAt);
+		moment.updateClosedAt(closedAt);
 
 		Optional.ofNullable(momentRequest.place()).ifPresent(place -> {
 			Location meetLocation = locationService.findMeetLocation(momentId);
@@ -81,13 +88,24 @@ public class DefaultMomentFacade implements MomentFacade {
 	private void validateMomentRequest(MomentRequest momentRequest) {
 		LocalDateTime now = LocalDateTime.now();
 
-		int capacity = momentRequest.capacity();
-		LocalDateTime meetAt = momentRequest.meetAt();
-		LocalDateTime closedAt = momentRequest.closedAt();
+		int capacity = Optional.ofNullable(momentRequest.capacity())
+			.orElseThrow(() -> new BusinessException(REQUIRED_FIELD_MISSING));
+		LocalDateTime meetAt = Optional.ofNullable(momentRequest.meetAt())
+			.orElseThrow(() -> new BusinessException(REQUIRED_FIELD_MISSING));
+		LocalDateTime closedAt = Optional.ofNullable(momentRequest.closedAt())
+			.orElseThrow(() -> new BusinessException(REQUIRED_FIELD_MISSING));
 
+		validateCapacity(capacity);
+		validateDate(now, meetAt, closedAt);
+	}
+
+	private void validateCapacity(int capacity) {
 		if (capacity < 2) {
 			throw new BusinessException(INVALID_MOMENT_CAPACITY);
 		}
+	}
+
+	private void validateDate(LocalDateTime now, LocalDateTime meetAt, LocalDateTime closedAt) {
 		if (!meetAt.isAfter(now) || !closedAt.isAfter(now) || !meetAt.isAfter(closedAt)) {
 			throw new BusinessException(INVALID_MOMENT_DATE);
 		}

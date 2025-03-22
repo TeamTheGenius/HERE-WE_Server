@@ -25,7 +25,7 @@ public class LocationService {
 	}
 
 	public Location findMeetLocation(Long momentId) {
-		return locationRepository.findByIndex(momentId, 1)
+		return locationRepository.findByLocationIndex(momentId, 1)
 			.orElseThrow(() -> new BusinessException(NEED_MEET_PLACE));
 	}
 }

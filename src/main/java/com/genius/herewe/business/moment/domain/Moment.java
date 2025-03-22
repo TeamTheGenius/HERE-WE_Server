@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.location.domain.Location;
+import com.genius.herewe.core.global.domain.BaseTimeEntity;
 import com.genius.herewe.infra.file.domain.FileHolder;
 import com.genius.herewe.infra.file.domain.Files;
 
@@ -30,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Moment implements FileHolder {
+public class Moment extends BaseTimeEntity implements FileHolder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "moment_id")
@@ -56,7 +57,7 @@ public class Moment implements FileHolder {
 	@ColumnDefault("0")
 	private int participantCount;
 
-	private int capacity;
+	private Integer capacity;
 
 	private LocalDateTime meetAt;
 

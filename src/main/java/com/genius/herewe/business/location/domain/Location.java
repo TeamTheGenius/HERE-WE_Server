@@ -68,7 +68,7 @@ public class Location {
 			.name(place.name())
 			.address(place.address())
 			.roadAddress(place.roadAddress())
-			.url(place.placeUrl())
+			.url(place.url())
 			.x(place.x())
 			.y(place.y())
 			.phone(place.phone())
@@ -88,7 +88,7 @@ public class Location {
 		this.name = place.name();
 		this.address = place.address();
 		this.roadAddress = place.roadAddress();
-		this.url = place.placeUrl();
+		this.url = place.url();
 		this.x = place.x();
 		this.y = place.y();
 		this.phone = place.phone();

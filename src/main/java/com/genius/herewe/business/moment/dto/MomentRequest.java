@@ -15,7 +15,7 @@ public record MomentRequest(
 	@Schema(description = "모먼트의 만나는 위치")
 	Place place,
 	@Schema(description = "마감 인원 수")
-	int capacity,
+	Integer capacity,
 	@Schema(description = "마감 날짜/시간")
 	LocalDateTime closedAt
 ) {
