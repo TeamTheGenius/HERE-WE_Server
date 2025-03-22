@@ -1,5 +1,6 @@
 package com.genius.herewe.business.moment.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +8,9 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.business.crew.domain.Crew;
+import com.genius.herewe.business.location.domain.Location;
 import com.genius.herewe.infra.file.domain.FileHolder;
 import com.genius.herewe.infra.file.domain.Files;
-import com.genius.herewe.business.location.domain.Location;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -41,6 +42,9 @@ public class Moment implements FileHolder {
 	private Crew crew;
 
 	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MomentMember> momentMembers = new ArrayList<>();
+
+	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Location> locations = new ArrayList<>();
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -57,15 +61,23 @@ public class Moment implements FileHolder {
 
 	private LocalDateTime meetAt;
 
-	private LocalDateTime closedAt;
+	private LocalDate closedAt;
 
 	@Builder
-	public Moment(String name, int participantCount, int capacity, LocalDateTime meetAt, LocalDateTime closedAt) {
+	public Moment(String name, int participantCount, int capacity, LocalDateTime meetAt, LocalDate closedAt) {
 		this.name = name;
 		this.participantCount = participantCount;
 		this.capacity = capacity;
 		this.meetAt = meetAt;
 		this.closedAt = closedAt;
+	}
+
+	//== 연관관계 편의 메서드 ==//
+	public void addCrew(Crew crew) {
+		this.crew = crew;
+		if (!crew.getMoments().contains(this)) {
+			crew.getMoments().add(this);
+		}
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.genius.herewe.business.moment.domain;
 
+import java.time.LocalDate;
+
 import com.genius.herewe.core.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -30,4 +32,25 @@ public class MomentMember {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "moment_id")
 	private Moment moment;
+
+	private LocalDate joinedAt;
+
+	public MomentMember(LocalDate joinedAt) {
+		this.joinedAt = joinedAt;
+	}
+
+	public static MomentMember create() {
+		return new MomentMember(LocalDate.now());
+	}
+
+	public void joinMoment(User user, Moment moment) {
+		this.user = user;
+		this.moment = moment;
+		if (!user.getMomentMembers().contains(this)) {
+			user.getMomentMembers().add(this);
+		}
+		if (!moment.getMomentMembers().contains(this)) {
+			moment.getMomentMembers().add(this);
+		}
+	}
 }

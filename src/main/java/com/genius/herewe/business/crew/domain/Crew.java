@@ -7,6 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.business.chat.domain.ChatRoom;
 import com.genius.herewe.business.invitation.domain.Invitation;
+import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.notice.domain.Notice;
 import com.genius.herewe.core.global.domain.BaseTimeEntity;
 import com.genius.herewe.infra.file.domain.FileHolder;
@@ -41,6 +42,9 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 
 	@OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CrewMember> crewMembers = new ArrayList<>();
+
+	@OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Moment> moments = new ArrayList<>();
 
 	@OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Invitation> invitations = new ArrayList<>();
