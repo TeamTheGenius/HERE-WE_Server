@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+	REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "해당 항목은 필수 항목입니다. 입력 값을 확인해주세요."),
 	VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "데이터 전달 관련 유효성 검사에 실패했습니다."),
 	INVALID_PAGINATION_PARAM(HttpStatus.BAD_REQUEST, "페이지 번호는 0 이상이어야 하며, 페이지 사이즈는 1~15 중 하나여야 합니다."),
 
@@ -32,6 +33,9 @@ public enum ErrorCode {
 	INVITATION_EXPIRED(HttpStatus.BAD_REQUEST, "크루 초대가 만료되었습니다."),
 
 	MOMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 MOMENT를 찾을 수 없습니다."),
+	INVALID_MOMENT_CAPACITY(HttpStatus.BAD_REQUEST, "MOMENT의 최대 참여 가능 인원은 2명 이상이어야 합니다."),
+	INVALID_MOMENT_DATE(HttpStatus.BAD_REQUEST, "만남일자(meetAt)/마감일자(closedAt)는 오늘보다 나중이어야 하며, 만남일자가 마감일자보다 더 이후여야 합니다."),
+	NEED_MEET_PLACE(HttpStatus.NOT_FOUND, "만남 장소가 설정되지 않았습니다. 만남 장소를 설정해주세요."),
 
 	UNAUTHORIZED_ISSUE(HttpStatus.UNAUTHORIZED, "회원가입이 되어 있지 않은 사용자의 경우 JWT를 발급할 수 없습니다."),
 	JWT_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),

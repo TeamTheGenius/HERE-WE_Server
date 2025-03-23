@@ -7,9 +7,10 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.genius.herewe.business.crew.domain.Crew;
+import com.genius.herewe.business.location.domain.Location;
+import com.genius.herewe.core.global.domain.BaseTimeEntity;
 import com.genius.herewe.infra.file.domain.FileHolder;
 import com.genius.herewe.infra.file.domain.Files;
-import com.genius.herewe.business.location.domain.Location;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Moment implements FileHolder {
+public class Moment extends BaseTimeEntity implements FileHolder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "moment_id")
@@ -39,6 +40,9 @@ public class Moment implements FileHolder {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "crew_id")
 	private Crew crew;
+
+	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MomentMember> momentMembers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Location> locations = new ArrayList<>();
@@ -53,7 +57,7 @@ public class Moment implements FileHolder {
 	@ColumnDefault("0")
 	private int participantCount;
 
-	private int capacity;
+	private Integer capacity;
 
 	private LocalDateTime meetAt;
 
@@ -68,6 +72,14 @@ public class Moment implements FileHolder {
 		this.closedAt = closedAt;
 	}
 
+	//== 연관관계 편의 메서드 ==//
+	public void addCrew(Crew crew) {
+		this.crew = crew;
+		if (!crew.getMoments().contains(this)) {
+			crew.getMoments().add(this);
+		}
+	}
+
 	@Override
 	public Files getFiles() {
 		if (files == null) {
@@ -80,5 +92,21 @@ public class Moment implements FileHolder {
 	@Override
 	public void setFiles(Files files) {
 		this.files = files;
+	}
+
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateCapacity(Integer capacity) {
+		this.capacity = capacity;
+	}
+
+	public void updateMeetAt(LocalDateTime meetAt) {
+		this.meetAt = meetAt;
+	}
+
+	public void updateClosedAt(LocalDateTime closedAt) {
+		this.closedAt = closedAt;
 	}
 }

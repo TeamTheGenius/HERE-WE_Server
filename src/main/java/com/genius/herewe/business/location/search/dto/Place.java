@@ -25,7 +25,7 @@ public record Place(
 	String roadAddress,
 	@Schema(description = "kakao map url")
 	@JsonProperty(value = "place_url")
-	String placeUrl,
+	String url,
 	@Schema(description = "전화번호")
 	@JsonProperty(value = "phone")
 	String phone
