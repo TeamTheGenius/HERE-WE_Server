@@ -49,5 +49,6 @@ public class CrewMemberService {
 	@Transactional
 	public void delete(CrewMember crewMember) {
 		crewMemberRepository.delete(crewMember);
+		crewMemberRepository.flush();
 	}
 }

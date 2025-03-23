@@ -116,6 +116,7 @@ public class DefaultInvitationFacade implements InvitationFacade {
 
 		}
 
+		crew.updateParticipantCount(1);
 		CrewMember crewMember = CrewMember.createByRole(CrewRole.MEMBER);
 		crewMember.joinCrew(user, crew);
 
