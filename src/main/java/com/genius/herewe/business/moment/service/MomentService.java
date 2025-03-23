@@ -26,4 +26,9 @@ public class MomentService {
 		return momentRepository.findById(momentId)
 			.orElseThrow(() -> new BusinessException(MOMENT_NOT_FOUND));
 	}
+
+	@Transactional
+	public void delete(Moment moment) {
+		momentRepository.delete(moment);
+	}
 }

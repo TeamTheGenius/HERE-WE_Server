@@ -7,4 +7,6 @@ public interface MomentFacade {
 	MomentResponse createMoment(Long userId, Long crewId, MomentRequest momentRequest);
 
 	MomentResponse modifyMoment(Long momentId, MomentRequest momentRequest);
+
+	void deleteMoment(Long momentId);
 }

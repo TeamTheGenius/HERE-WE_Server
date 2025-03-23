@@ -90,6 +90,13 @@ public class DefaultMomentFacade implements MomentFacade {
 		return MomentResponse.createJoined(moment, true);
 	}
 
+	@Override
+	@Transactional
+	public void deleteMoment(Long momentId) {
+		Moment moment = momentService.findById(momentId);
+		momentService.delete(moment);
+	}
+
 	private void validateMomentRequest(MomentRequest momentRequest) {
 		LocalDateTime now = LocalDateTime.now();
 

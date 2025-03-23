@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
+import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
@@ -143,4 +144,32 @@ public interface MomentApi {
 		)
 	})
 	SingleResponse<MomentResponse> modifyMoment(@PathVariable Long momentId, @RequestBody MomentRequest momentRequest);
+
+	@Operation(summary = "모먼트 삭제", description = "모먼트 식별자(PK)를 통해 모먼트 삭제")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "모먼트 삭제 성공"
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "모먼트 식별자를 통해 모먼트 조회 실패 (찾을 수 없음)",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "모먼트 식별자를 통해 모먼트 조회 실패 (찾을 수 없음)",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "MOMENT_NOT_FOUND",
+								"message": "해당 MOMENT를 찾을 수 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	CommonResponse deleteMoment(@PathVariable Long momentId);
 }
