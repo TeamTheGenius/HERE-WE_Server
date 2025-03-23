@@ -98,7 +98,7 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 		this.name = name;
 	}
 
-	public void updateCapacity(int capacity) {
+	public void updateCapacity(Integer capacity) {
 		this.capacity = capacity;
 	}
 

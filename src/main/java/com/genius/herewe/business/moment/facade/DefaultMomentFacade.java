@@ -65,15 +65,16 @@ public class DefaultMomentFacade implements MomentFacade {
 		Moment moment = momentService.findById(momentId);
 
 		Optional.ofNullable(momentRequest.momentName()).ifPresent(moment::updateName);
-		Optional.ofNullable(moment.getCapacity()).ifPresent(val -> {
+		Optional.ofNullable(momentRequest.capacity()).ifPresent(val -> {
 			validateCapacity(val);
 			moment.updateCapacity(val);
 		});
 
-		LocalDateTime createdAt = moment.getCreatedAt();
 		LocalDateTime meetAt = momentRequest.meetAt() != null ? momentRequest.meetAt() : moment.getMeetAt();
 		LocalDateTime closedAt = momentRequest.closedAt() != null ? momentRequest.closedAt() : moment.getClosedAt();
-		validateDate(createdAt, meetAt, closedAt);
+		if (!meetAt.isAfter(closedAt)) {
+			throw new BusinessException(INVALID_MOMENT_DATE);
+		}
 		moment.updateMeetAt(meetAt);
 		moment.updateClosedAt(closedAt);
 
