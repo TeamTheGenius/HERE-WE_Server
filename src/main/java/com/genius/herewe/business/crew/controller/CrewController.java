@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
 import com.genius.herewe.business.crew.dto.CrewExpelRequest;
+import com.genius.herewe.business.crew.dto.CrewIdResponse;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
@@ -102,10 +103,10 @@ public class CrewController implements CrewApi {
 	}
 
 	@PostMapping("/invite/{token}")
-	public CommonResponse joinCrew(@PathVariable(name = "token") String inviteToken) {
-		invitationFacade.joinCrew(inviteToken);
+	public SingleResponse<CrewIdResponse> joinCrew(@PathVariable(name = "token") String inviteToken) {
+		CrewIdResponse crewIdResponse = invitationFacade.joinCrew(inviteToken);
 
-		return CommonResponse.ok();
+		return new SingleResponse<>(HttpStatus.OK, crewIdResponse);
 	}
 
 	@DeleteMapping("/{crewId}/members")

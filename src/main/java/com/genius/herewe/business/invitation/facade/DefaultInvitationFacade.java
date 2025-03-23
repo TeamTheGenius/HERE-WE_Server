@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.crew.domain.CrewMember;
 import com.genius.herewe.business.crew.domain.CrewRole;
+import com.genius.herewe.business.crew.dto.CrewIdResponse;
 import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
 import com.genius.herewe.business.invitation.domain.Invitation;
@@ -99,7 +100,7 @@ public class DefaultInvitationFacade implements InvitationFacade {
 	}
 
 	@Transactional
-	public void joinCrew(String inviteToken) {
+	public CrewIdResponse joinCrew(String inviteToken) {
 		Invitation invitation = invitationService.findByToken(inviteToken);
 		if (invitation.getExpiredAt().isBefore(LocalDateTime.now())) {
 			invitationService.deleteInNewTransaction(invitation);
@@ -120,5 +121,6 @@ public class DefaultInvitationFacade implements InvitationFacade {
 
 		crewMemberService.save(crewMember);
 		invitationService.delete(invitation);
+		return new CrewIdResponse(crew.getId());
 	}
 }
