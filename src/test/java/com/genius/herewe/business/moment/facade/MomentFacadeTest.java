@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -228,7 +229,7 @@ class MomentFacadeTest {
 				Moment moment = MomentFixture.createDefault();
 				Location location = Location.createFromPlace(place, 1);
 				given(momentService.findById(anyLong())).willReturn(moment);
-				given(locationService.findMeetLocation(anyLong())).willReturn(location);
+				given(locationService.findMeetLocation(anyLong())).willReturn(Optional.of(location));
 
 				//when
 				MomentResponse momentResponse = momentFacade.modifyMoment(1L, momentRequest);
@@ -319,12 +320,24 @@ class MomentFacadeTest {
 				//then
 				assertThat(momentResponse.closedAt()).isEqualTo(request.closedAt());
 			}
+		}
 
-			@Test
-			@DisplayName("장소만 변경하면 장소만 업데이트된다.")
-			public void it_updates_only_location() {
-				//given
-				Place newPlace = Place.builder()
+		@Nested
+		@DisplayName("장소 수정을 위해 장소 정보를 전달했을 때")
+		class Describe_to_change_meet_place {
+			Long momentId = 1L;
+			Place newPlace;
+			MomentRequest request;
+			Moment moment = MomentFixture.createDefault();
+			String originalName = moment.getName();
+			int originalCapacity = moment.getCapacity();
+			LocalDateTime originalClosedAt = moment.getClosedAt();
+			LocalDateTime originalMeetAt = moment.getMeetAt();
+
+			@BeforeEach
+			void init() {
+				given(momentService.findById(momentId)).willReturn(moment);
+				newPlace = Place.builder()
 					.name("새로운 장소")
 					.address("new address")
 					.roadAddress("new road address")
@@ -333,14 +346,15 @@ class MomentFacadeTest {
 					.y(134.23)
 					.phone("new phone")
 					.build();
-				MomentRequest request = MomentRequest.builder().place(newPlace).build();
+				request = MomentRequest.builder().place(newPlace).build();
+			}
 
-				String originalName = moment.getName();
-				int originalCapacity = moment.getCapacity();
-				LocalDateTime originalClosedAt = moment.getClosedAt();
-				LocalDateTime originalMeetAt = moment.getMeetAt();
+			@Test
+			@DisplayName("장소만 변경하면 장소만 업데이트된다.")
+			public void it_updates_only_location() {
+				//given
 				Location originalLocation = mock(Location.class);
-				given(locationService.findMeetLocation(momentId)).willReturn(originalLocation);
+				given(locationService.findMeetLocation(momentId)).willReturn(Optional.of(originalLocation));
 
 				//when
 				momentFacade.modifyMoment(momentId, request);
