@@ -93,4 +93,11 @@ public class Location {
 		this.y = place.y();
 		this.phone = place.phone();
 	}
+
+	public void updateLocationIndex(int amount) {
+		if (this.locationIndex + amount <= 0) {
+			return;
+		}
+		this.locationIndex += amount;
+	}
 }

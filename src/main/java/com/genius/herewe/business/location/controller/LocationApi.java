@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-public interface LocalApi {
+public interface LocationApi {
 	@Operation(summary = "키워드를 통한 장소 검색", description = "Kakao Map API를 이용하여 키워드 검색 결과를 반환합니다.")
 	@ApiResponses({
 		@ApiResponse(

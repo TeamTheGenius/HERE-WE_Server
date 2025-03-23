@@ -23,6 +23,11 @@ public class LocationService {
 		return locationRepository.save(location);
 	}
 
+	@Transactional
+	public Location save(Location location) {
+		return locationRepository.save(location);
+	}
+
 	public Optional<Location> findMeetLocation(Long momentId) {
 		return locationRepository.findByLocationIndex(momentId, 1);
 	}
