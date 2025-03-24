@@ -21,6 +21,7 @@ import com.genius.herewe.business.crew.dto.CrewCreateRequest;
 import com.genius.herewe.business.crew.dto.CrewExpelRequest;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
+import com.genius.herewe.business.crew.dto.CrewProfileResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.fixture.CrewFixture;
 import com.genius.herewe.business.crew.service.CrewMemberService;
@@ -46,6 +47,61 @@ class CrewFacadeTest {
 	@BeforeEach
 	void init() {
 		crewFacade = new DefaultCrewFacade(userService, crewService, crewMemberService, filesStorage);
+	}
+
+	@Nested
+	@DisplayName("크루에 대한 나의 정보 조회 시")
+	class Context_inquiry_my_crew_info {
+		Long userId = 1L;
+		Long crewId = 1L;
+		User user = UserFixture.createById(userId);
+		CrewMember crewMember = CrewMember.createByRole(CrewRole.MEMBER);
+
+		@Nested
+		@DisplayName("사용자/크루 정보를 조회하기 위해 정보를 전달했을 때")
+		class Describe_pass_info_to_inquiry_crew_info {
+			@Test
+			@DisplayName("사용자 식별자를 통해 사용자를 조회할 수 없으면 MEMBER_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_MEMBER_NOT_FOUND_exception() {
+				//given
+				Long fakeUserId = 999L;
+				given(userService.findById(fakeUserId)).willThrow(new BusinessException(MEMBER_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.inquiryCrewProfile(fakeUserId, crewId))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MEMBER_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("사용자/크루 식별자를 통해 크루 참여 정보를 조회할 수 없으면 CREW_JOIN_INFO_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_CREW_JOIN_INFO_NOT_FOUND_exception() {
+				//given
+				Long fakeUserId = 999L;
+				given(crewMemberService.find(fakeUserId, crewId)).willThrow(
+					new BusinessException(CREW_JOIN_INFO_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> crewFacade.inquiryCrewProfile(fakeUserId, crewId))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(CREW_JOIN_INFO_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("엔티티 조회에 문제가 없다면 사용자의 정보와 크루 권한 정보를 받아온다.")
+			public void it_return_my_crew_info() {
+				//given
+				given(userService.findById(userId)).willReturn(user);
+				given(crewMemberService.find(userId, crewId)).willReturn(crewMember);
+
+				//when
+				CrewProfileResponse crewProfileResponse = crewFacade.inquiryCrewProfile(userId, crewId);
+
+				//then
+				assertThat(crewProfileResponse.nickname()).isEqualTo(user.getNickname());
+				assertThat(crewProfileResponse.crewRole()).isEqualTo(crewMember.getRole());
+			}
+		}
 	}
 
 	@Nested
