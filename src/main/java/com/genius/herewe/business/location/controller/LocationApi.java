@@ -44,7 +44,7 @@ public interface LocationApi {
 				examples = {
 					@ExampleObject(
 						name = "momentId(식별자)를 통해 모먼트 엔티티를 찾지 못했을 때",
-						description = """
+						value = """
 							{
 								"resultCode": "404",
 								"code": "MOMENT_NOT_FOUND",
@@ -66,7 +66,7 @@ public interface LocationApi {
 				examples = {
 					@ExampleObject(
 						name = "1. 동시성 문제로 인해 예외 발생한 경우",
-						description = """
+						value = """
 							{
 								"resultCode": "409",
 								"code": "CONCURRENT_MODIFICATION_EXCEPTION",
@@ -76,7 +76,7 @@ public interface LocationApi {
 					),
 					@ExampleObject(
 						name = "2. 해당 인덱스로 이미 장소가 등록되어 있는 경우",
-						description = """
+						value = """
 							{
 								"resultCode": "409",
 								"code": "LOCATION_ALREADY_EXISTS",
