@@ -10,6 +10,7 @@ import com.genius.herewe.business.crew.dto.CrewCreateRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
+import com.genius.herewe.business.crew.dto.CrewProfileResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.invitation.dto.InvitationRequest;
 import com.genius.herewe.core.global.response.CommonResponse;
@@ -28,6 +29,47 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 public interface CrewApi {
+	@Operation(summary = "크루에 대한 나의 정보 조회", description = "크루에 대한 나의 정보(닉네임, 크루 내 권한) 조회")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "크루에 대한 나의 정보 조회 성공"
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = """
+				1. userId(식별자)를 통해 사용자 엔티티를 찾지 못했을 때
+				2. userId, crewId(식별자)를 통해 크루의 참여 정보를 찾지 못했을 때
+				""",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "1. userId(식별자)를 통해 사용자 엔티티를 찾지 못했을 때",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "MEMBER_NOT_FOUND",
+								"message": "사용자를 찾을 수 없습니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "2. userId, crewId(식별자)를 통해 크루의 참여 정보를 찾지 못했을 때",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "CREW_JOIN_INFO_NOT_FOUND",
+								"message": "해당 크루에 대한 참여 정보가 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	SingleResponse<CrewProfileResponse> inquiryCrewProfile(@HereWeUser User user, @PathVariable Long crewId);
+
 	@Operation(summary = "내가 참여한 크루 리스트 조회", description = "참여한 크루에 대해 pagination 형식으로 조회")
 	@ApiResponses({
 		@ApiResponse(
