@@ -11,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Table(name = "location",
+	uniqueConstraints = {
+		@UniqueConstraint(
+			name = "uk_location_index_moment",
+			columnNames = {"location_index", "moment_id"}
+		)
+	})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Location {
 	@Id
@@ -29,7 +38,7 @@ public class Location {
 	@JoinColumn(name = "moment_id")
 	private Moment moment;
 
-	@Column(nullable = false)
+	@Column(nullable = false, name = "location_index")
 	private int locationIndex;
 
 	@Column(nullable = false)
