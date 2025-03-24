@@ -20,6 +20,7 @@ import com.genius.herewe.business.crew.dto.CrewIdResponse;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
+import com.genius.herewe.business.crew.dto.CrewProfileResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.facade.CrewFacade;
 import com.genius.herewe.business.invitation.dto.InvitationRequest;
@@ -39,6 +40,13 @@ import lombok.RequiredArgsConstructor;
 public class CrewController implements CrewApi {
 	private final CrewFacade crewFacade;
 	private final InvitationFacade invitationFacade;
+
+	@GetMapping("/profile/{crewId}")
+	public SingleResponse<CrewProfileResponse> inquiryCrewProfile(@HereWeUser User user,
+		@PathVariable Long crewId) {
+		CrewProfileResponse crewProfileResponse = crewFacade.inquiryCrewProfile(user.getId(), crewId);
+		return new SingleResponse<>(HttpStatus.OK, crewProfileResponse);
+	}
 
 	@GetMapping("/my")
 	public PagingResponse<CrewPreviewResponse> inquiryMyCrews(

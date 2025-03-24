@@ -15,6 +15,7 @@ import com.genius.herewe.business.crew.dto.CrewExpelRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
+import com.genius.herewe.business.crew.dto.CrewProfileResponse;
 import com.genius.herewe.business.crew.dto.CrewResponse;
 import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
@@ -34,6 +35,13 @@ public class DefaultCrewFacade implements CrewFacade {
 	private final CrewService crewService;
 	private final CrewMemberService crewMemberService;
 	private final FilesStorage filesStorage;
+
+	@Override
+	public CrewProfileResponse inquiryCrewProfile(Long userId, Long crewId) {
+		User user = userService.findById(userId);
+		CrewMember crewMember = crewMemberService.find(userId, crewId);
+		return new CrewProfileResponse(user.getNickname(), crewMember.getRole());
+	}
 
 	@Override
 	public Page<CrewPreviewResponse> inquiryMyCrews(Long userId, Pageable pageable) {
