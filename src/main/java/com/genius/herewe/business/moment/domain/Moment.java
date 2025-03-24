@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OptimisticLock;
 
 import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.location.domain.Location;
@@ -23,6 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +39,9 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 	@Column(name = "moment_id")
 	private Long id;
 
+	@Version
+	private Long version;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "crew_id")
 	private Crew crew;
@@ -45,6 +50,7 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 	private List<MomentMember> momentMembers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OptimisticLock(excluded = false)
 	private List<Location> locations = new ArrayList<>();
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -108,5 +114,9 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 
 	public void updateClosedAt(LocalDateTime closedAt) {
 		this.closedAt = closedAt;
+	}
+
+	public void updateLastModifiedTime() {
+		this.modifiedAt = LocalDateTime.now();
 	}
 }
