@@ -31,4 +31,8 @@ public class LocationService {
 	public Optional<Location> findMeetLocation(Long momentId) {
 		return locationRepository.findByLocationIndex(momentId, 1);
 	}
+
+	public Optional<Location> findByIndex(Long momentId, int locationIndex) {
+		return locationRepository.findByLocationIndex(momentId, locationIndex);
+	}
 }

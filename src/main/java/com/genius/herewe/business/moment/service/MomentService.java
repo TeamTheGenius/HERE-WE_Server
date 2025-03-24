@@ -9,12 +9,14 @@ import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.repository.MomentRepository;
 import com.genius.herewe.core.global.exception.BusinessException;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MomentService {
+	private final EntityManager entityManager;
 	private final MomentRepository momentRepository;
 
 	@Transactional
@@ -27,8 +29,17 @@ public class MomentService {
 			.orElseThrow(() -> new BusinessException(MOMENT_NOT_FOUND));
 	}
 
+	public Moment findByIdWithOptimisticLock(Long momentId) {
+		return momentRepository.findByIdWithOptimisticLock(momentId)
+			.orElseThrow(() -> new BusinessException(MOMENT_NOT_FOUND));
+	}
+
 	@Transactional
 	public void delete(Moment moment) {
 		momentRepository.delete(moment);
+	}
+
+	public void flushChanges() {
+		entityManager.flush();
 	}
 }

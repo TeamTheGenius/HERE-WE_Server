@@ -115,4 +115,8 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 	public void updateClosedAt(LocalDateTime closedAt) {
 		this.closedAt = closedAt;
 	}
+
+	public void updateLastModifiedTime() {
+		this.modifiedAt = LocalDateTime.now();
+	}
 }
