@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.crew.domain.CrewMember;
+import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
 import com.genius.herewe.business.crew.repository.CrewMemberRepository;
 import com.genius.herewe.business.crew.repository.query.CrewMemberQueryRepository;
@@ -38,8 +39,8 @@ public class CrewMemberService {
 		return crewMemberRepository.find(userId, crewId);
 	}
 
-	public Page<CrewMember> findAllByCrewId(Long crewId, Pageable pageable) {
-		return crewMemberRepository.findAllByCrewId(crewId, pageable);
+	public Page<CrewMemberResponse> findAllMembersInCrew(Long crewId, Pageable pageable) {
+		return queryRepository.findAllMembersInCrew(crewId, pageable);
 	}
 
 	public Page<CrewPreviewResponse> findAllJoinCrews(Long userId, Pageable pageable) {
