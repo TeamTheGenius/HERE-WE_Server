@@ -60,9 +60,7 @@ public class DefaultCrewFacade implements CrewFacade {
 
 	@Override
 	public Page<CrewMemberResponse> inquiryMembers(Long crewId, Pageable pageable) {
-		Page<CrewMember> crewMembers = crewMemberService.findAllByCrewId(crewId, pageable);
-
-		return crewMembers.map(CrewMemberResponse::create);
+		return crewMemberService.findAllMembersInCrew(crewId, pageable);
 	}
 
 	@Override
