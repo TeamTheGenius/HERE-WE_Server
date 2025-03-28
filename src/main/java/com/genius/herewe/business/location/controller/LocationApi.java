@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.location.LocationRequest;
 import com.genius.herewe.business.location.search.dto.Place;
+import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
-import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.global.response.SlicingResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -88,5 +88,5 @@ public interface LocationApi {
 			)
 		)
 	})
-	SingleResponse<Place> addPlace(@PathVariable Long momentId, @Valid @RequestBody LocationRequest locationRequest);
+	CommonResponse addPlace(@PathVariable Long momentId, @Valid @RequestBody LocationRequest locationRequest);
 }

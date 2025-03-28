@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.genius.herewe.business.location.LocationRequest;
+import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.facade.LocationFacade;
 import com.genius.herewe.business.location.search.client.KakaoSearchClient;
 import com.genius.herewe.business.location.search.dto.Place;
+import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.global.response.SlicingResponse;
 
@@ -37,11 +39,17 @@ public class LocationController implements LocationApi {
 		return new SlicingResponse<>(HttpStatus.OK, places);
 	}
 
+	@GetMapping("/location/{momentId}")
+	public SingleResponse<PlaceResponse> inquiryPlaces(@PathVariable Long momentId) {
+		PlaceResponse placeResponse = locationFacade.inquiryAll(momentId);
+		return new SingleResponse<>(HttpStatus.OK, placeResponse);
+	}
+
 	@PostMapping("/location/{momentId}")
-	public SingleResponse<Place> addPlace(@PathVariable Long momentId,
+	public CommonResponse addPlace(@PathVariable Long momentId,
 		@Valid @RequestBody LocationRequest locationRequest) {
 
-		Place place = locationFacade.addPlace(momentId, locationRequest);
-		return new SingleResponse<>(HttpStatus.CREATED, place);
+		locationFacade.addPlace(momentId, locationRequest);
+		return CommonResponse.created();
 	}
 }

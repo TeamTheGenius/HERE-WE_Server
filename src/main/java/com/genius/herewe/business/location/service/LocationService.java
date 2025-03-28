@@ -1,5 +1,6 @@
 package com.genius.herewe.business.location.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -34,5 +35,9 @@ public class LocationService {
 
 	public Optional<Location> findByIndex(Long momentId, int locationIndex) {
 		return locationRepository.findByLocationIndex(momentId, locationIndex);
+	}
+
+	public List<Location> findAllInMoment(Long momentId) {
+		return locationRepository.findAllInMoment(momentId);
 	}
 }

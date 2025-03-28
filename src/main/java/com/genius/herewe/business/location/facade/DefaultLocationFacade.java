@@ -2,12 +2,16 @@ package com.genius.herewe.business.location.facade;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.location.LocationRequest;
 import com.genius.herewe.business.location.domain.Location;
+import com.genius.herewe.business.location.dto.LocationInfo;
+import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
@@ -58,5 +62,13 @@ public class DefaultLocationFacade implements LocationFacade {
 			}
 			throw new BusinessException(e);
 		}
+	}
+
+	@Override
+	public PlaceResponse inquiryAll(Long momentId) {
+		List<LocationInfo> locationInfos = locationService.findAllInMoment(momentId).stream()
+			.map(LocationInfo::create)
+			.toList();
+		return PlaceResponse.create(momentId, locationInfos);
 	}
 }
