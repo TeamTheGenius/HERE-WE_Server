@@ -30,6 +30,10 @@ public class DefaultLocationFacade implements LocationFacade {
 		try {
 			Place place = locationRequest.place();
 			int locationIndex = locationRequest.locationIndex();
+			//TODO: 해당 모먼트에 등록되어 있는 최대 인덱스 값을 확인하고 맞지 않으면 예외 발생 필요
+			if (locationIndex > 100) {
+				throw new BusinessException(LOCATION_LIMIT_EXCEEDED);
+			}
 
 			Moment moment = momentService.findByIdWithOptimisticLock(momentId);
 

@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Max;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,6 +40,7 @@ public class Location {
 	private Moment moment;
 
 	@Column(nullable = false, name = "location_index")
+	@Max(value = 100, message = "장소는 최대 100개까지 등록할 수 있습니다.")
 	private int locationIndex;
 
 	@Column(nullable = false)
