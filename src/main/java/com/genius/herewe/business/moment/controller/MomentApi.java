@@ -20,6 +20,34 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 public interface MomentApi {
+	@Operation(summary = "특정 모먼트 정보 상세 조회", description = "특정 모먼트에 대한 상세 정보 조회")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "모먼트에 대한 상세 정보 조회 성공"
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "momentId를 통해 모먼트를 찾지 못했을 때",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "momentId를 통해 모먼트를 찾지 못했을 때",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "MOMENT_NOT_FOUND",
+								"message": "해당 MOMENT를 찾을 수 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	SingleResponse<MomentResponse> inquirySingleMoment(@HereWeUser User user, @PathVariable Long momentId);
+
 	@Operation(summary = "모먼트 생성", description = "특정 크루에 모먼트 생성")
 	@ApiResponses({
 		@ApiResponse(
