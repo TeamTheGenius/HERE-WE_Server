@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.location.LocationRequest;
+import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
+import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.global.response.SlicingResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,15 @@ public interface LocationApi {
 	SlicingResponse<Place> search(@RequestParam("keyword") String keyword,
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size);
+
+	@Operation(summary = "장소 목록 조회", description = "특정 모먼트에 등록된 장소 리스트 조회")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "장소 정보 조회 성공"
+		)
+	})
+	SingleResponse<PlaceResponse> inquiryPlaces(@PathVariable Long momentId);
 
 	@Operation(summary = "장소 등록", description = "검색한 장소를 등록합니다.")
 	@ApiResponses({

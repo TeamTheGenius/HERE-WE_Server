@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
-@Schema(description = "")
+@Schema(description = "모먼트 상세 페이지에서 장소 목록 조회 시, 응답 객체")
 public record PlaceResponse(
 	@Schema(description = "장소를 조회한 모먼트의 식별자")
 	Long momentId,

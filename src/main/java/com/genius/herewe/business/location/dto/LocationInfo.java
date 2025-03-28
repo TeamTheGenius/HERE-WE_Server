@@ -6,25 +6,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
-@Schema(description = "")
+@Schema(description = "장소 ")
 public record LocationInfo(
-	@Schema(description = "")
+	@Schema(description = "장소의 순서")
 	int index,
-	@Schema(description = "")
+	@Schema(description = "kakao에서 제공하는 장소 식별자")
 	Long placeId,
-	@Schema(description = "")
+	@Schema(description = "장소 이름")
 	String name,
-	@Schema(description = "")
+	@Schema(description = "지번 주소")
 	String address,
-	@Schema(description = "")
+	@Schema(description = "도로명 주소")
 	String roadAddress,
-	@Schema(description = "")
+	@Schema(description = "해당 장소의 kakao map url")
 	String url,
-	@Schema(description = "")
+	@Schema(description = "해당 장소의 x 좌표")
 	Double x,
-	@Schema(description = "")
+	@Schema(description = "해당 장소의 y 좌표")
 	Double y,
-	@Schema(description = "")
+	@Schema(description = "전화번호")
 	String phone
 ) {
 
