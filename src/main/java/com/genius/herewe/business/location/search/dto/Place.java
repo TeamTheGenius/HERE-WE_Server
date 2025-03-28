@@ -1,5 +1,7 @@
 package com.genius.herewe.business.location.search.dto;
 
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.genius.herewe.business.location.domain.Location;
 
@@ -42,6 +44,13 @@ public record Place(
 	@JsonProperty(value = "phone")
 	String phone
 ) {
+
+	public static Place createFromOptional(Optional<Location> optionalLocation) {
+		if (optionalLocation.isEmpty()) {
+			return new Place(null, null, null, null, null, null, null, null);
+		}
+		return Place.create(optionalLocation.get());
+	}
 
 	public static Place create(Location location) {
 		return Place.builder()

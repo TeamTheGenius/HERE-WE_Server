@@ -11,11 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.genius.herewe.business.crew.domain.Crew;
 import com.genius.herewe.business.crew.service.CrewService;
 import com.genius.herewe.business.location.domain.Location;
+import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
+import com.genius.herewe.business.moment.service.MomentMemberService;
 import com.genius.herewe.business.moment.service.MomentService;
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.user.domain.User;
@@ -30,7 +32,21 @@ public class DefaultMomentFacade implements MomentFacade {
 	private final UserService userService;
 	private final CrewService crewService;
 	private final MomentService momentService;
+	private final MomentMemberService momentMemberService;
 	private final LocationService locationService;
+
+	@Override
+	public MomentResponse inquiryMoment(User user, Long momentId) {
+		Moment moment = momentService.findById(momentId);
+
+		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(user.getId(), momentId);
+		boolean isJoined = joinInfo.isPresent();
+
+		Optional<Location> meetLocation = locationService.findMeetLocation(momentId);
+		Place place = Place.createFromOptional(meetLocation);
+
+		return MomentResponse.create(moment, place, isJoined);
+	}
 
 	@Override
 	@Transactional
@@ -56,7 +72,7 @@ public class DefaultMomentFacade implements MomentFacade {
 		Location location = locationService.saveFromPlace(momentRequest.place(), 1);
 		location.addMoment(moment);
 
-		return MomentResponse.createJoined(moment, true);
+		return MomentResponse.create(moment, Place.create(location), true);
 	}
 
 	@Override
@@ -80,14 +96,16 @@ public class DefaultMomentFacade implements MomentFacade {
 
 		Optional.ofNullable(momentRequest.place()).ifPresent(place -> {
 			locationService.findMeetLocation(momentId)
-				.ifPresentOrElse(val -> val.update(place),
+				.ifPresentOrElse(val -> {
+						val.update(place);
+					},
 					() -> {
 						Location fromPlace = Location.createFromPlace(place, 1);
 						fromPlace.addMoment(moment);
 					});
 		});
 
-		return MomentResponse.createJoined(moment, true);
+		return MomentResponse.create(moment, momentRequest.place(), true);
 	}
 
 	@Override
