@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Max;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,7 +40,11 @@ public class Location {
 	private Moment moment;
 
 	@Column(nullable = false, name = "location_index")
+	@Max(value = 100, message = "장소는 최대 100개까지 등록할 수 있습니다.")
 	private int locationIndex;
+
+	@Column(nullable = false)
+	private Long placeId;
 
 	@Column(nullable = false)
 	private String name;
@@ -59,9 +64,12 @@ public class Location {
 	private String phone;
 
 	@Builder
-	public Location(int locationIndex, String name, String address, String roadAddress, String url, Double x, Double y,
+	public Location(int locationIndex, Long placeId, String name, String address, String roadAddress, String url,
+		Double x,
+		Double y,
 		String phone) {
 		this.locationIndex = locationIndex;
+		this.placeId = placeId;
 		this.name = name;
 		this.address = address;
 		this.roadAddress = roadAddress;
@@ -74,6 +82,7 @@ public class Location {
 	public static Location createFromPlace(Place place, int index) {
 		return Location.builder()
 			.locationIndex(index)
+			.placeId(place.id())
 			.name(place.name())
 			.address(place.address())
 			.roadAddress(place.roadAddress())
@@ -101,12 +110,5 @@ public class Location {
 		this.x = place.x();
 		this.y = place.y();
 		this.phone = place.phone();
-	}
-
-	public void updateLocationIndex(int amount) {
-		if (this.locationIndex + amount <= 0) {
-			return;
-		}
-		this.locationIndex += amount;
 	}
 }

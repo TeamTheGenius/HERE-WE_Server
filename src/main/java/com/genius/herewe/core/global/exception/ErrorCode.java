@@ -29,6 +29,7 @@ public enum ErrorCode {
 
 	CREW_JOIN_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 크루에 대한 참여 정보가 없습니다."),
 	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),
+	CREW_MEMBERSHIP_REQUIRED(HttpStatus.FORBIDDEN, "크루 멤버에게만 허용된 작업입니다. 크루에 참여 후 재시도해주세요."),
 
 	INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "크루 초대 정보를 찾을 수 없습니다. 초대 정보를 다시 확인해주세요."),
 	INVITATION_EXPIRED(HttpStatus.BAD_REQUEST, "크루 초대가 만료되었습니다."),
@@ -36,8 +37,12 @@ public enum ErrorCode {
 	MOMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 MOMENT를 찾을 수 없습니다."),
 	INVALID_MOMENT_CAPACITY(HttpStatus.BAD_REQUEST, "MOMENT의 최대 참여 가능 인원은 2명 이상이어야 합니다."),
 	INVALID_MOMENT_DATE(HttpStatus.BAD_REQUEST, "만남일자(meetAt)/마감일자(closedAt)는 오늘보다 나중이어야 하며, 만남일자가 마감일자보다 더 이후여야 합니다."),
+	ALREADY_JOINED_MOMENT(HttpStatus.BAD_REQUEST, "이미 참여한 모먼트입니다."),
+	MOMENT_DEADLINE_EXPIRED(HttpStatus.BAD_REQUEST, "모먼트 참여 마감일자가 지났습니다. 모먼트 참여/참여 취소는 마감일자 이전까지 가능합니다."),
+	MOMENT_CAPACITY_FULL(HttpStatus.BAD_REQUEST, "참여 인원이 최대 정원에 도달했습니다."),
 
 	LOCATION_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 순서의 장소가 이미 추가되었습니다. 잠시 후 다시 시도해주세요."),
+	LOCATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "장소는 최대 100개까지 등록할 수 있습니다."),
 
 	UNAUTHORIZED_ISSUE(HttpStatus.UNAUTHORIZED, "회원가입이 되어 있지 않은 사용자의 경우 JWT를 발급할 수 없습니다."),
 	JWT_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),

@@ -2,12 +2,16 @@ package com.genius.herewe.business.location.facade;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.location.LocationRequest;
 import com.genius.herewe.business.location.domain.Location;
+import com.genius.herewe.business.location.dto.LocationInfo;
+import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
@@ -30,6 +34,10 @@ public class DefaultLocationFacade implements LocationFacade {
 		try {
 			Place place = locationRequest.place();
 			int locationIndex = locationRequest.locationIndex();
+			//TODO: 해당 모먼트에 등록되어 있는 최대 인덱스 값을 확인하고 맞지 않으면 예외 발생 필요
+			if (locationIndex > 100) {
+				throw new BusinessException(LOCATION_LIMIT_EXCEEDED);
+			}
 
 			Moment moment = momentService.findByIdWithOptimisticLock(momentId);
 
@@ -54,5 +62,13 @@ public class DefaultLocationFacade implements LocationFacade {
 			}
 			throw new BusinessException(e);
 		}
+	}
+
+	@Override
+	public PlaceResponse inquiryAll(Long momentId) {
+		List<LocationInfo> locationInfos = locationService.findAllInMoment(momentId).stream()
+			.map(LocationInfo::create)
+			.toList();
+		return PlaceResponse.create(momentId, locationInfos);
 	}
 }
