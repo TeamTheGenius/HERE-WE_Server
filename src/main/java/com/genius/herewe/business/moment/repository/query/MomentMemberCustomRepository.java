@@ -16,10 +16,11 @@ public class MomentMemberCustomRepository {
 
 	public List<User> findAllJoinedUsers(Long momentId) {
 		return entityManager.createQuery("""
-				SELECT mm.user
+				SELECT u
 				FROM MomentMember mm
+				JOIN mm.user u
 				WHERE mm.moment.id = :momentId
-				ORDER BY mm.joinedAt ASC, mm.user.nickname ASC
+				ORDER BY mm.joinedAt ASC, u.nickname ASC
 				""", User.class)
 			.setParameter("momentId", momentId)
 			.setMaxResults(100)
