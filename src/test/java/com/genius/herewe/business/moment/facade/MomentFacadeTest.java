@@ -22,17 +22,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.genius.herewe.business.crew.domain.Crew;
+import com.genius.herewe.business.crew.domain.CrewMember;
+import com.genius.herewe.business.crew.domain.CrewRole;
 import com.genius.herewe.business.crew.fixture.CrewFixture;
+import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
 import com.genius.herewe.business.location.domain.Location;
 import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
+import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.fixture.MomentFixture;
+import com.genius.herewe.business.moment.service.MomentMemberService;
 import com.genius.herewe.business.moment.service.MomentService;
 import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.fixture.UserFixture;
 import com.genius.herewe.core.user.service.UserService;
 
@@ -54,7 +61,11 @@ class MomentFacadeTest {
 	@Mock
 	private CrewService crewService;
 	@Mock
+	private CrewMemberService crewMemberService;
+	@Mock
 	private MomentService momentService;
+	@Mock
+	private MomentMemberService momentMemberService;
 	@Mock
 	private LocationService locationService;
 
@@ -372,6 +383,246 @@ class MomentFacadeTest {
 				assertThat(moment.getMeetAt()).isEqualTo(originalMeetAt);
 				assertThat(moment.getClosedAt()).isEqualTo(originalClosedAt);
 			}
+		}
+	}
+
+	@Nested
+	@DisplayName("모먼트 참여 시도 시")
+	class Context_join_moment {
+		LocalDateTime now = LocalDateTime.now();
+		Long userId = 1L;
+		Long momentId = 1L;
+
+		User user = UserFixture.createDefault();
+		Crew crew = CrewFixture.createDefault();
+		Moment moment = MomentFixture.createDefault();
+
+		@Nested
+		@DisplayName("참여 요청에 필요한 정보 전달 시")
+		class Describe_pass_join_info {
+			@Test
+			@DisplayName("userId에 해당하는 사용자를 찾을 수 없는 경우 MEMBER_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_MEMBER_NOT_FOUND_exception() {
+				//given
+				Long fakeUserId = 999L;
+				given(userService.findById(fakeUserId)).willThrow(new BusinessException(MEMBER_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> momentFacade.join(fakeUserId, momentId, now))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MEMBER_NOT_FOUND.getMessage());
+			}
+
+			@Test
+			@DisplayName("momentId에 해당하는 모먼트를 찾을 수 없는 경우 MOMENT_NOT_FOUND 예외가 발생한다.")
+			public void it_throws_MOMENT_NOT_FOUND_exception() {
+				//given
+				Long fakeMomentId = 999L;
+				given(userService.findById(userId)).willReturn(user);
+				given(momentService.findById(fakeMomentId)).willThrow(new BusinessException(MOMENT_NOT_FOUND));
+
+				//when & then
+				assertThatThrownBy(() -> momentFacade.join(userId, fakeMomentId, now))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MOMENT_NOT_FOUND.getMessage());
+			}
+		}
+
+		@Nested
+		@DisplayName("참여 조건 검증 시")
+		class Describe_validate_join_condition {
+			@BeforeEach
+			void init() {
+				given(userService.findById(userId)).willReturn(user);
+				given(momentService.findById(momentId)).willReturn(moment);
+				moment.addCrew(crew);
+			}
+
+			@Test
+			@DisplayName("모먼트가 속해있는 크루에 대한 참여 정보가 없는 경우 CREW_MEMBERSHIP_REQUIRED 예외가 발생한다.")
+			public void it_throws_CREW_MEMBERSHIP_REQUIRED_exception() {
+				//given
+				given(crewMemberService.findOptional(anyLong(), anyLong())).willReturn(Optional.empty());
+
+				//when & then
+				assertThatThrownBy(() -> momentFacade.join(userId, momentId, now))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(CREW_MEMBERSHIP_REQUIRED.getMessage());
+			}
+
+			@Test
+			@DisplayName("해당 모먼트에 이미 참여한 경우 ALREADY_JOINED_MOMENT 예외가 발생한다.")
+			public void it_throws_ALREADY_JOINED_MOMENT_exception() {
+				//given
+				given(crewMemberService.findOptional(anyLong(), anyLong())).willReturn(
+					Optional.of(CrewMember.createByRole(CrewRole.MEMBER)));
+				given(momentMemberService.findByJoinInfo(any(), any())).willReturn(
+					Optional.of(MomentMember.create()));
+
+				//when & then
+				assertThatThrownBy(() -> momentFacade.join(userId, momentId, now))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(ALREADY_JOINED_MOMENT.getMessage());
+			}
+
+			@Test
+			@DisplayName("moment의 마감기한이 지난 경우 MOMENT_DEADLINE_EXPIRED 예외가 발생한다.")
+			public void it_throws_MOMENT_DEADLINE_EXPIRED_exception() {
+				//given
+				LocalDateTime future = LocalDateTime.now().plusDays(20);
+				given(crewMemberService.findOptional(anyLong(), anyLong())).willReturn(
+					Optional.of(CrewMember.createByRole(CrewRole.MEMBER)));
+				given(momentMemberService.findByJoinInfo(any(), any())).willReturn(Optional.empty());
+
+				//when & then
+				assertThatThrownBy(() -> momentFacade.join(userId, momentId, future))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MOMENT_DEADLINE_EXPIRED.getMessage());
+			}
+
+			@Test
+			@DisplayName("moment의 최대 참가 가능 인원이 이미 다 찬 경우 MOMENT_CAPACITY_FULL 예외가 발생한다.")
+			public void it_throws_MOMENT_CAPACITY_FULL_exception() {
+				//given
+				given(crewMemberService.findOptional(anyLong(), anyLong())).willReturn(
+					Optional.of(CrewMember.createByRole(CrewRole.MEMBER)));
+				given(momentMemberService.findByJoinInfo(any(), any())).willReturn(Optional.empty());
+
+				int capacity = moment.getCapacity();
+				moment.updateParticipant(capacity);
+
+				//when & then
+				assertThatThrownBy(() -> momentFacade.join(userId, momentId, now))
+					.isInstanceOf(BusinessException.class)
+					.hasMessageContaining(MOMENT_CAPACITY_FULL.getMessage());
+			}
+		}
+
+		@Nested
+		@DisplayName("참여 조건을 모두 만족할 때")
+		class Describe_match_condition {
+			@BeforeEach
+			void init() {
+				given(userService.findById(userId)).willReturn(user);
+				given(momentService.findById(anyLong())).willReturn(moment);
+				given(crewMemberService.findOptional(anyLong(), anyLong())).willReturn(
+					Optional.of(CrewMember.createByRole(CrewRole.MEMBER)));
+				given(momentMemberService.findByJoinInfo(any(), any())).willReturn(Optional.empty());
+				moment.addCrew(crew);
+			}
+
+			@Test
+			@DisplayName("moment의 참여인원이 1 늘어난다")
+			void participant_count_increased() {
+				// given
+				Moment spyMoment = spy(moment);
+				given(momentService.findById(anyLong())).willReturn(spyMoment);
+				given(locationService.findMeetLocation(momentId)).willReturn(Optional.of(mock(Location.class)));
+
+				// when
+				MomentResponse response = momentFacade.join(userId, momentId, now);
+
+				// then
+				verify(spyMoment, times(1)).updateParticipant(1);
+			}
+
+			@Test
+			@DisplayName("MomentMember 엔티티가 새롭게 생성되고 저장된다")
+			void momentMember_created_and_saved() {
+				// given
+				given(locationService.findMeetLocation(momentId)).willReturn(Optional.of(mock(Location.class)));
+
+				// when
+				MomentResponse response = momentFacade.join(userId, momentId, now);
+
+				// then
+				ArgumentCaptor<MomentMember> captor = ArgumentCaptor.forClass(MomentMember.class);
+				verify(momentMemberService, times(1)).save(captor.capture());
+
+				MomentMember savedMember = captor.getValue();
+				assertThat(savedMember).isNotNull();
+			}
+
+			@Test
+			@DisplayName("만남 장소가 존재하지 않는다면 null이 담겨져 전달된다")
+			void location_is_null_when_not_exists() {
+				// given
+				given(locationService.findMeetLocation(momentId)).willReturn(Optional.empty());
+
+				// when
+				MomentResponse response = momentFacade.join(userId, momentId, now);
+
+				// then
+				Place meetPlace = response.place();
+				assertThat(meetPlace).isNotNull();
+				assertThat(meetPlace.id()).isNull();
+				assertThat(meetPlace.name()).isNull();
+				assertThat(meetPlace.address()).isNull();
+				assertThat(meetPlace.roadAddress()).isNull();
+				assertThat(meetPlace.x()).isNull();
+				assertThat(meetPlace.y()).isNull();
+				assertThat(meetPlace.url()).isNull();
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("모먼트 참여 취소 시")
+	class Context_quit_moment {
+		LocalDateTime now = LocalDateTime.now();
+		Long userId = 1L;
+		Long momentId = 1L;
+
+		User user = UserFixture.createDefault();
+		Crew crew = CrewFixture.createDefault();
+		Moment moment = MomentFixture.createDefault();
+
+		@BeforeEach
+		void init() {
+			moment.addCrew(crew);
+
+		}
+
+		@Test
+		@DisplayName("momentId에 해당하는 모먼트를 찾지 못하면 MOMENT_NOT_FOUND 예외가 발생한다")
+		public void it_throws_MOMENT_NOT_FOUND_exception() {
+			//given
+			Long fakeMomentId = 999L;
+			given(momentService.findById(fakeMomentId)).willThrow(new BusinessException(MOMENT_NOT_FOUND));
+
+			//when & then
+			assertThatThrownBy(() -> momentFacade.quit(userId, fakeMomentId, now))
+				.isInstanceOf(BusinessException.class)
+				.hasMessageContaining(MOMENT_NOT_FOUND.getMessage());
+		}
+
+		@Test
+		@DisplayName("요청일자가 closedAt보다 이후라면 MOMENT_DEADLINE_EXPIRED 예외가 발생한다")
+		public void it_throws_MOMENT_DEADLINE_EXPIRED_exception() {
+			//given
+			LocalDateTime passedDate = LocalDateTime.now().plusDays(20);
+			given(momentService.findById(momentId)).willReturn(moment);
+
+			//when & then
+			assertThatThrownBy(() -> momentFacade.quit(userId, momentId, passedDate))
+				.isInstanceOf(BusinessException.class)
+				.hasMessageContaining(MOMENT_DEADLINE_EXPIRED.getMessage());
+		}
+
+		@Test
+		@DisplayName("참여 정보가 존재한다면 모먼트의 참여인원을 1 감소한다")
+		public void it_decrease_participant() {
+			//given
+			Moment spyMoment = spy(moment);
+			given(momentService.findById(momentId)).willReturn(spyMoment);
+			given(momentMemberService.findByJoinInfo(userId, momentId)).willReturn(Optional.of(MomentMember.create()));
+
+			// when
+			momentFacade.quit(userId, momentId, now);
+
+			// then
+			verify(momentMemberService).delete(any(MomentMember.class));
+			verify(spyMoment).updateParticipant(-1);
 		}
 	}
 }

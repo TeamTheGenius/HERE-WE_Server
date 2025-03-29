@@ -9,6 +9,12 @@ public class MomentFixture {
 		return builder().build();
 	}
 
+	public static Moment createByClosedAt(int duration) {
+		return builder()
+			.closedAt(LocalDateTime.now().plusDays(duration))
+			.build();
+	}
+
 	public static MomentBuilder builder() {
 		return new MomentBuilder();
 	}

@@ -156,7 +156,7 @@ public class DefaultMomentFacade implements MomentFacade {
 		}
 		int capacity = moment.getCapacity();
 		int participantCount = moment.getParticipantCount();
-		if (capacity == participantCount) {
+		if (capacity <= participantCount) {
 			throw new BusinessException(MOMENT_CAPACITY_FULL);
 		}
 	}
