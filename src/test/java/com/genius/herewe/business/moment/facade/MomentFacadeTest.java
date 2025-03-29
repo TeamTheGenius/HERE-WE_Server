@@ -78,7 +78,7 @@ class MomentFacadeTest {
 			@DisplayName("capacity, meetAt, closedAt 중 하나라도 NULL인 경우 REQUIRED_FIELD_MISSING 예외가 발생한다.")
 			@MethodSource("provideInvalidRequests")
 			public void it_throws_REQUIRED_FIELD_MISSING_exception(MomentRequest request, String fieldName) {
-				assertThatThrownBy(() -> momentFacade.createMoment(1L, 1L, request))
+				assertThatThrownBy(() -> momentFacade.create(1L, 1L, request))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(REQUIRED_FIELD_MISSING.getMessage());
 			}
@@ -95,7 +95,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when & then
-				assertThatThrownBy(() -> momentFacade.createMoment(1L, 1L, momentRequest))
+				assertThatThrownBy(() -> momentFacade.create(1L, 1L, momentRequest))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(INVALID_MOMENT_CAPACITY.getMessage());
 			}
@@ -116,11 +116,11 @@ class MomentFacadeTest {
 					.build();
 
 				//when & then
-				assertThatThrownBy(() -> momentFacade.createMoment(1L, 2L, momentRequest1))
+				assertThatThrownBy(() -> momentFacade.create(1L, 2L, momentRequest1))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(INVALID_MOMENT_DATE.getMessage());
 
-				assertThatThrownBy(() -> momentFacade.createMoment(1L, 2L, momentRequest2))
+				assertThatThrownBy(() -> momentFacade.create(1L, 2L, momentRequest2))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(INVALID_MOMENT_DATE.getMessage());
 			}
@@ -153,7 +153,7 @@ class MomentFacadeTest {
 				given(locationService.saveFromPlace(place, 1)).willReturn(Location.createFromPlace(place, 1));
 
 				//when
-				momentFacade.createMoment(userId, crewId, momentRequest);
+				momentFacade.create(userId, crewId, momentRequest);
 
 				//then
 				ArgumentCaptor<Moment> momentCaptor = ArgumentCaptor.forClass(Moment.class);
@@ -174,7 +174,7 @@ class MomentFacadeTest {
 				given(locationService.saveFromPlace(any(Place.class), anyInt())).willReturn(expectedLocation);
 
 				//when
-				momentFacade.createMoment(userId, crewId, momentRequest);
+				momentFacade.create(userId, crewId, momentRequest);
 
 				//then
 				ArgumentCaptor<Place> placeCaptor = ArgumentCaptor.forClass(Place.class);
@@ -217,7 +217,7 @@ class MomentFacadeTest {
 				given(momentService.findById(fakeMomentId)).willThrow(new BusinessException(MOMENT_NOT_FOUND));
 
 				//when & then
-				assertThatThrownBy(() -> momentFacade.modifyMoment(fakeMomentId, momentRequest))
+				assertThatThrownBy(() -> momentFacade.modify(fakeMomentId, momentRequest))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(MOMENT_NOT_FOUND.getMessage());
 			}
@@ -232,7 +232,7 @@ class MomentFacadeTest {
 				given(locationService.findMeetLocation(anyLong())).willReturn(Optional.of(location));
 
 				//when
-				MomentResponse momentResponse = momentFacade.modifyMoment(1L, momentRequest);
+				MomentResponse momentResponse = momentFacade.modify(1L, momentRequest);
 
 				//then
 				assertThat(momentResponse).isNotNull();
@@ -263,7 +263,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				MomentResponse momentResponse = momentFacade.modifyMoment(momentId, request);
+				MomentResponse momentResponse = momentFacade.modify(momentId, request);
 
 				//then
 				assertThat(momentResponse.name()).isEqualTo(request.momentName());
@@ -278,7 +278,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				MomentResponse momentResponse = momentFacade.modifyMoment(momentId, request);
+				MomentResponse momentResponse = momentFacade.modify(momentId, request);
 
 				//then
 				assertThat(momentResponse.capacity()).isEqualTo(request.capacity());
@@ -296,7 +296,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				momentFacade.modifyMoment(momentId, request);
+				momentFacade.modify(momentId, request);
 
 				//then
 				assertThat(moment.getMeetAt()).isEqualTo(request.meetAt());
@@ -315,7 +315,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				MomentResponse momentResponse = momentFacade.modifyMoment(momentId, request);
+				MomentResponse momentResponse = momentFacade.modify(momentId, request);
 
 				//then
 				assertThat(momentResponse.closedAt()).isEqualTo(request.closedAt());
@@ -357,7 +357,7 @@ class MomentFacadeTest {
 				given(locationService.findMeetLocation(momentId)).willReturn(Optional.of(originalLocation));
 
 				//when
-				momentFacade.modifyMoment(momentId, request);
+				momentFacade.modify(momentId, request);
 
 				//then
 				verify(locationService).findMeetLocation(momentId);

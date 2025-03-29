@@ -94,10 +94,18 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 		return this.files;
 	}
 
-	//== 비지니스 로직 ==//
 	@Override
 	public void setFiles(Files files) {
 		this.files = files;
+	}
+
+	//== 비지니스 로직 ==//
+	public void updateParticipant(int amount) {
+		if (this.participantCount + amount < 0) {
+			this.participantCount = 0;
+			return;
+		}
+		this.participantCount += amount;
 	}
 
 	public void updateName(String name) {

@@ -11,12 +11,22 @@ import com.genius.herewe.business.moment.repository.MomentMemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MomentMemberService {
 	private final MomentMemberRepository momentMemberRepository;
 
 	public Optional<MomentMember> findByJoinInfo(Long userId, Long momentId) {
 		return momentMemberRepository.findByJoinInfo(userId, momentId);
+	}
+
+	@Transactional
+	public MomentMember save(MomentMember momentMember) {
+		return momentMemberRepository.save(momentMember);
+	}
+
+	@Transactional
+	public void delete(MomentMember momentMember) {
+		momentMemberRepository.delete(momentMember);
 	}
 }

@@ -36,7 +36,7 @@ public class DefaultMomentFacade implements MomentFacade {
 	private final LocationService locationService;
 
 	@Override
-	public MomentResponse inquiryMoment(User user, Long momentId) {
+	public MomentResponse inquirySingle(User user, Long momentId) {
 		Moment moment = momentService.findById(momentId);
 
 		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(user.getId(), momentId);
@@ -50,7 +50,7 @@ public class DefaultMomentFacade implements MomentFacade {
 
 	@Override
 	@Transactional
-	public MomentResponse createMoment(Long userId, Long crewId, MomentRequest momentRequest) {
+	public MomentResponse create(Long userId, Long crewId, MomentRequest momentRequest) {
 		validateMomentRequest(momentRequest);
 
 		User user = userService.findById(userId);
@@ -77,7 +77,7 @@ public class DefaultMomentFacade implements MomentFacade {
 
 	@Override
 	@Transactional
-	public MomentResponse modifyMoment(Long momentId, MomentRequest momentRequest) {
+	public MomentResponse modify(Long momentId, MomentRequest momentRequest) {
 		Moment moment = momentService.findById(momentId);
 
 		Optional.ofNullable(momentRequest.momentName()).ifPresent(moment::updateName);
@@ -110,9 +110,61 @@ public class DefaultMomentFacade implements MomentFacade {
 
 	@Override
 	@Transactional
-	public void deleteMoment(Long momentId) {
+	public void delete(Long momentId) {
 		Moment moment = momentService.findById(momentId);
 		momentService.delete(moment);
+	}
+
+	@Override
+	@Transactional
+	public MomentResponse join(Long userId, Long momentId, LocalDateTime now) {
+		User user = userService.findById(userId);
+		Moment moment = momentService.findById(momentId);
+
+		validateJoinCondition(userId, moment, now);
+
+		moment.updateParticipant(1);
+		MomentMember momentMember = MomentMember.create();
+		momentMember.joinMoment(user, moment);
+		momentMemberService.save(momentMember);
+
+		Optional<Location> optionalLocation = locationService.findMeetLocation(momentId);
+		Place place = Place.createFromOptional(optionalLocation);
+
+		return MomentResponse.create(moment, place, true);
+	}
+
+	private void validateJoinCondition(Long userId, Moment moment, LocalDateTime now) {
+		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(userId, moment.getId());
+		if (joinInfo.isPresent()) {
+			throw new BusinessException(ALREADY_JOINED_MOMENT);
+		}
+		LocalDateTime closedAt = moment.getClosedAt();
+		if (!closedAt.isAfter(now)) {
+			throw new BusinessException(MOMENT_DEADLINE_EXPIRED);
+		}
+		int capacity = moment.getCapacity();
+		int participantCount = moment.getParticipantCount();
+		if (capacity == participantCount) {
+			throw new BusinessException(MOMENT_CAPACITY_FULL);
+		}
+	}
+
+	@Override
+	@Transactional
+	public void quit(Long userId, Long momentId, LocalDateTime now) {
+		Moment moment = momentService.findById(momentId);
+
+		LocalDateTime closedAt = moment.getClosedAt();
+		if (!closedAt.isAfter(now)) {
+			throw new BusinessException(MOMENT_DEADLINE_EXPIRED);
+		}
+
+		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(userId, momentId);
+		joinInfo.ifPresent(val -> {
+			momentMemberService.delete(val);
+			moment.updateParticipant(-1);
+		});
 	}
 
 	private void validateMomentRequest(MomentRequest momentRequest) {

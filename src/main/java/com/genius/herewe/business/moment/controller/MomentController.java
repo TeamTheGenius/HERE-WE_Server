@@ -1,5 +1,7 @@
 package com.genius.herewe.business.moment.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +31,23 @@ public class MomentController implements MomentApi {
 
 	@GetMapping("/{momentId}")
 	public SingleResponse<MomentResponse> inquirySingleMoment(@HereWeUser User user, @PathVariable Long momentId) {
-		MomentResponse momentResponse = momentFacade.inquiryMoment(user, momentId);
+		MomentResponse momentResponse = momentFacade.inquirySingle(user, momentId);
 		return new SingleResponse<>(HttpStatus.OK, momentResponse);
+	}
+
+	@PostMapping("/{momentId}/join")
+	public SingleResponse<MomentResponse> joinMoment(@HereWeUser User user, @PathVariable Long momentId) {
+		LocalDateTime now = LocalDateTime.now();
+		MomentResponse momentResponse = momentFacade.join(user.getId(), momentId, now);
+
+		return new SingleResponse<>(HttpStatus.OK, momentResponse);
+	}
+
+	@DeleteMapping("/{momentId}/join")
+	public CommonResponse quitMoment(@HereWeUser User user, @PathVariable Long momentId) {
+		LocalDateTime now = LocalDateTime.now();
+		momentFacade.quit(user.getId(), momentId, now);
+		return CommonResponse.ok();
 	}
 
 	@PostMapping
@@ -38,7 +55,7 @@ public class MomentController implements MomentApi {
 		@RequestParam(name = "crewId") Long crewId,
 		@RequestBody MomentRequest momentRequest) {
 
-		MomentResponse momentResponse = momentFacade.createMoment(user.getId(), crewId, momentRequest);
+		MomentResponse momentResponse = momentFacade.create(user.getId(), crewId, momentRequest);
 		return new SingleResponse<>(HttpStatus.CREATED, momentResponse);
 	}
 
@@ -46,13 +63,13 @@ public class MomentController implements MomentApi {
 	public SingleResponse<MomentResponse> modifyMoment(@PathVariable Long momentId,
 		@RequestBody MomentRequest momentRequest) {
 
-		MomentResponse momentResponse = momentFacade.modifyMoment(momentId, momentRequest);
+		MomentResponse momentResponse = momentFacade.modify(momentId, momentRequest);
 		return new SingleResponse<>(HttpStatus.OK, momentResponse);
 	}
 
 	@DeleteMapping("/{momentId}")
 	public CommonResponse deleteMoment(@PathVariable Long momentId) {
-		momentFacade.deleteMoment(momentId);
+		momentFacade.delete(momentId);
 		return CommonResponse.ok();
 	}
 }

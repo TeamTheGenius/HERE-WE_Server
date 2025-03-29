@@ -48,6 +48,86 @@ public interface MomentApi {
 	})
 	SingleResponse<MomentResponse> inquirySingleMoment(@HereWeUser User user, @PathVariable Long momentId);
 
+	@Operation(summary = "모먼트 참여 요청", description = "특정 모먼트에 대해 참여 요청")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "모먼트 참여 처리 성공"
+		),
+		@ApiResponse(
+			responseCode = "400",
+			description = """
+				1. 해당 사용자가 이미 참여한 모먼트일 때
+				2. 모먼트 참여 마감 기한이 지났을 때
+				3. 모먼트 최대 참여 가능 정원이 다 찼을 때
+				""",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "1. 해당 사용자가 이미 참여한 모먼트일 때",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "ALREADY_JOINED_MOMENT",
+								"message": "이미 참여한 모먼트입니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "2. 모먼트 참여 마감 기한이 지났을 때",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "MOMENT_DEADLINE_EXPIRED",
+								"message": "모먼트 참여 마감일자가 지났습니다. 모먼트 참여/참여 취소는 마감일자 이전까지 가능합니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "3. 모먼트 최대 참여 가능 정원이 다 찼을 때",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "MOMENT_CAPACITY_FULL",
+								"message": "참여 인원이 최대 정원에 도달했습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	SingleResponse<MomentResponse> joinMoment(@HereWeUser User user, @PathVariable Long momentId);
+
+	@Operation(summary = "모먼트 참여 취소 요청", description = "특정 모먼트에 대해 참여 취소 요청")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "모먼트 참여 취소 성공"
+		),
+		@ApiResponse(
+			responseCode = "400",
+			description = "모먼트 참여 마감 기한이 지난 경우",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "모먼트 참여 마감 기한이 지난 경우",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "MOMENT_DEADLINE_EXPIRED",
+								"message": "모먼트 참여 마감일자가 지났습니다. 모먼트 참여/참여 취소는 마감일자 이전까지 가능합니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	CommonResponse quitMoment(@HereWeUser User user, @PathVariable Long momentId);
+
 	@Operation(summary = "모먼트 생성", description = "특정 크루에 모먼트 생성")
 	@ApiResponses({
 		@ApiResponse(

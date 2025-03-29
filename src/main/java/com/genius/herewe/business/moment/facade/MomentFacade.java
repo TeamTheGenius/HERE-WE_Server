@@ -1,15 +1,21 @@
 package com.genius.herewe.business.moment.facade;
 
+import java.time.LocalDateTime;
+
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.core.user.domain.User;
 
 public interface MomentFacade {
-	MomentResponse inquiryMoment(User user, Long momentId);
+	MomentResponse inquirySingle(User user, Long momentId);
 
-	MomentResponse createMoment(Long userId, Long crewId, MomentRequest momentRequest);
+	MomentResponse create(Long userId, Long crewId, MomentRequest momentRequest);
 
-	MomentResponse modifyMoment(Long momentId, MomentRequest momentRequest);
+	MomentResponse modify(Long momentId, MomentRequest momentRequest);
 
-	void deleteMoment(Long momentId);
+	void delete(Long momentId);
+
+	MomentResponse join(Long userId, Long momentId, LocalDateTime now);
+
+	void quit(Long userId, Long momentId, LocalDateTime now);
 }
