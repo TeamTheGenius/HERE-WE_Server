@@ -1,5 +1,6 @@
 package com.genius.herewe.business.moment.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -7,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.business.moment.repository.MomentMemberRepository;
+import com.genius.herewe.business.moment.repository.query.MomentMemberCustomRepository;
+import com.genius.herewe.core.user.domain.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MomentMemberService {
 	private final MomentMemberRepository momentMemberRepository;
+	private final MomentMemberCustomRepository momentMemberCustomRepository;
 
 	public Optional<MomentMember> findByJoinInfo(Long userId, Long momentId) {
 		return momentMemberRepository.findByJoinInfo(userId, momentId);
@@ -28,5 +32,9 @@ public class MomentMemberService {
 	@Transactional
 	public void delete(MomentMember momentMember) {
 		momentMemberRepository.delete(momentMember);
+	}
+
+	public List<User> findAllJoinedUsers(Long momentId) {
+		return momentMemberCustomRepository.findAllJoinedUsers(momentId);
 	}
 }

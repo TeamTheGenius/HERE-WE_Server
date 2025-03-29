@@ -4,10 +4,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
+import com.genius.herewe.core.global.response.ListResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
 import com.genius.herewe.core.user.domain.User;
@@ -280,4 +282,13 @@ public interface MomentApi {
 		)
 	})
 	CommonResponse deleteMoment(@PathVariable Long momentId);
+
+	@Operation(summary = "모먼트에 참여한 사용자 리스트 조회", description = "특정 모먼트에 참여한 사용자의 목록 조회. 참여일자/닉네임 오름차순 정렬")
+	@ApiResponses(
+		@ApiResponse(
+			responseCode = "200",
+			description = "모먼트에 참여한 사용자 리스트 조회 성공"
+		)
+	)
+	ListResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId);
 }

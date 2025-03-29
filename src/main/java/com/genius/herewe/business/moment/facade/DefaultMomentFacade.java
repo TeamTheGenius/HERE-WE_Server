@@ -3,6 +3,7 @@ package com.genius.herewe.business.moment.facade;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
+import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.service.MomentMemberService;
@@ -165,6 +167,17 @@ public class DefaultMomentFacade implements MomentFacade {
 			momentMemberService.delete(val);
 			moment.updateParticipant(-1);
 		});
+	}
+
+	@Override
+	public List<MomentMemberResponse> inquiryJoinedMembers(Long momentId) {
+		List<User> joinedUsers = momentMemberService.findAllJoinedUsers(momentId);
+		return joinedUsers.stream()
+			.map(user -> MomentMemberResponse.builder()
+				.userId(user.getId())
+				.name(user.getNickname())
+				.build())
+			.toList();
 	}
 
 	private void validateMomentRequest(MomentRequest momentRequest) {

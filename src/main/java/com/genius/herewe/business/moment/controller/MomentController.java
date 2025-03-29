@@ -1,6 +1,7 @@
 package com.genius.herewe.business.moment.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,16 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.facade.MomentFacade;
 import com.genius.herewe.core.global.response.CommonResponse;
+import com.genius.herewe.core.global.response.ListResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
 import com.genius.herewe.core.user.domain.User;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/moment")
@@ -71,5 +76,11 @@ public class MomentController implements MomentApi {
 	public CommonResponse deleteMoment(@PathVariable Long momentId) {
 		momentFacade.delete(momentId);
 		return CommonResponse.ok();
+	}
+
+	@GetMapping("/{momentId}/members")
+	public ListResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId) {
+		List<MomentMemberResponse> momentMemberResponses = momentFacade.inquiryJoinedMembers(momentId);
+		return new ListResponse<>(HttpStatus.OK, momentMemberResponses);
 	}
 }
