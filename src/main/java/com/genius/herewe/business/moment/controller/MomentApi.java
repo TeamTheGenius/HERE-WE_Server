@@ -1,5 +1,6 @@
 package com.genius.herewe.business.moment.controller;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,8 +10,8 @@ import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
-import com.genius.herewe.core.global.response.ListResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
+import com.genius.herewe.core.global.response.SlicingResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
 import com.genius.herewe.core.user.domain.User;
 
@@ -290,5 +291,5 @@ public interface MomentApi {
 			description = "모먼트에 참여한 사용자 리스트 조회 성공"
 		)
 	)
-	ListResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId);
+	SlicingResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId, Pageable pageable);
 }

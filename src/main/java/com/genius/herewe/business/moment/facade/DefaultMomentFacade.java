@@ -3,9 +3,10 @@ package com.genius.herewe.business.moment.facade;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,14 +179,8 @@ public class DefaultMomentFacade implements MomentFacade {
 	}
 
 	@Override
-	public List<MomentMemberResponse> inquiryJoinedMembers(Long momentId) {
-		List<User> joinedUsers = momentMemberService.findAllJoinedUsers(momentId);
-		return joinedUsers.stream()
-			.map(user -> MomentMemberResponse.builder()
-				.userId(user.getId())
-				.name(user.getNickname())
-				.build())
-			.toList();
+	public Slice<MomentMemberResponse> inquiryJoinedMembers(Long momentId, Pageable pageable) {
+		return momentMemberService.findAllJoinedUsers(momentId, pageable);
 	}
 
 	private void validateMomentRequest(MomentRequest momentRequest) {

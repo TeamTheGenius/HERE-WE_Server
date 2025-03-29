@@ -1,8 +1,10 @@
 package com.genius.herewe.business.moment.controller;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +21,8 @@ import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.facade.MomentFacade;
 import com.genius.herewe.core.global.response.CommonResponse;
-import com.genius.herewe.core.global.response.ListResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
+import com.genius.herewe.core.global.response.SlicingResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
 import com.genius.herewe.core.user.domain.User;
 
@@ -79,8 +81,10 @@ public class MomentController implements MomentApi {
 	}
 
 	@GetMapping("/{momentId}/members")
-	public ListResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId) {
-		List<MomentMemberResponse> momentMemberResponses = momentFacade.inquiryJoinedMembers(momentId);
-		return new ListResponse<>(HttpStatus.OK, momentMemberResponses);
+	public SlicingResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId,
+		@PageableDefault(size = 20) Pageable pageable) {
+
+		Slice<MomentMemberResponse> momentMemberResponses = momentFacade.inquiryJoinedMembers(momentId, pageable);
+		return new SlicingResponse<>(HttpStatus.OK, momentMemberResponses);
 	}
 }
