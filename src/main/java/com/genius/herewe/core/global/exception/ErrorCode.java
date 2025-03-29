@@ -29,6 +29,7 @@ public enum ErrorCode {
 
 	CREW_JOIN_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 크루에 대한 참여 정보가 없습니다."),
 	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),
+	CREW_MEMBERSHIP_REQUIRED(HttpStatus.FORBIDDEN, "크루 멤버에게만 허용된 작업입니다. 크루에 참여 후 재시도해주세요."),
 
 	INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "크루 초대 정보를 찾을 수 없습니다. 초대 정보를 다시 확인해주세요."),
 	INVITATION_EXPIRED(HttpStatus.BAD_REQUEST, "크루 초대가 만료되었습니다."),

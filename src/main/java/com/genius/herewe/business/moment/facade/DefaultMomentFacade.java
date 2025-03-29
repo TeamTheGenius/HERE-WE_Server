@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.crew.domain.Crew;
+import com.genius.herewe.business.crew.domain.CrewMember;
+import com.genius.herewe.business.crew.service.CrewMemberService;
 import com.genius.herewe.business.crew.service.CrewService;
 import com.genius.herewe.business.location.domain.Location;
 import com.genius.herewe.business.location.search.dto.Place;
@@ -33,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class DefaultMomentFacade implements MomentFacade {
 	private final UserService userService;
 	private final CrewService crewService;
+	private final CrewMemberService crewMemberService;
 	private final MomentService momentService;
 	private final MomentMemberService momentMemberService;
 	private final LocationService locationService;
@@ -137,8 +140,13 @@ public class DefaultMomentFacade implements MomentFacade {
 	}
 
 	private void validateJoinCondition(Long userId, Moment moment, LocalDateTime now) {
-		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(userId, moment.getId());
-		if (joinInfo.isPresent()) {
+		Long crewId = moment.getCrew().getId();
+		Optional<CrewMember> crewJoinInfo = crewMemberService.findOptional(userId, crewId);
+		if (crewJoinInfo.isEmpty()) {
+			throw new BusinessException(CREW_MEMBERSHIP_REQUIRED);
+		}
+		Optional<MomentMember> momentJoinInfo = momentMemberService.findByJoinInfo(userId, moment.getId());
+		if (momentJoinInfo.isPresent()) {
 			throw new BusinessException(ALREADY_JOINED_MOMENT);
 		}
 		LocalDateTime closedAt = moment.getClosedAt();
