@@ -3,7 +3,6 @@ package com.genius.herewe.business.moment.service;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.moment.domain.Moment;
+import com.genius.herewe.business.moment.repository.MomentMemberRepository;
 import com.genius.herewe.business.moment.repository.MomentRepository;
 import com.genius.herewe.core.global.exception.BusinessException;
 
@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class MomentService {
 	private final EntityManager entityManager;
 	private final MomentRepository momentRepository;
+	private final MomentMemberRepository momentMemberRepository;
 
 	@Transactional
 	public Moment save(Moment moment) {
@@ -52,7 +53,7 @@ public class MomentService {
 		entityManager.flush();
 	}
 
-	public List<Moment> findAllJoined(List<Long> momentIds, LocalDateTime now) {
-		return momentRepository.findAllJoined(momentIds, now);
+	public Page<Moment> findAllJoinedMoments(Long userId, LocalDateTime now, Pageable pageable) {
+		return momentMemberRepository.findAllJoinedMoments(userId, now, pageable);
 	}
 }

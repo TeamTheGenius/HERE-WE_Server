@@ -52,16 +52,15 @@ public class DefaultMomentFacade implements MomentFacade {
 
 	@Override
 	public Page<MomentIncomingResponse> inquiryIncomingList(Long userId, LocalDateTime now, Pageable pageable) {
-		//
-		Page<Long> joinedMomentIds = momentMemberService.findAllJoinedMomentIds(userId, pageable);
-		List<Long> momentIds = joinedMomentIds.getContent();
+		Page<Moment> joinedMoments = momentService.findAllJoinedMoments(userId, now, pageable);
 
-		List<Moment> joinedMoments = momentService.findAllJoined(momentIds, now);
+		List<Moment> moments = joinedMoments.getContent();
+		List<Long> momentIds = moments.stream().map(Moment::getId).toList();
+
 		Map<Long, Location> locationInfos = locationService.findMeetingLocationsInIds(momentIds);
-
 		Map<Long, Crew> crewInfos = crewService.findAllInMoments(momentIds);
 
-		List<MomentIncomingResponse> incomingResponses = joinedMoments.stream().map(moment -> {
+		List<MomentIncomingResponse> incomingResponses = moments.stream().map(moment -> {
 			Crew crew = crewInfos.get(moment.getId());
 			Location location = locationInfos.get(moment.getId());
 
@@ -74,7 +73,7 @@ public class DefaultMomentFacade implements MomentFacade {
 				.build();
 		}).toList();
 
-		return new PageImpl<>(incomingResponses, pageable, joinedMomentIds.getTotalElements());
+		return new PageImpl<>(incomingResponses, pageable, joinedMoments.getTotalElements());
 	}
 
 	@Override

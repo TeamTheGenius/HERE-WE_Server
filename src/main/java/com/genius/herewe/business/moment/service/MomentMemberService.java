@@ -3,7 +3,6 @@ package com.genius.herewe.business.moment.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -43,9 +42,5 @@ public class MomentMemberService {
 
 	public List<Long> findAllInMomentIds(List<Long> momentIds) {
 		return momentMemberRepository.findIdsInMoment(momentIds);
-	}
-
-	public Page<Long> findAllJoinedMomentIds(Long userId, Pageable pageable) {
-		return momentMemberRepository.findAllJoinedMomentIds(userId, pageable);
 	}
 }
