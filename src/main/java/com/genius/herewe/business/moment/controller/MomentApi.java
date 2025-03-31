@@ -34,7 +34,7 @@ public interface MomentApi {
 			description = "크루에 속한 모먼트 리스트 조회 성공"
 		)
 	)
-	PagingResponse<MomentPreviewResponse> inquiryMomentList(@HereWeUser User user,
+	PagingResponse<MomentPreviewResponse> inquiryMoments(@HereWeUser User user,
 		@PathVariable Long crewId,
 		@PageableDefault(size = 20) Pageable pageable);
 

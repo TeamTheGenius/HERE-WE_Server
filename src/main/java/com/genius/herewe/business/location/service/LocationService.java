@@ -1,7 +1,9 @@
 package com.genius.herewe.business.location.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +43,12 @@ public class LocationService {
 		return locationRepository.findByLocationIndex(momentId, 1);
 	}
 
-	public List<Location> findMeetingLocationsByCrewId(List<Long> momentIds) {
-		return locationRepository.findMeetingLocationsByCrewId(momentIds);
+	public Map<Long, Location> findMeetingLocationsInIds(List<Long> momentIds) {
+		List<Location> meetingLocations = locationRepository.findMeetingLocationsByIds(momentIds);
+		return meetingLocations.stream()
+			.collect(Collectors.toMap(
+				location -> location.getMoment().getId(),
+				location -> location
+			));
 	}
 }

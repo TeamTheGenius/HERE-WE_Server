@@ -2,6 +2,9 @@ package com.genius.herewe.business.moment.service;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,8 +39,8 @@ public class MomentService {
 			.orElseThrow(() -> new BusinessException(MOMENT_NOT_FOUND));
 	}
 
-	public Page<Moment> findAllByPaging(Long crewId, Pageable pageable) {
-		return momentRepository.findAllByPaging(crewId, pageable);
+	public Page<Moment> findAllInCrewByPaging(Long crewId, Pageable pageable) {
+		return momentRepository.findAllInCrewByPaging(crewId, pageable);
 	}
 
 	@Transactional
@@ -47,5 +50,9 @@ public class MomentService {
 
 	public void flushChanges() {
 		entityManager.flush();
+	}
+
+	public List<Moment> findAllJoined(List<Long> momentIds, LocalDateTime now) {
+		return momentRepository.findAllJoined(momentIds, now);
 	}
 }

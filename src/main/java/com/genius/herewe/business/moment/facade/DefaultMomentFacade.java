@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,6 +26,7 @@ import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
 import com.genius.herewe.business.moment.domain.ParticipantStatus;
+import com.genius.herewe.business.moment.dto.MomentIncomingResponse;
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
@@ -51,17 +51,40 @@ public class DefaultMomentFacade implements MomentFacade {
 	private final LocationService locationService;
 
 	@Override
+	public Page<MomentIncomingResponse> inquiryIncomingList(Long userId, LocalDateTime now, Pageable pageable) {
+		//
+		Page<Long> joinedMomentIds = momentMemberService.findAllJoinedMomentIds(userId, pageable);
+		List<Long> momentIds = joinedMomentIds.getContent();
+
+		List<Moment> joinedMoments = momentService.findAllJoined(momentIds, now);
+		Map<Long, Location> locationInfos = locationService.findMeetingLocationsInIds(momentIds);
+
+		Map<Long, Crew> crewInfos = crewService.findAllInMoments(momentIds);
+
+		List<MomentIncomingResponse> incomingResponses = joinedMoments.stream().map(moment -> {
+			Crew crew = crewInfos.get(moment.getId());
+			Location location = locationInfos.get(moment.getId());
+
+			return MomentIncomingResponse.builder()
+				.momentId(moment.getId())
+				.crewName(crew.getName())
+				.momentName(moment.getName())
+				.meetAt(moment.getMeetAt())
+				.meetPlaceName(location.getName())
+				.build();
+		}).toList();
+
+		return new PageImpl<>(incomingResponses, pageable, joinedMomentIds.getTotalElements());
+	}
+
+	@Override
 	public Page<MomentPreviewResponse> inquiryList(Long userId, Long crewId, LocalDateTime now, Pageable pageable) {
-		Page<Moment> moments = momentService.findAllByPaging(crewId, pageable);
+		Page<Moment> moments = momentService.findAllInCrewByPaging(crewId, pageable);
+
 		List<Long> momentIds = moments.getContent().stream().map(Moment::getId).toList();
+		Map<Long, Location> locationInfos = locationService.findMeetingLocationsInIds(momentIds);
 
-		Map<Long, Location> locationInfos = locationService.findMeetingLocationsByCrewId(momentIds)
-			.stream().collect(Collectors.toMap(
-				location -> location.getMoment().getId(),
-				location -> location
-			));
-
-		List<Long> momentMemberIds = momentMemberService.findAllJoinedMomentIds(momentIds);
+		List<Long> momentMemberIds = momentMemberService.findAllInMomentIds(momentIds);
 		Set<Long> momentMemberSet = new HashSet<>(momentMemberIds);
 
 		List<MomentPreviewResponse> previewResponses = moments.getContent().stream()
