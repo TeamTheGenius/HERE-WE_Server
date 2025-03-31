@@ -93,6 +93,20 @@ public class Location {
 			.build();
 	}
 
+	public static Location createDummy() {
+		return Location.builder()
+			.locationIndex(0)
+			.placeId(0L)
+			.name("")
+			.address("")
+			.roadAddress("")
+			.url("")
+			.x(0.0)
+			.y(0.0)
+			.phone("")
+			.build();
+	}
+
 	//== 연관관계 편의 메서드 ==//
 	public void addMoment(Moment moment) {
 		this.moment = moment;

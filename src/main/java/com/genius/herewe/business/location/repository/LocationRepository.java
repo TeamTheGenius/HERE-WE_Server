@@ -16,4 +16,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
 	@Query("SELECT l FROM Location l WHERE l.moment.id = :momentId ORDER BY l.locationIndex ASC LIMIT 100")
 	List<Location> findAllInMoment(@Param("momentId") Long momentId);
+
+	@Query("SELECT l FROM Location l WHERE l.locationIndex = 1 AND l.moment.id IN :momentIds")
+	List<Location> findMeetingLocationsByCrewId(List<Long> momentIds);
 }

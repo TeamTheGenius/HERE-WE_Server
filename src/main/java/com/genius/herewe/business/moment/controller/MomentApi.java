@@ -1,15 +1,18 @@
 package com.genius.herewe.business.moment.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
+import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
+import com.genius.herewe.core.global.response.PagingResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.global.response.SlicingResponse;
 import com.genius.herewe.core.security.annotation.HereWeUser;
@@ -23,6 +26,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 public interface MomentApi {
+
+	@Operation(summary = "크루에 속한 모먼트 리스트 조회", description = "특정 크루에 속한 모먼트들을 페이지네이션으로 조회")
+	@ApiResponses(
+		@ApiResponse(
+			responseCode = "200",
+			description = "크루에 속한 모먼트 리스트 조회 성공"
+		)
+	)
+	PagingResponse<MomentPreviewResponse> inquiryMomentList(@HereWeUser User user,
+		@PathVariable Long crewId,
+		@PageableDefault(size = 20) Pageable pageable);
+
 	@Operation(summary = "특정 모먼트 정보 상세 조회", description = "특정 모먼트에 대한 상세 정보 조회")
 	@ApiResponses({
 		@ApiResponse(
