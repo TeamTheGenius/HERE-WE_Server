@@ -2,15 +2,19 @@ package com.genius.herewe.business.moment.facade;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
+import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.core.user.domain.User;
 
 public interface MomentFacade {
+	Page<MomentPreviewResponse> inquiryList(Long userId, Long crewId, LocalDateTime now, Pageable pageable);
+
 	MomentResponse inquirySingle(User user, Long momentId);
 
 	MomentResponse create(Long userId, Long crewId, MomentRequest momentRequest);

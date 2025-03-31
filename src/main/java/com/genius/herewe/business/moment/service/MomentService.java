@@ -2,6 +2,8 @@ package com.genius.herewe.business.moment.service;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,10 @@ public class MomentService {
 	public Moment findByIdWithOptimisticLock(Long momentId) {
 		return momentRepository.findByIdWithOptimisticLock(momentId)
 			.orElseThrow(() -> new BusinessException(MOMENT_NOT_FOUND));
+	}
+
+	public Page<Moment> findAllByPaging(Long crewId, Pageable pageable) {
+		return momentRepository.findAllByPaging(crewId, pageable);
 	}
 
 	@Transactional

@@ -1,5 +1,6 @@
 package com.genius.herewe.business.moment.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -37,5 +38,9 @@ public class MomentMemberService {
 
 	public Slice<MomentMemberResponse> findAllJoinedUsers(Long momentId, Pageable pageable) {
 		return queryRepository.findAllJoinedUsers(momentId, pageable);
+	}
+
+	public List<Long> findAllJoinedMomentIds(List<Long> momentIds) {
+		return momentMemberRepository.findIdsInMoment(momentIds);
 	}
 }

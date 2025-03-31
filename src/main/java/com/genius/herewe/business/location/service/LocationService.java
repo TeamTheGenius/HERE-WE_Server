@@ -29,15 +29,19 @@ public class LocationService {
 		return locationRepository.save(location);
 	}
 
-	public Optional<Location> findMeetLocation(Long momentId) {
-		return locationRepository.findByLocationIndex(momentId, 1);
-	}
-
 	public Optional<Location> findByIndex(Long momentId, int locationIndex) {
 		return locationRepository.findByLocationIndex(momentId, locationIndex);
 	}
 
 	public List<Location> findAllInMoment(Long momentId) {
 		return locationRepository.findAllInMoment(momentId);
+	}
+
+	public Optional<Location> findMeetLocation(Long momentId) {
+		return locationRepository.findByLocationIndex(momentId, 1);
+	}
+
+	public List<Location> findMeetingLocationsByCrewId(List<Long> momentIds) {
+		return locationRepository.findMeetingLocationsByCrewId(momentIds);
 	}
 }

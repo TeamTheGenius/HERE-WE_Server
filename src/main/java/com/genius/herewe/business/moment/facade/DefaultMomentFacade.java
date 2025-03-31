@@ -3,8 +3,15 @@ package com.genius.herewe.business.moment.facade;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -19,7 +26,9 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
+import com.genius.herewe.business.moment.domain.ParticipantStatus;
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
+import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.service.MomentMemberService;
@@ -40,6 +49,42 @@ public class DefaultMomentFacade implements MomentFacade {
 	private final MomentService momentService;
 	private final MomentMemberService momentMemberService;
 	private final LocationService locationService;
+
+	@Override
+	public Page<MomentPreviewResponse> inquiryList(Long userId, Long crewId, LocalDateTime now, Pageable pageable) {
+		Page<Moment> moments = momentService.findAllByPaging(crewId, pageable);
+		List<Long> momentIds = moments.getContent().stream().map(Moment::getId).toList();
+
+		Map<Long, Location> locationInfos = locationService.findMeetingLocationsByCrewId(momentIds)
+			.stream().collect(Collectors.toMap(
+				location -> location.getMoment().getId(),
+				location -> location
+			));
+
+		List<Long> momentMemberIds = momentMemberService.findAllJoinedMomentIds(momentIds);
+		Set<Long> momentMemberSet = new HashSet<>(momentMemberIds);
+
+		List<MomentPreviewResponse> previewResponses = moments.getContent().stream()
+			.map(moment -> {
+				boolean isJoined = momentMemberSet.contains(moment.getId());
+				ParticipantStatus status = getParticipantStatus(isJoined, moment.getClosedAt(), now);
+				String placeName = locationInfos.getOrDefault(moment.getId(), Location.createDummy()).getName();
+				return MomentPreviewResponse.create(moment, status, placeName);
+			})
+			.toList();
+
+		return new PageImpl<>(previewResponses, pageable, moments.getTotalElements());
+	}
+
+	private ParticipantStatus getParticipantStatus(boolean isJoined, LocalDateTime closedAt, LocalDateTime now) {
+		if (isJoined) {
+			return ParticipantStatus.PARTICIPATING;
+		}
+		if (now.isAfter(closedAt)) {
+			return ParticipantStatus.DEADLINE_PASSED;
+		}
+		return ParticipantStatus.AVAILABLE;
+	}
 
 	@Override
 	public MomentResponse inquirySingle(User user, Long momentId) {

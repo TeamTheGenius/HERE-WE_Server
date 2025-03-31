@@ -2,6 +2,8 @@ package com.genius.herewe.business.moment.repository;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +17,7 @@ public interface MomentRepository extends JpaRepository<Moment, Long> {
 	@Lock(LockModeType.OPTIMISTIC)
 	@Query("SELECT m FROM Moment m WHERE m.id = :momentId")
 	Optional<Moment> findByIdWithOptimisticLock(@Param("momentId") Long momentId);
+
+	@Query("SELECT m FROM Moment m WHERE m.crew.id = :crewId ORDER BY m.createdAt")
+	Page<Moment> findAllByPaging(@Param("crewId") Long crewId, Pageable pageable);
 }
