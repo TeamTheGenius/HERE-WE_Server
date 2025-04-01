@@ -63,7 +63,8 @@ public class MomentController implements MomentApi {
 
 	@GetMapping("/{momentId}")
 	public SingleResponse<MomentResponse> inquirySingleMoment(@HereWeUser User user, @PathVariable Long momentId) {
-		MomentResponse momentResponse = momentFacade.inquirySingle(user, momentId);
+		LocalDateTime now = LocalDateTime.now();
+		MomentResponse momentResponse = momentFacade.inquirySingle(user, momentId, now);
 		return new SingleResponse<>(HttpStatus.OK, momentResponse);
 	}
 

@@ -33,6 +33,7 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
+import com.genius.herewe.business.moment.domain.ParticipantStatus;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.fixture.MomentFixture;
@@ -80,7 +81,7 @@ class MomentFacadeTest {
 				return Stream.of(
 					Arguments.of(new MomentRequest("Test", null, place, 5, LocalDateTime.now()), "meetAt"),
 					Arguments.of(new MomentRequest("Test", LocalDateTime.now(), place, null, LocalDateTime.now()),
-						"capacity"),
+								 "capacity"),
 					Arguments.of(new MomentRequest("Test", LocalDateTime.now(), place, 5, null), "closedAt")
 				);
 			}
@@ -247,7 +248,7 @@ class MomentFacadeTest {
 
 				//then
 				assertThat(momentResponse).isNotNull();
-				assertThat(momentResponse.isJoined()).isTrue();
+				assertThat(momentResponse.status()).isEqualTo(ParticipantStatus.PARTICIPATING.getValue());
 				assertThat(momentResponse.name()).isEqualTo(momentRequest.momentName());
 				assertThat(momentResponse.capacity()).isEqualTo(momentRequest.capacity());
 				assertThat(momentResponse.closedAt()).isEqualTo(momentRequest.closedAt());
