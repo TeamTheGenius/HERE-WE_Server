@@ -65,6 +65,7 @@ public class DefaultMomentFacade implements MomentFacade {
 			Location location = locationInfos.get(moment.getId());
 
 			return MomentIncomingResponse.builder()
+				.crewId(crew.getId())
 				.momentId(moment.getId())
 				.crewName(crew.getName())
 				.momentName(moment.getName())
