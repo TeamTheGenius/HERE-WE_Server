@@ -14,8 +14,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Tag(name = "Auth API", description = "인증/인가 관련 API")
 public interface AuthApi {
 
 	@Operation(summary = "사용자 인가 요청", description = "소셜 로그인 이후, 사용자 인가 요청")
@@ -44,5 +46,5 @@ public interface AuthApi {
 	})
 	@PostMapping("/auth")
 	SingleResponse<AuthResponse> authorize(HttpServletResponse response,
-		@RequestBody AuthRequest authRequest);
+										   @RequestBody AuthRequest authRequest);
 }

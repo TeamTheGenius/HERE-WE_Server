@@ -26,8 +26,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Crew API", description = "Crew 관련 API")
 public interface CrewApi {
 	@Operation(summary = "크루에 대한 나의 정보 조회", description = "크루에 대한 나의 정보(닉네임, 크루 내 권한) 조회")
 	@ApiResponses({

@@ -21,7 +21,9 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "User API", description = "사용자 관련 API")
 public interface UserApi {
 	@Operation(summary = "닉네임 중복 확인", description = "회원가입 과정에서 사용하고자하는 닉네임이 중복인지 확인")
 	@ApiResponses({

@@ -18,8 +18,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Location API", description = "장소 관련 API")
 public interface LocationApi {
 	@Operation(summary = "키워드를 통한 장소 검색", description = "Kakao Map API를 이용하여 키워드 검색 결과를 반환합니다.")
 	@ApiResponses({
@@ -29,8 +31,8 @@ public interface LocationApi {
 		),
 	})
 	SlicingResponse<Place> search(@RequestParam("keyword") String keyword,
-		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size);
+								  @RequestParam(defaultValue = "0") int page,
+								  @RequestParam(defaultValue = "10") int size);
 
 	@Operation(summary = "장소 목록 조회", description = "특정 모먼트에 등록된 장소 리스트 조회")
 	@ApiResponses({

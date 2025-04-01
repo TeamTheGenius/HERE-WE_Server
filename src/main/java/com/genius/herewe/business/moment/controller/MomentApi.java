@@ -25,7 +25,9 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Moment API", description = "모먼트 관련 API")
 public interface MomentApi {
 
 	@Operation(summary = "다가오는 모먼트 리스트 조회",
