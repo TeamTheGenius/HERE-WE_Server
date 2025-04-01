@@ -30,10 +30,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	private final RegistrationTokenService registrationTokenService;
 
 	public OAuth2SuccessHandler(@Value("${url.base}") String BASE_URL,
-		@Value("${url.path.signup}") String SIGN_UP_PATH,
-		@Value("${url.path.auth}") String AUTH_PATH,
-		UserRepository userRepository,
-		RegistrationTokenService registrationTokenService) {
+								@Value("${url.path.signup}") String SIGN_UP_PATH,
+								@Value("${url.path.auth}") String AUTH_PATH,
+								UserRepository userRepository,
+								RegistrationTokenService registrationTokenService) {
 		this.userRepository = userRepository;
 		this.registrationTokenService = registrationTokenService;
 		this.SIGNUP_URL = BASE_URL + SIGN_UP_PATH;
@@ -42,7 +42,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-		Authentication authentication) throws IOException, ServletException {
+										Authentication authentication) throws IOException, ServletException {
 
 		UserPrincipal oAuth2User = (UserPrincipal)authentication.getPrincipal();
 		String email = oAuth2User.getName();

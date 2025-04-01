@@ -19,7 +19,7 @@ public class RestClientConfig {
 	private final String KAKAO_AUTH_KEY;
 
 	public RestClientConfig(@Value("${external.api.kakao.base-url}") String BASE_URL,
-		@Value("${external.api.kakao.key}") String KAKAO_AUTH_KEY) {
+							@Value("${external.api.kakao.key}") String KAKAO_AUTH_KEY) {
 		this.BASE_URL = BASE_URL;
 		this.KAKAO_AUTH_KEY = KAKAO_AUTH_KEY;
 	}

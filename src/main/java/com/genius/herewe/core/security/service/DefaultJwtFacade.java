@@ -48,12 +48,12 @@ public class DefaultJwtFacade implements JwtFacade {
 	private final long REFRESH_EXPIRATION;
 
 	public DefaultJwtFacade(CustomUserDetailsService customUserDetailsService,
-		UserService userService, RefreshTokenService refreshTokenService,
-		@Value("${jwt.issuer}") String ISSUER,
-		@Value("${jwt.secret.access}") String ACCESS_SECRET_KEY,
-		@Value("${jwt.secret.refresh}") String REFRESH_SECRET_KEY,
-		@Value("${jwt.expiration.access}") long ACCESS_EXPIRATION,
-		@Value("${jwt.expiration.refresh}") long REFRESH_EXPIRATION) {
+							UserService userService, RefreshTokenService refreshTokenService,
+							@Value("${jwt.issuer}") String ISSUER,
+							@Value("${jwt.secret.access}") String ACCESS_SECRET_KEY,
+							@Value("${jwt.secret.refresh}") String REFRESH_SECRET_KEY,
+							@Value("${jwt.expiration.access}") long ACCESS_EXPIRATION,
+							@Value("${jwt.expiration.refresh}") long REFRESH_EXPIRATION) {
 		this.customUserDetailsService = customUserDetailsService;
 		this.userService = userService;
 		this.refreshTokenService = refreshTokenService;

@@ -28,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 	public static final String[] PERMITTED_URI = {"/v3/api-docs/**", "/swagger-ui/**",
-		"/swagger-ui.html", "/swagger-resources/**",
-		"/api-docs/**", "/webjars/**", "/favicon.ico", "/api/auth/**"};
+		"/swagger-ui.html", "/swagger-resources/**", "/api-docs/**",
+		"/webjars/**", "/favicon.ico", "/api/auth/**"};
 	private static final String[] PERMITTED_ROLES = {"USER", "ADMIN"};
 
 	private final CustomCorsConfiguration customCorsConfiguration;
@@ -42,7 +42,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.cors(CorsConfigurer
-				-> CorsConfigurer.configurationSource(customCorsConfiguration))
+					  -> CorsConfigurer.configurationSource(customCorsConfiguration))
 			.csrf(CsrfConfigurer::disable)
 			.httpBasic(HttpBasicConfigurer::disable)
 			.formLogin(FormLoginConfigurer::disable)

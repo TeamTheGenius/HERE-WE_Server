@@ -28,7 +28,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 public interface MomentApi {
 
-	@Operation(summary = "다가오는 모먼트 리스트 조회", description = "다가오는 모먼트들을 페이지네이션으로 조회")
+	@Operation(summary = "다가오는 모먼트 리스트 조회",
+		description = "다가오는 모먼트들을 페이지네이션으로 조회",
+		tags = {""})
 	@ApiResponses({
 		@ApiResponse(
 			responseCode = "200",
@@ -36,7 +38,7 @@ public interface MomentApi {
 		)
 	})
 	PagingResponse<MomentIncomingResponse> inquiryIncomingMoments(@HereWeUser User user,
-		@PageableDefault(size = 20) Pageable pageable);
+																  @PageableDefault(size = 20) Pageable pageable);
 
 	@Operation(summary = "크루에 속한 모먼트 리스트 조회", description = "특정 크루에 속한 모먼트들을 페이지네이션으로 조회")
 	@ApiResponses(
@@ -46,8 +48,8 @@ public interface MomentApi {
 		)
 	)
 	PagingResponse<MomentPreviewResponse> inquiryMoments(@HereWeUser User user,
-		@PathVariable Long crewId,
-		@PageableDefault(size = 20) Pageable pageable);
+														 @PathVariable Long crewId,
+														 @PageableDefault(size = 20) Pageable pageable);
 
 	@Operation(summary = "특정 모먼트 정보 상세 조회", description = "특정 모먼트에 대한 상세 정보 조회")
 	@ApiResponses({
@@ -239,7 +241,7 @@ public interface MomentApi {
 		)
 	})
 	SingleResponse<MomentResponse> createMoment(@HereWeUser User user, @RequestParam(name = "crewId") Long crewId,
-		@RequestBody MomentRequest momentRequest);
+												@RequestBody MomentRequest momentRequest);
 
 	@Operation(summary = "모먼트 수정", description = "모먼트의 정보 수정")
 	@ApiResponses({

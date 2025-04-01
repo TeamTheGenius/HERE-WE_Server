@@ -42,7 +42,7 @@ public class MomentController implements MomentApi {
 
 	@GetMapping
 	public PagingResponse<MomentIncomingResponse> inquiryIncomingMoments(@HereWeUser User user,
-		@PageableDefault(size = 20) Pageable pageable) {
+																		 @PageableDefault(size = 20) Pageable pageable) {
 
 		LocalDateTime now = LocalDateTime.now();
 		Page<MomentIncomingResponse> momentIncomingResponses = momentFacade.inquiryIncomingList(
@@ -52,8 +52,8 @@ public class MomentController implements MomentApi {
 
 	@GetMapping("/crew/{crewId}")
 	public PagingResponse<MomentPreviewResponse> inquiryMoments(@HereWeUser User user,
-		@PathVariable Long crewId,
-		@PageableDefault(size = 20) Pageable pageable) {
+																@PathVariable Long crewId,
+																@PageableDefault(size = 20) Pageable pageable) {
 
 		LocalDateTime now = LocalDateTime.now();
 		Page<MomentPreviewResponse> momentPreviewResponses = momentFacade.inquiryList(
@@ -84,8 +84,8 @@ public class MomentController implements MomentApi {
 
 	@PostMapping
 	public SingleResponse<MomentResponse> createMoment(@HereWeUser User user,
-		@RequestParam(name = "crewId") Long crewId,
-		@RequestBody MomentRequest momentRequest) {
+													   @RequestParam(name = "crewId") Long crewId,
+													   @RequestBody MomentRequest momentRequest) {
 
 		MomentResponse momentResponse = momentFacade.create(user.getId(), crewId, momentRequest);
 		return new SingleResponse<>(HttpStatus.CREATED, momentResponse);
@@ -93,7 +93,7 @@ public class MomentController implements MomentApi {
 
 	@PatchMapping("/{momentId}")
 	public SingleResponse<MomentResponse> modifyMoment(@PathVariable Long momentId,
-		@RequestBody MomentRequest momentRequest) {
+													   @RequestBody MomentRequest momentRequest) {
 
 		MomentResponse momentResponse = momentFacade.modify(momentId, momentRequest);
 		return new SingleResponse<>(HttpStatus.OK, momentResponse);
@@ -107,7 +107,7 @@ public class MomentController implements MomentApi {
 
 	@GetMapping("/{momentId}/members")
 	public SlicingResponse<MomentMemberResponse> inquiryJoinedMembers(@PathVariable Long momentId,
-		@PageableDefault(size = 20) Pageable pageable) {
+																	  @PageableDefault(size = 20) Pageable pageable) {
 
 		Slice<MomentMemberResponse> momentMemberResponses = momentFacade.inquiryJoinedMembers(momentId, pageable);
 		return new SlicingResponse<>(HttpStatus.OK, momentMemberResponses);

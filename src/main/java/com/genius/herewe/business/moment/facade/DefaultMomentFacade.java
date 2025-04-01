@@ -170,12 +170,12 @@ public class DefaultMomentFacade implements MomentFacade {
 		Optional.ofNullable(momentRequest.place()).ifPresent(place -> {
 			locationService.findMeetLocation(momentId)
 				.ifPresentOrElse(val -> {
-						val.update(place);
-					},
-					() -> {
-						Location fromPlace = Location.createFromPlace(place, 1);
-						fromPlace.addMoment(moment);
-					});
+									 val.update(place);
+								 },
+								 () -> {
+									 Location fromPlace = Location.createFromPlace(place, 1);
+									 fromPlace.addMoment(moment);
+								 });
 		});
 
 		return MomentResponse.create(moment, momentRequest.place(), true);
