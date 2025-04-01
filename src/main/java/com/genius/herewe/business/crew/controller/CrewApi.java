@@ -124,7 +124,7 @@ public interface CrewApi {
 	})
 	SingleResponse<CrewResponse> inquiryCrewInfo(@HereWeUser User user, @PathVariable Long crewId);
 
-	@Operation(summary = "크루 정보 조회", description = "크루 ID, 이름, 리더 이름, 역할, 소개글, 참여인원 정보 반환")
+	@Operation(summary = "크루원 정보 조회", description = "크루 ID, 이름, 리더 이름, 역할, 소개글, 참여인원 정보 반환")
 	@ApiResponses({
 		@ApiResponse(
 			responseCode = "200",
