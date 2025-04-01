@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.genius.herewe.business.moment.dto.MomentIncomingResponse;
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
@@ -26,6 +27,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 public interface MomentApi {
+
+	@Operation(summary = "다가오는 모먼트 리스트 조회", description = "다가오는 모먼트들을 페이지네이션으로 조회")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "다가오는 모먼트 리스트 조회 성공"
+		)
+	})
+	PagingResponse<MomentIncomingResponse> inquiryIncomingMoments(@HereWeUser User user,
+		@PageableDefault(size = 20) Pageable pageable);
 
 	@Operation(summary = "크루에 속한 모먼트 리스트 조회", description = "특정 크루에 속한 모먼트들을 페이지네이션으로 조회")
 	@ApiResponses(
