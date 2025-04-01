@@ -10,6 +10,8 @@ import lombok.Builder;
 public record MomentIncomingResponse(
 	@Schema(description = "모먼트 식별자(PK)", example = "1")
 	Long momentId,
+	@Schema(description = "크루 식별자(PK)", example = "2")
+	Long crewId,
 	@Schema(description = "모먼트가 속한 크루의 이름", example = "눈물나게 맛있는거 먹는 사람들")
 	String crewName,
 	@Schema(description = "모먼트의 이름", example = "눈물나게 맛있는 훠궈 먹으러 가는 날")
