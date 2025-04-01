@@ -265,7 +265,7 @@ public class DefaultMomentFacade implements MomentFacade {
 	}
 
 	private void validateCapacity(int capacity) {
-		if (capacity < 2) {
+		if (capacity < 2 || capacity > 500) {
 			throw new BusinessException(INVALID_MOMENT_CAPACITY);
 		}
 	}

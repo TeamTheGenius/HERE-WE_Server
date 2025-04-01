@@ -25,6 +25,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.Max;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,8 +62,10 @@ public class Moment extends BaseTimeEntity implements FileHolder {
 	private String name;
 
 	@ColumnDefault("0")
+	@Max(value = 500, message = "모먼트 최대 참여 가능 인원 수는 500명입니다.")
 	private int participantCount;
 
+	@Max(value = 500, message = "모먼트 최대 참여 가능 인원 수는 500명입니다.")
 	private Integer capacity;
 
 	private LocalDateTime meetAt;
