@@ -23,6 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.Max;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -67,6 +68,7 @@ public class Crew extends BaseTimeEntity implements FileHolder {
 	private String introduce;
 
 	@ColumnDefault("0")
+	@Max(value = 500, message = "크루 최대 참여 가능 인원은 500명입니다.")
 	private int participantCount;
 
 	@Builder

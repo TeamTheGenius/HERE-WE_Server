@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional(readOnly = true)
 public class DefaultInvitationFacade implements InvitationFacade {
+	private final int MAX_PARTICIPANT = 500;
 	private final String BASE_URL;
 	private final String INVITE_URL;
 	private final UserService userService;
@@ -40,10 +41,10 @@ public class DefaultInvitationFacade implements InvitationFacade {
 	private final MailManager mailManager;
 
 	public DefaultInvitationFacade(@Value("${url.base}") String BASE_URL,
-		@Value("${url.path.invite}") String INVITE_URL,
-		UserService userService, CrewService crewService,
-		CrewMemberService crewMemberService,
-		InvitationService invitationService, MailManager mailManager) {
+								   @Value("${url.path.invite}") String INVITE_URL,
+								   UserService userService, CrewService crewService,
+								   CrewMemberService crewMemberService,
+								   InvitationService invitationService, MailManager mailManager) {
 		this.BASE_URL = BASE_URL;
 		this.INVITE_URL = INVITE_URL;
 		this.userService = userService;
@@ -61,6 +62,9 @@ public class DefaultInvitationFacade implements InvitationFacade {
 			.orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
 		Crew crew = crewService.findById(invitationRequest.crewId());
 
+		if (crew.getParticipantCount() >= MAX_PARTICIPANT) {
+			throw new BusinessException(INVALID_CREW_CAPACITY);
+		}
 		if (crewMemberService.findOptional(user.getId(), crew.getId()).isPresent()) {
 			throw new BusinessException(ALREADY_JOINED_CREW);
 		}
