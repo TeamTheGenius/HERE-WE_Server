@@ -51,4 +51,14 @@ public class LocationService {
 				location -> location
 			));
 	}
+
+	@Transactional
+	public int bulkDecreaseIndexes(Long momentId, int locationIndex, Long momentVersion) {
+		return locationRepository.bulkDecreaseIndexes(momentId, locationIndex, momentVersion);
+	}
+
+	@Transactional
+	public void delete(Location location) {
+		locationRepository.delete(location);
+	}
 }

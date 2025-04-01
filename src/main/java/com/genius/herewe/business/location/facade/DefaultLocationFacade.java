@@ -15,6 +15,7 @@ import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
+import com.genius.herewe.business.moment.service.MomentMemberService;
 import com.genius.herewe.business.moment.service.MomentService;
 import com.genius.herewe.core.global.exception.BusinessException;
 
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultLocationFacade implements LocationFacade {
 	private final MomentService momentService;
+	private final MomentMemberService momentMemberService;
 	private final LocationService locationService;
 
 	@Override
@@ -70,5 +72,31 @@ public class DefaultLocationFacade implements LocationFacade {
 			.map(LocationInfo::create)
 			.toList();
 		return PlaceResponse.create(momentId, locationInfos);
+	}
+
+	@Override
+	@Transactional
+	public void deletePlace(Long userId, Long momentId, int locationIndex) {
+		try {
+			momentMemberService.findByJoinInfo(userId, momentId)
+				.orElseThrow(() -> new BusinessException(MOMENT_PARTICIPATION_NOT_FOUND));
+
+			Moment moment = momentService.findByIdWithOptimisticLock(momentId);
+
+			Location targetLocation = locationService.findByIndex(momentId, locationIndex)
+				.orElseThrow(() -> new BusinessException(LOCATION_NOT_FOUND));
+			locationService.delete(targetLocation);
+
+			int updatedRows = locationService.bulkDecreaseIndexes(momentId, locationIndex, moment.getVersion());
+			if (updatedRows == 0) {
+				throw new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION);
+			}
+
+			moment.updateLastModifiedTime();
+			momentService.save(moment);
+			momentService.flushChanges();
+		} catch (OptimisticLockException e) {
+			throw new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION);
+		}
 	}
 }

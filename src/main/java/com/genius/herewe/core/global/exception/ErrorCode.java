@@ -42,6 +42,9 @@ public enum ErrorCode {
 	MOMENT_DEADLINE_EXPIRED(HttpStatus.BAD_REQUEST, "모먼트 참여 마감일자가 지났습니다. 모먼트 참여/참여 취소는 마감일자 이전까지 가능합니다."),
 	MOMENT_CAPACITY_FULL(HttpStatus.BAD_REQUEST, "참여 인원이 최대 정원에 도달했습니다."),
 
+	MOMENT_PARTICIPATION_NOT_FOUND(HttpStatus.NOT_FOUND, "모먼트 참여 정보를 찾을 수 없습니다."),
+
+	LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 모먼트에 해당 인덱스의 장소가 존재하지 않습니다."),
 	LOCATION_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 순서의 장소가 이미 추가되었습니다. 잠시 후 다시 시도해주세요."),
 	LOCATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "장소는 최대 100개까지 등록할 수 있습니다."),
 

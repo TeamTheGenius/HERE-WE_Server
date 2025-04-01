@@ -8,4 +8,6 @@ public interface LocationFacade {
 	Place addPlace(Long momentId, LocationRequest locationRequest);
 
 	PlaceResponse inquiryAll(Long momentId);
+
+	void deletePlace(Long userId, Long momentId, int locationIndex);
 }
