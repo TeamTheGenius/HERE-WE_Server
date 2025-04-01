@@ -19,5 +19,5 @@ public interface MomentRepository extends JpaRepository<Moment, Long> {
 	Optional<Moment> findByIdWithOptimisticLock(@Param("momentId") Long momentId);
 
 	@Query("SELECT m FROM Moment m WHERE m.crew.id = :crewId ORDER BY m.createdAt")
-	Page<Moment> findAllByPaging(@Param("crewId") Long crewId, Pageable pageable);
+	Page<Moment> findAllInCrewByPaging(@Param("crewId") Long crewId, Pageable pageable);
 }

@@ -40,7 +40,7 @@ public class MomentMemberService {
 		return queryRepository.findAllJoinedUsers(momentId, pageable);
 	}
 
-	public List<Long> findAllJoinedMomentIds(List<Long> momentIds) {
+	public List<Long> findAllInMomentIds(List<Long> momentIds) {
 		return momentMemberRepository.findIdsInMoment(momentIds);
 	}
 }

@@ -51,7 +51,7 @@ public class CrewController implements CrewApi {
 	@GetMapping("/my")
 	public PagingResponse<CrewPreviewResponse> inquiryMyCrews(
 		@HereWeUser User user,
-		@PageableDefault(size = 10, page = 0) Pageable pageable) {
+		@PageableDefault(size = 20, page = 0) Pageable pageable) {
 
 		Page<CrewPreviewResponse> crewPreviewResponses = crewFacade.inquiryMyCrews(user.getId(), pageable);
 		return new PagingResponse<>(HttpStatus.OK, crewPreviewResponses);

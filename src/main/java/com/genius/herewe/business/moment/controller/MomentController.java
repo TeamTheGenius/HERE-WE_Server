@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.genius.herewe.business.moment.dto.MomentIncomingResponse;
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
 import com.genius.herewe.business.moment.dto.MomentRequest;
@@ -39,8 +40,18 @@ import lombok.extern.slf4j.Slf4j;
 public class MomentController implements MomentApi {
 	private final MomentFacade momentFacade;
 
+	@GetMapping
+	public PagingResponse<MomentIncomingResponse> inquiryIncomingMoments(@HereWeUser User user,
+		@PageableDefault(size = 20) Pageable pageable) {
+
+		LocalDateTime now = LocalDateTime.now();
+		Page<MomentIncomingResponse> momentIncomingResponses = momentFacade.inquiryIncomingList(
+			user.getId(), now, pageable);
+		return new PagingResponse<>(HttpStatus.OK, momentIncomingResponses);
+	}
+
 	@GetMapping("/crew/{crewId}")
-	public PagingResponse<MomentPreviewResponse> inquiryMomentList(@HereWeUser User user,
+	public PagingResponse<MomentPreviewResponse> inquiryMoments(@HereWeUser User user,
 		@PathVariable Long crewId,
 		@PageableDefault(size = 20) Pageable pageable) {
 
