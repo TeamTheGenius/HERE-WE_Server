@@ -248,7 +248,7 @@ class MomentFacadeTest {
 
 				//then
 				assertThat(momentResponse).isNotNull();
-				assertThat(momentResponse.status()).isEqualTo(ParticipantStatus.PARTICIPATING);
+				assertThat(momentResponse.status()).isEqualTo(ParticipantStatus.PARTICIPATING.getValue());
 				assertThat(momentResponse.name()).isEqualTo(momentRequest.momentName());
 				assertThat(momentResponse.capacity()).isEqualTo(momentRequest.capacity());
 				assertThat(momentResponse.closedAt()).isEqualTo(momentRequest.closedAt());
