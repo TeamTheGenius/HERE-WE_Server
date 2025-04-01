@@ -18,7 +18,7 @@ public interface MomentFacade {
 
 	Page<MomentPreviewResponse> inquiryList(Long userId, Long crewId, LocalDateTime now, Pageable pageable);
 
-	MomentResponse inquirySingle(User user, Long momentId);
+	MomentResponse inquirySingle(User user, Long momentId, LocalDateTime now);
 
 	MomentResponse create(Long userId, Long crewId, MomentRequest momentRequest);
 

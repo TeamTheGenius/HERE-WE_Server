@@ -1,5 +1,6 @@
 package com.genius.herewe.business.moment.facade;
 
+import static com.genius.herewe.business.moment.domain.ParticipantStatus.*;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
@@ -65,6 +66,7 @@ public class DefaultMomentFacade implements MomentFacade {
 			Location location = locationInfos.get(moment.getId());
 
 			return MomentIncomingResponse.builder()
+				.crewId(crew.getId())
 				.momentId(moment.getId())
 				.crewName(crew.getName())
 				.momentName(moment.getName())
@@ -100,7 +102,7 @@ public class DefaultMomentFacade implements MomentFacade {
 
 	private ParticipantStatus getParticipantStatus(boolean isJoined, LocalDateTime closedAt, LocalDateTime now) {
 		if (isJoined) {
-			return ParticipantStatus.PARTICIPATING;
+			return PARTICIPATING;
 		}
 		if (now.isAfter(closedAt)) {
 			return ParticipantStatus.DEADLINE_PASSED;
@@ -109,7 +111,7 @@ public class DefaultMomentFacade implements MomentFacade {
 	}
 
 	@Override
-	public MomentResponse inquirySingle(User user, Long momentId) {
+	public MomentResponse inquirySingle(User user, Long momentId, LocalDateTime now) {
 		Moment moment = momentService.findById(momentId);
 
 		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(user.getId(), momentId);
@@ -118,7 +120,9 @@ public class DefaultMomentFacade implements MomentFacade {
 		Optional<Location> meetLocation = locationService.findMeetLocation(momentId);
 		Place place = Place.createFromOptional(meetLocation);
 
-		return MomentResponse.create(moment, place, isJoined);
+		ParticipantStatus status = getParticipantStatus(isJoined, moment.getClosedAt(), now);
+
+		return MomentResponse.create(moment, place, status);
 	}
 
 	@Override
@@ -145,7 +149,7 @@ public class DefaultMomentFacade implements MomentFacade {
 		Location location = locationService.saveFromPlace(momentRequest.place(), 1);
 		location.addMoment(moment);
 
-		return MomentResponse.create(moment, Place.create(location), true);
+		return MomentResponse.create(moment, Place.create(location), PARTICIPATING);
 	}
 
 	@Override
@@ -178,7 +182,7 @@ public class DefaultMomentFacade implements MomentFacade {
 								 });
 		});
 
-		return MomentResponse.create(moment, momentRequest.place(), true);
+		return MomentResponse.create(moment, momentRequest.place(), PARTICIPATING);
 	}
 
 	@Override
@@ -204,7 +208,7 @@ public class DefaultMomentFacade implements MomentFacade {
 		Optional<Location> optionalLocation = locationService.findMeetLocation(momentId);
 		Place place = Place.createFromOptional(optionalLocation);
 
-		return MomentResponse.create(moment, place, true);
+		return MomentResponse.create(moment, place, PARTICIPATING);
 	}
 
 	private void validateJoinCondition(Long userId, Moment moment, LocalDateTime now) {
