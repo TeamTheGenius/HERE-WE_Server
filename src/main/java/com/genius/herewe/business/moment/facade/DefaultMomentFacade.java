@@ -1,6 +1,5 @@
 package com.genius.herewe.business.moment.facade;
 
-import static com.genius.herewe.business.moment.domain.ParticipantStatus.*;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
-import com.genius.herewe.business.moment.domain.ParticipantStatus;
 import com.genius.herewe.business.moment.dto.MomentIncomingResponse;
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
@@ -91,23 +89,13 @@ public class DefaultMomentFacade implements MomentFacade {
 		List<MomentPreviewResponse> previewResponses = moments.getContent().stream()
 			.map(moment -> {
 				boolean isJoined = momentMemberSet.contains(moment.getId());
-				ParticipantStatus status = getParticipantStatus(isJoined, moment.getClosedAt(), now);
+				boolean isClosed = now.isAfter(moment.getClosedAt());
 				String placeName = locationInfos.getOrDefault(moment.getId(), Location.createDummy()).getName();
-				return MomentPreviewResponse.create(moment, status, placeName);
+				return MomentPreviewResponse.create(moment, isJoined, isClosed, placeName);
 			})
 			.toList();
 
 		return new PageImpl<>(previewResponses, pageable, moments.getTotalElements());
-	}
-
-	private ParticipantStatus getParticipantStatus(boolean isJoined, LocalDateTime closedAt, LocalDateTime now) {
-		if (isJoined) {
-			return PARTICIPATING;
-		}
-		if (now.isAfter(closedAt)) {
-			return ParticipantStatus.DEADLINE_PASSED;
-		}
-		return ParticipantStatus.AVAILABLE;
 	}
 
 	@Override

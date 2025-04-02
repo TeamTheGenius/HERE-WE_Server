@@ -3,7 +3,6 @@ package com.genius.herewe.business.moment.dto;
 import java.time.LocalDateTime;
 
 import com.genius.herewe.business.moment.domain.Moment;
-import com.genius.herewe.business.moment.domain.ParticipantStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -13,8 +12,10 @@ import lombok.Builder;
 public record MomentPreviewResponse(
 	@Schema(description = "모먼트의 식별자(PK)", example = "1")
 	Long momentId,
-	@Schema(description = "모먼트에 대한 사용자의 상태", example = "참여가능   or   참여중   or   마감")
-	String status,
+	@Schema(description = "모먼트 참여 여부")
+	Boolean isJoined,
+	@Schema(description = "모먼트 마감일자가 지났는지 여부")
+	Boolean isClosed,
 	@Schema(description = "모먼트의 이름", example = "눈물나게 맛있는 훠궈 먹으러 가자")
 	String name,
 	@Schema(description = "모먼트 만남일자", example = "2025-04-28T12:31:00")
@@ -29,10 +30,11 @@ public record MomentPreviewResponse(
 	LocalDateTime closedAt
 ) {
 
-	public static MomentPreviewResponse create(Moment moment, ParticipantStatus status, String placeName) {
+	public static MomentPreviewResponse create(Moment moment, Boolean isJoined, Boolean isClosed, String placeName) {
 		return MomentPreviewResponse.builder()
 			.momentId(moment.getId())
-			.status(status.getValue())
+			.isJoined(isJoined)
+			.isClosed(isClosed)
 			.name(moment.getName())
 			.meetAt(moment.getMeetAt())
 			.meetingPlaceName(placeName)
