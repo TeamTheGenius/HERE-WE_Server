@@ -1,6 +1,5 @@
 package com.genius.herewe.business.moment.facade;
 
-import static com.genius.herewe.business.moment.domain.ParticipantStatus.*;
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
-import com.genius.herewe.business.moment.domain.ParticipantStatus;
 import com.genius.herewe.business.moment.dto.MomentIncomingResponse;
 import com.genius.herewe.business.moment.dto.MomentMemberResponse;
 import com.genius.herewe.business.moment.dto.MomentPreviewResponse;
@@ -91,23 +89,13 @@ public class DefaultMomentFacade implements MomentFacade {
 		List<MomentPreviewResponse> previewResponses = moments.getContent().stream()
 			.map(moment -> {
 				boolean isJoined = momentMemberSet.contains(moment.getId());
-				ParticipantStatus status = getParticipantStatus(isJoined, moment.getClosedAt(), now);
+				boolean isClosed = now.isAfter(moment.getClosedAt());
 				String placeName = locationInfos.getOrDefault(moment.getId(), Location.createDummy()).getName();
-				return MomentPreviewResponse.create(moment, status, placeName);
+				return MomentPreviewResponse.create(moment, isJoined, isClosed, placeName);
 			})
 			.toList();
 
 		return new PageImpl<>(previewResponses, pageable, moments.getTotalElements());
-	}
-
-	private ParticipantStatus getParticipantStatus(boolean isJoined, LocalDateTime closedAt, LocalDateTime now) {
-		if (isJoined) {
-			return PARTICIPATING;
-		}
-		if (now.isAfter(closedAt)) {
-			return ParticipantStatus.DEADLINE_PASSED;
-		}
-		return ParticipantStatus.AVAILABLE;
 	}
 
 	@Override
@@ -116,13 +104,12 @@ public class DefaultMomentFacade implements MomentFacade {
 
 		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(user.getId(), momentId);
 		boolean isJoined = joinInfo.isPresent();
+		boolean isClosed = now.isAfter(moment.getClosedAt());
 
 		Optional<Location> meetLocation = locationService.findMeetLocation(momentId);
 		Place place = Place.createFromOptional(meetLocation);
 
-		ParticipantStatus status = getParticipantStatus(isJoined, moment.getClosedAt(), now);
-
-		return MomentResponse.create(moment, place, status);
+		return MomentResponse.create(moment, place, isJoined, isClosed);
 	}
 
 	@Override
@@ -149,12 +136,12 @@ public class DefaultMomentFacade implements MomentFacade {
 		Location location = locationService.saveFromPlace(momentRequest.place(), 1);
 		location.addMoment(moment);
 
-		return MomentResponse.create(moment, Place.create(location), PARTICIPATING);
+		return MomentResponse.create(moment, Place.create(location), true, false);
 	}
 
 	@Override
 	@Transactional
-	public MomentResponse modify(Long momentId, MomentRequest momentRequest) {
+	public MomentResponse modify(Long momentId, MomentRequest momentRequest, LocalDateTime now) {
 		Moment moment = momentService.findById(momentId);
 
 		Optional.ofNullable(momentRequest.momentName()).ifPresent(moment::updateName);
@@ -182,7 +169,9 @@ public class DefaultMomentFacade implements MomentFacade {
 								 });
 		});
 
-		return MomentResponse.create(moment, momentRequest.place(), PARTICIPATING);
+		boolean isClosed = now.isAfter(moment.getClosedAt());
+
+		return MomentResponse.create(moment, momentRequest.place(), true, isClosed);
 	}
 
 	@Override
@@ -208,7 +197,7 @@ public class DefaultMomentFacade implements MomentFacade {
 		Optional<Location> optionalLocation = locationService.findMeetLocation(momentId);
 		Place place = Place.createFromOptional(optionalLocation);
 
-		return MomentResponse.create(moment, place, PARTICIPATING);
+		return MomentResponse.create(moment, place, true, false);
 	}
 
 	private void validateJoinCondition(Long userId, Moment moment, LocalDateTime now) {

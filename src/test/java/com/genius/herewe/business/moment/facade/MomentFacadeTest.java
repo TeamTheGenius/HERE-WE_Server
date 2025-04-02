@@ -33,7 +33,6 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.business.location.service.LocationService;
 import com.genius.herewe.business.moment.domain.Moment;
 import com.genius.herewe.business.moment.domain.MomentMember;
-import com.genius.herewe.business.moment.domain.ParticipantStatus;
 import com.genius.herewe.business.moment.dto.MomentRequest;
 import com.genius.herewe.business.moment.dto.MomentResponse;
 import com.genius.herewe.business.moment.fixture.MomentFixture;
@@ -229,7 +228,7 @@ class MomentFacadeTest {
 				given(momentService.findById(fakeMomentId)).willThrow(new BusinessException(MOMENT_NOT_FOUND));
 
 				//when & then
-				assertThatThrownBy(() -> momentFacade.modify(fakeMomentId, momentRequest))
+				assertThatThrownBy(() -> momentFacade.modify(fakeMomentId, momentRequest, now))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(MOMENT_NOT_FOUND.getMessage());
 			}
@@ -244,11 +243,12 @@ class MomentFacadeTest {
 				given(locationService.findMeetLocation(anyLong())).willReturn(Optional.of(location));
 
 				//when
-				MomentResponse momentResponse = momentFacade.modify(1L, momentRequest);
+				MomentResponse momentResponse = momentFacade.modify(1L, momentRequest, now);
 
 				//then
 				assertThat(momentResponse).isNotNull();
-				assertThat(momentResponse.status()).isEqualTo(ParticipantStatus.PARTICIPATING.getValue());
+				assertThat(momentResponse.isJoined()).isTrue();
+				assertThat(momentResponse.isClosed()).isFalse();
 				assertThat(momentResponse.name()).isEqualTo(momentRequest.momentName());
 				assertThat(momentResponse.capacity()).isEqualTo(momentRequest.capacity());
 				assertThat(momentResponse.closedAt()).isEqualTo(momentRequest.closedAt());
@@ -275,7 +275,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				MomentResponse momentResponse = momentFacade.modify(momentId, request);
+				MomentResponse momentResponse = momentFacade.modify(momentId, request, now);
 
 				//then
 				assertThat(momentResponse.name()).isEqualTo(request.momentName());
@@ -290,7 +290,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				MomentResponse momentResponse = momentFacade.modify(momentId, request);
+				MomentResponse momentResponse = momentFacade.modify(momentId, request, now);
 
 				//then
 				assertThat(momentResponse.capacity()).isEqualTo(request.capacity());
@@ -308,7 +308,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				momentFacade.modify(momentId, request);
+				momentFacade.modify(momentId, request, now);
 
 				//then
 				assertThat(moment.getMeetAt()).isEqualTo(request.meetAt());
@@ -327,7 +327,7 @@ class MomentFacadeTest {
 					.build();
 
 				//when
-				MomentResponse momentResponse = momentFacade.modify(momentId, request);
+				MomentResponse momentResponse = momentFacade.modify(momentId, request, now);
 
 				//then
 				assertThat(momentResponse.closedAt()).isEqualTo(request.closedAt());
@@ -369,7 +369,7 @@ class MomentFacadeTest {
 				given(locationService.findMeetLocation(momentId)).willReturn(Optional.of(originalLocation));
 
 				//when
-				momentFacade.modify(momentId, request);
+				momentFacade.modify(momentId, request, now);
 
 				//then
 				verify(locationService).findMeetLocation(momentId);

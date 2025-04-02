@@ -22,7 +22,7 @@ public interface MomentFacade {
 
 	MomentResponse create(Long userId, Long crewId, MomentRequest momentRequest);
 
-	MomentResponse modify(Long momentId, MomentRequest momentRequest);
+	MomentResponse modify(Long momentId, MomentRequest momentRequest, LocalDateTime now);
 
 	void delete(Long momentId);
 
