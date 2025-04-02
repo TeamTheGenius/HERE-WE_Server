@@ -116,13 +116,12 @@ public class DefaultMomentFacade implements MomentFacade {
 
 		Optional<MomentMember> joinInfo = momentMemberService.findByJoinInfo(user.getId(), momentId);
 		boolean isJoined = joinInfo.isPresent();
+		boolean isClosed = now.isAfter(moment.getClosedAt());
 
 		Optional<Location> meetLocation = locationService.findMeetLocation(momentId);
 		Place place = Place.createFromOptional(meetLocation);
 
-		ParticipantStatus status = getParticipantStatus(isJoined, moment.getClosedAt(), now);
-
-		return MomentResponse.create(moment, place, status);
+		return MomentResponse.create(moment, place, isJoined, isClosed);
 	}
 
 	@Override
@@ -149,12 +148,12 @@ public class DefaultMomentFacade implements MomentFacade {
 		Location location = locationService.saveFromPlace(momentRequest.place(), 1);
 		location.addMoment(moment);
 
-		return MomentResponse.create(moment, Place.create(location), PARTICIPATING);
+		return MomentResponse.create(moment, Place.create(location), true, false);
 	}
 
 	@Override
 	@Transactional
-	public MomentResponse modify(Long momentId, MomentRequest momentRequest) {
+	public MomentResponse modify(Long momentId, MomentRequest momentRequest, LocalDateTime now) {
 		Moment moment = momentService.findById(momentId);
 
 		Optional.ofNullable(momentRequest.momentName()).ifPresent(moment::updateName);
@@ -182,7 +181,9 @@ public class DefaultMomentFacade implements MomentFacade {
 								 });
 		});
 
-		return MomentResponse.create(moment, momentRequest.place(), PARTICIPATING);
+		boolean isClosed = now.isAfter(moment.getClosedAt());
+
+		return MomentResponse.create(moment, momentRequest.place(), true, isClosed);
 	}
 
 	@Override
@@ -208,7 +209,7 @@ public class DefaultMomentFacade implements MomentFacade {
 		Optional<Location> optionalLocation = locationService.findMeetLocation(momentId);
 		Place place = Place.createFromOptional(optionalLocation);
 
-		return MomentResponse.create(moment, place, PARTICIPATING);
+		return MomentResponse.create(moment, place, true, false);
 	}
 
 	private void validateJoinCondition(Long userId, Moment moment, LocalDateTime now) {

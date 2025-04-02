@@ -96,7 +96,8 @@ public class MomentController implements MomentApi {
 	public SingleResponse<MomentResponse> modifyMoment(@PathVariable Long momentId,
 													   @RequestBody MomentRequest momentRequest) {
 
-		MomentResponse momentResponse = momentFacade.modify(momentId, momentRequest);
+		LocalDateTime now = LocalDateTime.now();
+		MomentResponse momentResponse = momentFacade.modify(momentId, momentRequest, now);
 		return new SingleResponse<>(HttpStatus.OK, momentResponse);
 	}
 
