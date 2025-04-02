@@ -21,7 +21,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query("SELECT l FROM Location l WHERE l.locationIndex = 1 AND l.moment.id IN :momentIds")
 	List<Location> findMeetingLocationsByIds(@Param("momentIds") List<Long> momentIds);
 
-	@Modifying
+	@Modifying(flushAutomatically = true, clearAutomatically = true)
 	@Query("""
 		UPDATE Location l
 		SET l.locationIndex = l.locationIndex - 1

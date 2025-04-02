@@ -4,8 +4,10 @@ import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
 import java.util.List;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.business.location.LocationRequest;
@@ -21,11 +23,15 @@ import com.genius.herewe.core.global.exception.BusinessException;
 
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DefaultLocationFacade implements LocationFacade {
+	private final int MAX_RETRIES = 3;
+
 	private final MomentService momentService;
 	private final MomentMemberService momentMemberService;
 	private final LocationService locationService;
@@ -77,26 +83,74 @@ public class DefaultLocationFacade implements LocationFacade {
 	@Override
 	@Transactional
 	public void deletePlace(Long userId, Long momentId, int locationIndex) {
-		try {
-			momentMemberService.findByJoinInfo(userId, momentId)
-				.orElseThrow(() -> new BusinessException(MOMENT_PARTICIPATION_NOT_FOUND));
-
-			Moment moment = momentService.findByIdWithOptimisticLock(momentId);
-
-			Location targetLocation = locationService.findByIndex(momentId, locationIndex)
-				.orElseThrow(() -> new BusinessException(LOCATION_NOT_FOUND));
-			locationService.delete(targetLocation);
-
-			int updatedRows = locationService.bulkDecreaseIndexes(momentId, locationIndex, moment.getVersion());
-			if (updatedRows == 0) {
-				throw new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION);
+		int retryCount = 0;
+		while (retryCount < MAX_RETRIES) {
+			try {
+				executeDeletePlace(userId, momentId, locationIndex);
+				return;
+			} catch (Exception e) {
+				retryCount++;
+				if (shouldRetry(e, retryCount)) {
+					logRetryAttempt(retryCount, momentId, locationIndex, e);
+					applyBackoff(retryCount);
+					continue;
+				}
+				throw translateException(e);
 			}
+		}
+		log.error("모든 재시도 실패");
+	}
 
-			moment.updateLastModifiedTime();
-			momentService.save(moment);
-			momentService.flushChanges();
-		} catch (OptimisticLockException e) {
+	private boolean shouldRetry(Exception e, int retryCount) {
+		// 최대 재시도 횟수 미만이고 재시도 가능한 예외인 경우
+		return retryCount < MAX_RETRIES &&
+			(e instanceof DataAccessException ||
+				e instanceof OptimisticLockException ||
+				(e.getCause() != null && e.getCause() instanceof DataAccessException));
+	}
+
+	private void applyBackoff(int retryCount) {
+		try {
+			long delay = (long)(100 * Math.pow(2, retryCount - 1));
+			Thread.sleep(delay);
+		} catch (InterruptedException ie) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private void logRetryAttempt(int retryCount, Long momentId, int locationIndex, Exception e) {
+		log.warn("Retry attempt {}/{} for deleting place: momentId={}, locationIndex={}, error={}",
+				 retryCount, MAX_RETRIES, momentId, locationIndex, e.getMessage());
+	}
+
+	private RuntimeException translateException(Exception e) {
+		if (e instanceof BusinessException) {
+			return (BusinessException)e;
+		} else if (e instanceof OptimisticLockException || e instanceof DataAccessException) {
+			return new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION, e);
+		} else {
+			return new BusinessException(UNEXPECTED_ERROR, e);
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	private void executeDeletePlace(Long userId, Long momentId, int locationIndex) {
+		momentMemberService.findByJoinInfo(userId, momentId)
+			.orElseThrow(() -> new BusinessException(MOMENT_PARTICIPATION_NOT_FOUND));
+
+		Moment moment = momentService.findByIdWithOptimisticLock(momentId);
+
+		Location targetLocation = locationService.findByIndex(momentId, locationIndex)
+			.orElseThrow(() -> new BusinessException(LOCATION_NOT_FOUND));
+		locationService.delete(targetLocation);
+
+		int updatedRows = locationService.bulkDecreaseIndexes(momentId, locationIndex, moment.getVersion());
+		if (updatedRows == 0) {
 			throw new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION);
 		}
+
+		moment.updateLastModifiedTime();
+		momentService.save(moment);
+		momentService.flushChanges();
 	}
 }

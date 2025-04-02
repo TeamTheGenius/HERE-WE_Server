@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+	UNEXPECTED_ERROR(HttpStatus.BAD_REQUEST, "처리되지 않은 에러입니다. 추가 처리가 필요합니다."),
+
 	CONCURRENT_MODIFICATION_EXCEPTION(HttpStatus.CONFLICT, "이 데이터는 다른 사용자에 의해 수정되었습니다. 다시 시도해주세요."),
 	REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "해당 항목은 필수 항목입니다. 입력 값을 확인해주세요."),
 	VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "데이터 전달 관련 유효성 검사에 실패했습니다."),
