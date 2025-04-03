@@ -103,7 +103,9 @@ public interface LocationApi {
 			)
 		)
 	})
-	CommonResponse addPlace(@PathVariable Long momentId, @Valid @RequestBody LocationRequest locationRequest);
+	CommonResponse addPlace(@HereWeUser User user,
+							@PathVariable Long momentId,
+							@Valid @RequestBody LocationRequest locationRequest);
 
 	@Operation(summary = "등록되어 있는 장소 삭제", description = "모먼트에 등록되어 있는 장소 삭제")
 	@ApiResponses({

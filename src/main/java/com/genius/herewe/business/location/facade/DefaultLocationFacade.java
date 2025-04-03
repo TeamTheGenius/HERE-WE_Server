@@ -36,7 +36,10 @@ public class DefaultLocationFacade implements LocationFacade {
 
 	@Override
 	@Transactional
-	public Place addPlace(Long momentId, LocationRequest locationRequest) {
+	public Place addPlace(Long userId, Long momentId, LocationRequest locationRequest) {
+		momentMemberService.findByJoinInfo(userId, momentId)
+			.orElseThrow(() -> new BusinessException(MOMENT_PARTICIPATION_NOT_FOUND));
+
 		return retryHandler.executeWithRetry(
 			() -> executeAddPlace(momentId, locationRequest)
 		);
