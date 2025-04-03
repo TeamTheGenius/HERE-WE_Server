@@ -30,4 +30,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	int bulkDecreaseIndexes(@Param("momentId") Long momentId,
 							@Param("thresholdIndex") int thresholdIndex,
 							@Param("momentVersion") Long momentVersion);
+
+	@Query("SELECT MAX(l.locationIndex) FROM Location l WHERE l.moment.id = :momentId")
+	int findLastIndexForMoment(@Param("momentId") Long momentId);
+
 }
