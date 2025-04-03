@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+	UNEXPECTED_ERROR(HttpStatus.BAD_REQUEST, "처리되지 않은 에러입니다. 추가 처리가 필요합니다."),
+
 	CONCURRENT_MODIFICATION_EXCEPTION(HttpStatus.CONFLICT, "이 데이터는 다른 사용자에 의해 수정되었습니다. 다시 시도해주세요."),
 	REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "해당 항목은 필수 항목입니다. 입력 값을 확인해주세요."),
 	VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "데이터 전달 관련 유효성 검사에 실패했습니다."),
@@ -42,8 +44,11 @@ public enum ErrorCode {
 	MOMENT_DEADLINE_EXPIRED(HttpStatus.BAD_REQUEST, "모먼트 참여 마감일자가 지났습니다. 모먼트 참여/참여 취소는 마감일자 이전까지 가능합니다."),
 	MOMENT_CAPACITY_FULL(HttpStatus.BAD_REQUEST, "참여 인원이 최대 정원에 도달했습니다."),
 
+	MOMENT_PARTICIPATION_NOT_FOUND(HttpStatus.NOT_FOUND, "모먼트 참여 정보를 찾을 수 없습니다."),
+
 	LOCATION_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 순서의 장소가 이미 추가되었습니다. 잠시 후 다시 시도해주세요."),
 	LOCATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "장소는 최대 100개까지 등록할 수 있습니다."),
+	INVALID_LOCATION_INDEX(HttpStatus.BAD_REQUEST, "유효하지 않은 위치 인덱스입니다."),
 
 	UNAUTHORIZED_ISSUE(HttpStatus.UNAUTHORIZED, "회원가입이 되어 있지 않은 사용자의 경우 JWT를 발급할 수 없습니다."),
 	JWT_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),

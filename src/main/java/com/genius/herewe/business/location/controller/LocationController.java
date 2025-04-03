@@ -2,6 +2,7 @@ package com.genius.herewe.business.location.controller;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,8 @@ import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.global.response.SlicingResponse;
+import com.genius.herewe.core.security.annotation.HereWeUser;
+import com.genius.herewe.core.user.domain.User;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +34,8 @@ public class LocationController implements LocationApi {
 
 	@GetMapping("/search/location")
 	public SlicingResponse<Place> search(@RequestParam("keyword") String keyword,
-		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "15") int size) {
+										 @RequestParam(defaultValue = "0") int page,
+										 @RequestParam(defaultValue = "15") int size) {
 
 		Slice<Place> places = kakaoSearchClient.searchByKeyword(keyword, size, page);
 
@@ -47,9 +50,18 @@ public class LocationController implements LocationApi {
 
 	@PostMapping("/location/{momentId}")
 	public CommonResponse addPlace(@PathVariable Long momentId,
-		@Valid @RequestBody LocationRequest locationRequest) {
+								   @Valid @RequestBody LocationRequest locationRequest) {
 
 		locationFacade.addPlace(momentId, locationRequest);
 		return CommonResponse.created();
+	}
+
+	@DeleteMapping("/location/{momentId}")
+	public CommonResponse deletePlace(@HereWeUser User user,
+									  @PathVariable Long momentId,
+									  @RequestParam("index") int locationIndex) {
+
+		locationFacade.deletePlace(user.getId(), momentId, locationIndex);
+		return CommonResponse.ok();
 	}
 }
