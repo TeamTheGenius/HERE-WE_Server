@@ -41,25 +41,22 @@ public class DefaultLocationFacade implements LocationFacade {
 	public Place addPlace(Long momentId, LocationRequest locationRequest) {
 		try {
 			Place place = locationRequest.place();
-			int locationIndex = locationRequest.locationIndex();
-			//TODO: 해당 모먼트에 등록되어 있는 최대 인덱스 값을 확인하고 맞지 않으면 예외 발생 필요
-			if (locationIndex > 100) {
+
+			int lastIndex = locationService.findLastIndexForMoment(momentId);
+			int nextIndex = lastIndex + 1;
+			if (nextIndex > 100) {
 				throw new BusinessException(LOCATION_LIMIT_EXCEEDED);
 			}
 
 			Moment moment = momentService.findByIdWithOptimisticLock(momentId);
-
-			locationService.findByIndex(momentId, locationIndex).ifPresent(val -> {
-				throw new BusinessException(LOCATION_ALREADY_EXISTS);
-			});
+			
+			Location location = Location.createFromPlace(place, nextIndex);
+			location.addMoment(moment);
+			locationService.save(location);
 
 			moment.updateLastModifiedTime();
 			momentService.save(moment);
 			momentService.flushChanges();
-
-			Location location = Location.createFromPlace(place, locationIndex);
-			location.addMoment(moment);
-			locationService.save(location);
 
 			return place;
 		} catch (OptimisticLockException e) {
@@ -86,6 +83,7 @@ public class DefaultLocationFacade implements LocationFacade {
 		int retryCount = 0;
 		while (retryCount < MAX_RETRIES) {
 			try {
+				// 이 밑에 함수만 다른걸 쓸거임
 				executeDeletePlace(userId, momentId, locationIndex);
 				return;
 			} catch (Exception e) {
