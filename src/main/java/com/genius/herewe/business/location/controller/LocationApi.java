@@ -11,6 +11,8 @@ import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.global.response.SlicingResponse;
+import com.genius.herewe.core.security.annotation.HereWeUser;
+import com.genius.herewe.core.user.domain.User;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -102,4 +104,85 @@ public interface LocationApi {
 		)
 	})
 	CommonResponse addPlace(@PathVariable Long momentId, @Valid @RequestBody LocationRequest locationRequest);
+
+	@Operation(summary = "등록되어 있는 장소 삭제", description = "모먼트에 등록되어 있는 장소 삭제")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "장소 삭제 성공"
+		),
+		@ApiResponse(
+			responseCode = "400",
+			description = """
+				1. query string으로 전달한 인덱스(삭제할 인덱스)가 유효하지 않을 때
+				2. 아직 예외 처리하지 못한 에러일 때 - 별도 처리 필요
+				""",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "1. query string으로 전달한 인덱스(삭제할 인덱스)가 유효하지 않을 때",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "INVALID_LOCATION_INDEX",
+								"message": "유효하지 않은 위치 인덱스입니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "2. 아직 예외 처리하지 못한 에러일 때 - 별도 처리 필요",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "UNEXPECTED_ERROR",
+								"message": "처리되지 않은 에러입니다. 추가 처리가 필요합니다."
+							}
+							"""
+					)
+				}
+			)
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "사용자가 참여하지 않은 모먼트에서 장소 삭제 요청 시",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "사용자가 참여하지 않은 모먼트에서 장소 삭제 요청 시 (모먼트 참여 정보를 찾을 수 없을 때)",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "MOMENT_PARTICIPATION_NOT_FOUND",
+								"message": "모먼트 참여 정보를 찾을 수 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		),
+		@ApiResponse(
+			responseCode = "409",
+			description = "동시성 문제로 인해 요청이 처리되지 못했을 때 - 재시도 필요",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "동시성 문제로 인해 요청이 처리되지 못했을 때",
+						value = """
+							{
+								"resultCode": "409",
+								"code": "CONCURRENT_MODIFICATION_EXCEPTION",
+								"message": "이 데이터는 다른 사용자에 의해 수정되었습니다. 다시 시도해주세요."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	CommonResponse deletePlace(@HereWeUser User user,
+							   @PathVariable Long momentId,
+							   @RequestParam("index") int locationIndex);
 }
