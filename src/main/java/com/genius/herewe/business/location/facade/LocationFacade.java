@@ -5,7 +5,7 @@ import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.search.dto.Place;
 
 public interface LocationFacade {
-	Place addPlace(Long momentId, LocationRequest locationRequest);
+	Place addPlace(Long userId, Long momentId, LocationRequest locationRequest);
 
 	PlaceResponse inquiryAll(Long momentId);
 

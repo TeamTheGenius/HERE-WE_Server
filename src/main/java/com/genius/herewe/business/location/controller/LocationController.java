@@ -49,10 +49,11 @@ public class LocationController implements LocationApi {
 	}
 
 	@PostMapping("/location/{momentId}")
-	public CommonResponse addPlace(@PathVariable Long momentId,
+	public CommonResponse addPlace(@HereWeUser User user,
+								   @PathVariable Long momentId,
 								   @Valid @RequestBody LocationRequest locationRequest) {
 
-		locationFacade.addPlace(momentId, locationRequest);
+		locationFacade.addPlace(user.getId(), momentId, locationRequest);
 		return CommonResponse.created();
 	}
 
