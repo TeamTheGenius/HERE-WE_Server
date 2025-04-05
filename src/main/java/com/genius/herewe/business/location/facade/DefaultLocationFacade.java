@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.genius.herewe.business.location.LocationRequest;
 import com.genius.herewe.business.location.domain.Location;
 import com.genius.herewe.business.location.dto.LocationInfo;
+import com.genius.herewe.business.location.dto.PlaceOrderRequest;
 import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.handler.RetryHandler;
 import com.genius.herewe.business.location.search.dto.Place;
@@ -101,9 +102,7 @@ public class DefaultLocationFacade implements LocationFacade {
 
 		Moment moment = momentService.findByIdWithOptimisticLock(momentId);
 		int lastIndex = locationService.findLastIndexForMoment(momentId);
-		if (1 > locationIndex || locationIndex > lastIndex) {
-			throw new BusinessException(INVALID_LOCATION_INDEX);
-		}
+		validateIndex(locationIndex, lastIndex);
 
 		Location targetLocation = locationService.findByIndex(momentId, locationIndex)
 			.orElseThrow(() -> new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION));
@@ -120,5 +119,54 @@ public class DefaultLocationFacade implements LocationFacade {
 		moment.updateLastModifiedTime();
 		momentService.save(moment);
 		momentService.flushChanges();
+	}
+
+	@Override
+	@Transactional
+	public void updateOrder(Long userId, Long momentId, PlaceOrderRequest orderRequest) {
+		retryHandler.executeWithRetry(() -> {
+			executeUpdateOrder(userId, momentId, orderRequest);
+			return null;
+		});
+	}
+
+	private void executeUpdateOrder(Long userId, Long momentId, PlaceOrderRequest orderRequest) {
+		momentMemberService.findByJoinInfo(userId, momentId)
+			.orElseThrow(() -> new BusinessException(MOMENT_PARTICIPATION_NOT_FOUND));
+
+		int originalIndex = orderRequest.originalIndex();
+		int newIndex = orderRequest.newIndex();
+		int lastIndex = locationService.findLastIndexForMoment(momentId);
+
+		validateIndex(originalIndex, lastIndex);
+		validateIndex(newIndex, lastIndex);
+		if (originalIndex == newIndex) {
+			return;
+		}
+
+		Moment moment = momentService.findByIdWithOptimisticLock(momentId);
+		Long momentVersion = moment.getVersion();
+
+		locationService.updateLocationIndexToTemporary(momentId, originalIndex, -1, momentVersion);
+
+		if (originalIndex < newIndex) {
+			locationService.invertIndexesForDecrement(momentId, originalIndex, newIndex, momentVersion);
+			locationService.applyDecrementToInverted(momentId, -newIndex, momentVersion);
+		} else {
+			locationService.invertIndexesForIncrement(momentId, newIndex, originalIndex, momentVersion);
+			locationService.applyIncrementToInverted(momentId, -originalIndex, momentVersion);
+		}
+		locationService.updateLocationIndexToTemporary(momentId, -1, newIndex, momentVersion);
+
+		moment = momentService.findByIdWithOptimisticLock(momentId);
+		moment.updateLastModifiedTime();
+		momentService.save(moment);
+		momentService.flushChanges();
+	}
+
+	private void validateIndex(int index, int lastIndex) {
+		if (1 > index || index > lastIndex) {
+			throw new BusinessException(INVALID_LOCATION_INDEX);
+		}
 	}
 }

@@ -32,7 +32,6 @@ public class LocationService {
 	}
 
 	public Optional<Location> findByIndex(Long momentId, int locationIndex) {
-		Optional<Location> byLocationIndex = locationRepository.findByLocationIndex(momentId, locationIndex);
 		return locationRepository.findByLocationIndex(momentId, locationIndex);
 	}
 
@@ -60,6 +59,31 @@ public class LocationService {
 	@Transactional
 	public int bulkDecreaseIndexes(Long momentId, int locationIndex, Long momentVersion) {
 		return locationRepository.bulkDecreaseIndexes(momentId, locationIndex, momentVersion);
+	}
+
+	@Transactional
+	public int invertIndexesForDecrement(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
+		return locationRepository.invertIndexesForDecrement(momentId, lowerBound, upperBound, momentVersion);
+	}
+
+	@Transactional
+	public int applyDecrementToInverted(Long momentId, int lowerThreshold, Long momentVersion) {
+		return locationRepository.applyDecrementToInverted(momentId, lowerThreshold, momentVersion);
+	}
+
+	@Transactional
+	public int applyIncrementToInverted(Long momentId, int lowerThreshold, Long momentVersion) {
+		return locationRepository.applyIncrementToInverted(momentId, lowerThreshold, momentVersion);
+	}
+
+	@Transactional
+	public int invertIndexesForIncrement(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
+		return locationRepository.invertIndexesForIncrement(momentId, lowerBound, upperBound, momentVersion);
+	}
+
+	@Transactional
+	public int updateLocationIndexToTemporary(Long momentId, int originalIndex, int newIndex, Long momentVersion) {
+		return locationRepository.updateLocationIndexToTemporary(momentId, originalIndex, newIndex, momentVersion);
 	}
 
 	@Transactional
