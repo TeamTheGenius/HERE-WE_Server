@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.genius.herewe.core.global.exception.AsyncExceptionHandler;
+import com.genius.herewe.core.global.exception.handler.AsyncExceptionHandler;
 
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.location.LocationRequest;
+import com.genius.herewe.business.location.dto.PlaceOrderRequest;
 import com.genius.herewe.business.location.dto.PlaceResponse;
 import com.genius.herewe.business.location.search.dto.Place;
 import com.genius.herewe.core.global.response.CommonResponse;
@@ -187,4 +188,76 @@ public interface LocationApi {
 	CommonResponse deletePlace(@HereWeUser User user,
 							   @PathVariable Long momentId,
 							   @RequestParam("index") int locationIndex);
+
+	@Operation(summary = "장소 순서 변경", description = "등록된 장소의 순서를 변경")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "장소 순서 변경 성공"
+		),
+		@ApiResponse(
+			responseCode = "400",
+			description = """
+				request body에 담긴 인덱스 정보가 유효하지 않을 때
+				1) originalIndex(원래 위치)가 1~최대 값 범위를 벗어나있을 때
+				2) newIndex(변경하고자 하는 위치)가 1~최대 값 범위를 벗어나있을 때
+				""",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "request body에 담긴 인덱스 정보가 유효하지 않을 때",
+						value = """
+							{
+								"resultCode": "400",
+								"code": "INVALID_LOCATION_INDEX",
+								"message": "유효하지 않은 위치 인덱스입니다."
+							}
+							"""
+					)
+				}
+			)
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "모먼트에 참여하지 않은 사용자가 요청했을 때. 즉, 모먼트 참여 정보를 찾을 수 없을 때",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "모먼트 참여 정보를 찾을 수 없을 때",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "MOMENT_PARTICIPATION_NOT_FOUND",
+								"message": "모먼트 참여 정보를 찾을 수 없습니다. 모먼트 참여자가 아닙니다."
+							}
+							"""
+					)
+				}
+			)
+		),
+		@ApiResponse(
+			responseCode = "409",
+			description = "동시성 문제로 인해 요청이 처리되지 못했을 때 - 재시도 필요",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "동시성 문제로 인해 요청이 처리되지 못했을 때 - 재시도 필요",
+						value = """
+							{
+								"resultCode": "409",
+								"code": "CONCURRENT_MODIFICATION_EXCEPTION",
+								"message": "이 데이터는 다른 사용자에 의해 수정되었습니다. 다시 시도해주세요."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	CommonResponse updateOrder(@HereWeUser User user,
+							   @PathVariable Long momentId,
+							   @RequestBody PlaceOrderRequest orderRequest);
 }

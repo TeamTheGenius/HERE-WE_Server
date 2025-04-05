@@ -65,9 +65,9 @@ public class Location {
 
 	@Builder
 	public Location(int locationIndex, Long placeId, String name, String address, String roadAddress, String url,
-		Double x,
-		Double y,
-		String phone) {
+					Double x,
+					Double y,
+					String phone) {
 		this.locationIndex = locationIndex;
 		this.placeId = placeId;
 		this.name = name;
