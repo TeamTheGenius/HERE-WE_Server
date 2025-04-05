@@ -1,4 +1,4 @@
-package com.genius.herewe.core.global.exception;
+package com.genius.herewe.core.global.exception.handler;
 
 import java.lang.reflect.Method;
 
