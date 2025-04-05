@@ -89,11 +89,10 @@ public class DefaultLocationFacade implements LocationFacade {
 	@Override
 	@Transactional
 	public void deletePlace(Long userId, Long momentId, int locationIndex) {
-		executeDeletePlace(userId, momentId, locationIndex);
-		// retryHandler.executeWithRetry(() -> {
-		// 	executeDeletePlace(userId, momentId, locationIndex);
-		// 	return null;
-		// });
+		retryHandler.executeWithRetry(() -> {
+			executeDeletePlace(userId, momentId, locationIndex);
+			return null;
+		});
 	}
 
 	@Transactional
@@ -111,11 +110,9 @@ public class DefaultLocationFacade implements LocationFacade {
 
 		boolean isLastIndex = locationIndex == lastIndex;
 		if (!isLastIndex) {
-			int invertedRows = locationService.invertIndexesForDecrement(momentId, locationIndex,
-																		 lastIndex, moment.getVersion());
-			int updatedRows = locationService.applyDecrementToInverted(momentId, -lastIndex, moment.getVersion());
-
-			if (invertedRows == 0 || updatedRows == 0) {
+			boolean isValid = locationService.bulkDecreaseIndexes(momentId, locationIndex,
+																  lastIndex, moment.getVersion());
+			if (!isValid) {
 				throw new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION);
 			}
 		}
@@ -154,11 +151,9 @@ public class DefaultLocationFacade implements LocationFacade {
 		locationService.repositionIndex(momentId, originalIndex, -1, momentVersion);
 
 		if (originalIndex < newIndex) {
-			locationService.invertIndexesForDecrement(momentId, originalIndex, newIndex, momentVersion);
-			locationService.applyDecrementToInverted(momentId, -newIndex, momentVersion);
+			locationService.bulkDecreaseIndexes(momentId, originalIndex, newIndex, momentVersion);
 		} else {
-			locationService.invertIndexesForIncrement(momentId, newIndex, originalIndex, momentVersion);
-			locationService.applyIncrementToInverted(momentId, -originalIndex, momentVersion);
+			locationService.bulkIncreaseIndexes(momentId, newIndex, originalIndex, momentVersion);
 		}
 		locationService.repositionIndex(momentId, -1, newIndex, momentVersion);
 

@@ -57,23 +57,19 @@ public class LocationService {
 	}
 
 	@Transactional
-	public int invertIndexesForDecrement(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
-		return locationRepository.invertIndexesForDecrement(momentId, lowerBound, upperBound, momentVersion);
+	public boolean bulkDecreaseIndexes(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
+		int invertedRows = locationRepository.invertIndexesForDecrement(momentId, lowerBound,
+																		upperBound, momentVersion);
+		int updatedRows = locationRepository.applyDecrementToInverted(momentId, -upperBound, momentVersion);
+		return !(invertedRows == 0 || updatedRows == 0);
 	}
 
 	@Transactional
-	public int applyDecrementToInverted(Long momentId, int lowerThreshold, Long momentVersion) {
-		return locationRepository.applyDecrementToInverted(momentId, lowerThreshold, momentVersion);
-	}
-
-	@Transactional
-	public int applyIncrementToInverted(Long momentId, int lowerThreshold, Long momentVersion) {
-		return locationRepository.applyIncrementToInverted(momentId, lowerThreshold, momentVersion);
-	}
-
-	@Transactional
-	public int invertIndexesForIncrement(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
-		return locationRepository.invertIndexesForIncrement(momentId, lowerBound, upperBound, momentVersion);
+	public boolean bulkIncreaseIndexes(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
+		int invertedRows = locationRepository.invertIndexesForIncrement(momentId, lowerBound,
+																		upperBound, momentVersion);
+		int updatedRows = locationRepository.applyIncrementToInverted(momentId, -upperBound, momentVersion);
+		return !(invertedRows == 0 || updatedRows == 0);
 	}
 
 	@Transactional
