@@ -57,11 +57,6 @@ public class LocationService {
 	}
 
 	@Transactional
-	public int bulkDecreaseIndexes(Long momentId, int locationIndex, Long momentVersion) {
-		return locationRepository.bulkDecreaseIndexes(momentId, locationIndex, momentVersion);
-	}
-
-	@Transactional
 	public int invertIndexesForDecrement(Long momentId, int lowerBound, int upperBound, Long momentVersion) {
 		return locationRepository.invertIndexesForDecrement(momentId, lowerBound, upperBound, momentVersion);
 	}

@@ -89,10 +89,11 @@ public class DefaultLocationFacade implements LocationFacade {
 	@Override
 	@Transactional
 	public void deletePlace(Long userId, Long momentId, int locationIndex) {
-		retryHandler.executeWithRetry(() -> {
-			executeDeletePlace(userId, momentId, locationIndex);
-			return null;
-		});
+		executeDeletePlace(userId, momentId, locationIndex);
+		// retryHandler.executeWithRetry(() -> {
+		// 	executeDeletePlace(userId, momentId, locationIndex);
+		// 	return null;
+		// });
 	}
 
 	@Transactional
@@ -110,8 +111,11 @@ public class DefaultLocationFacade implements LocationFacade {
 
 		boolean isLastIndex = locationIndex == lastIndex;
 		if (!isLastIndex) {
-			int updatedRows = locationService.bulkDecreaseIndexes(momentId, locationIndex, moment.getVersion());
-			if (updatedRows == 0) {
+			int invertedRows = locationService.invertIndexesForDecrement(momentId, locationIndex,
+																		 lastIndex, moment.getVersion());
+			int updatedRows = locationService.applyDecrementToInverted(momentId, -lastIndex, moment.getVersion());
+
+			if (invertedRows == 0 || updatedRows == 0) {
 				throw new BusinessException(CONCURRENT_MODIFICATION_EXCEPTION);
 			}
 		}

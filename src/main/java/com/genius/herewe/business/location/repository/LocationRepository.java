@@ -21,16 +21,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query("SELECT l FROM Location l WHERE l.locationIndex = 1 AND l.moment.id IN :momentIds")
 	List<Location> findMeetingLocationsByIds(@Param("momentIds") List<Long> momentIds);
 
-	@Modifying(flushAutomatically = true, clearAutomatically = true)
-	@Query("""
-		UPDATE Location l
-		SET l.locationIndex = l.locationIndex - 1
-		WHERE l.moment.id = :momentId AND l.locationIndex > :thresholdIndex AND l.moment.version = :momentVersion
-		""")
-	int bulkDecreaseIndexes(@Param("momentId") Long momentId,
-							@Param("thresholdIndex") int thresholdIndex,
-							@Param("momentVersion") Long momentVersion);
-
 	@Query("SELECT MAX(l.locationIndex) FROM Location l WHERE l.moment.id = :momentId")
 	int findLastIndexForMoment(@Param("momentId") Long momentId);
 
