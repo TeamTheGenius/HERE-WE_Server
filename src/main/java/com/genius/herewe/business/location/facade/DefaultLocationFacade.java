@@ -147,7 +147,7 @@ public class DefaultLocationFacade implements LocationFacade {
 		Moment moment = momentService.findByIdWithOptimisticLock(momentId);
 		Long momentVersion = moment.getVersion();
 
-		locationService.updateLocationIndexToTemporary(momentId, originalIndex, -1, momentVersion);
+		locationService.repositionIndex(momentId, originalIndex, -1, momentVersion);
 
 		if (originalIndex < newIndex) {
 			locationService.invertIndexesForDecrement(momentId, originalIndex, newIndex, momentVersion);
@@ -156,7 +156,7 @@ public class DefaultLocationFacade implements LocationFacade {
 			locationService.invertIndexesForIncrement(momentId, newIndex, originalIndex, momentVersion);
 			locationService.applyIncrementToInverted(momentId, -originalIndex, momentVersion);
 		}
-		locationService.updateLocationIndexToTemporary(momentId, -1, newIndex, momentVersion);
+		locationService.repositionIndex(momentId, -1, newIndex, momentVersion);
 
 		moment = momentService.findByIdWithOptimisticLock(momentId);
 		moment.updateLastModifiedTime();

@@ -87,8 +87,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 		WHERE l.moment.id = :momentId AND l.moment.version = :momentVersion
 		AND l.locationIndex = :originalIndex
 		""")
-	int updateLocationIndexToTemporary(@Param("momentId") Long momentId,
-									   @Param("originalIndex") int originalIndex,
-									   @Param("newIndex") int newIndex,
-									   @Param("momentVersion") Long momentVersion);
+	int repositionIndex(@Param("momentId") Long momentId,
+						@Param("originalIndex") int originalIndex,
+						@Param("newIndex") int newIndex,
+						@Param("momentVersion") Long momentVersion);
 }

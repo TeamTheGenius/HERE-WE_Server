@@ -82,8 +82,8 @@ public class LocationService {
 	}
 
 	@Transactional
-	public int updateLocationIndexToTemporary(Long momentId, int originalIndex, int newIndex, Long momentVersion) {
-		return locationRepository.updateLocationIndexToTemporary(momentId, originalIndex, newIndex, momentVersion);
+	public int repositionIndex(Long momentId, int originalIndex, int newIndex, Long momentVersion) {
+		return locationRepository.repositionIndex(momentId, originalIndex, newIndex, momentVersion);
 	}
 
 	@Transactional
