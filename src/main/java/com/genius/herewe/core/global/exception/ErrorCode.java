@@ -48,7 +48,7 @@ public enum ErrorCode {
 
 	LOCATION_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 순서의 장소가 이미 추가되었습니다. 잠시 후 다시 시도해주세요."),
 	LOCATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "장소는 최대 100개까지 등록할 수 있습니다."),
-	INVALID_LOCATION_INDEX(HttpStatus.BAD_REQUEST, "유효하지 않은 위치 인덱스입니다."),
+	INVALID_LOCATION_INDEX(HttpStatus.BAD_REQUEST, "유효하지 않은 위치 인덱스입니다. 다시 확인해주세요."),
 
 	UNAUTHORIZED_ISSUE(HttpStatus.UNAUTHORIZED, "회원가입이 되어 있지 않은 사용자의 경우 JWT를 발급할 수 없습니다."),
 	JWT_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),
