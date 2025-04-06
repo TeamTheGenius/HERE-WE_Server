@@ -164,7 +164,7 @@ public class DefaultLocationFacade implements LocationFacade {
 	}
 
 	private void validateIndex(int index, int lastIndex) {
-		if (1 > index || index > lastIndex) {
+		if (1 >= index || index > lastIndex) {
 			throw new BusinessException(INVALID_LOCATION_INDEX);
 		}
 	}
