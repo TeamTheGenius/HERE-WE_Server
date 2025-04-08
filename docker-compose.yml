@@ -9,6 +9,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
       - SPRING_PROFILES_ACTIVE=prod,oauth,common
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=optional:file:/config/
+    volumes:
+      - ./configs:/config  # <== 이 폴더 안에 yml 파일들 넣어두기
     depends_on:
       db:
         condition: service_healthy

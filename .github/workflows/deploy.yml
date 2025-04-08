@@ -101,9 +101,15 @@ jobs:
       - name: Copy .env file
         run: cp HERE-WE-SECRET/.env .
 
-      - name: Upload to S3
+      - name: Package and Upload to S3
         run: |
-          zip -r deploy.zip appspec.yml scripts/deploy.sh .env docker-compose.yml
+          mkdir -p deploy
+          cp appspec.yml deploy/
+          cp scripts/deploy.sh deploy/
+          cp HERE-WE-SECRET/.env deploy/
+          cp HERE-WE-SECRET/main/resources/*.yml deploy/
+          cd deploy
+          zip -r deploy.zip .
           aws s3 cp deploy.zip s3://$AWS_S3_BUCKET/deploy.zip --region $AWS_REGION
 
       - name: Deploy with CodeDeploy

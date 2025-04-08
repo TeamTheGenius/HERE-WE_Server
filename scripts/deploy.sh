@@ -8,7 +8,7 @@ echo ">>> 배포 시작: $(date)" >> $LOG_FILE
 
 cd $DEPLOY_PATH || exit
 
-# .env 로부터 불러오기
+# .env 로부터 환경변수 불러오기
 export $(grep -v '^#' ${DEPLOY_PATH}.env | xargs)
 
 # Docker Hub 로그인
@@ -18,6 +18,14 @@ if [ $? -ne 0 ]; then
   echo ">>> [ERROR] Docker Hub 로그인 실패" >> $LOG_FILE
   exit 1
 fi
+
+# configs 디렉토리 생성 및 설정파일 복사
+echo ">>> 설정 파일 복사" >> $LOG_FILE
+mkdir -p ${DEPLOY_PATH}configs
+
+cp ${DEPLOY_PATH}application-prod.yml ${DEPLOY_PATH}configs/
+cp ${DEPLOY_PATH}application-oauth.yml ${DEPLOY_PATH}configs/
+cp ${DEPLOY_PATH}application-common.yml ${DEPLOY_PATH}configs/
 
 # 기존 컨테이너 종료 및 삭제
 echo ">>> 기존 컨테이너 종료 및 제거" >> $LOG_FILE
