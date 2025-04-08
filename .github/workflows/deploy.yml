@@ -103,12 +103,12 @@ jobs:
 
       - name: Package and Upload to S3
         run: |
-          mkdir -p deploy
+          mkdir -p deploy/scripts     
           cp appspec.yml deploy/
-          cp scripts/deploy.sh deploy/
           cp docker-compose.yml deploy/
           cp HERE-WE-SECRET/.env deploy/
           cp HERE-WE-SECRET/main/resources/*.yml deploy/
+          cp scripts/deploy.sh deploy/scripts/
           cd deploy
           zip -r deploy.zip .
           aws s3 cp deploy.zip s3://$AWS_S3_BUCKET/deploy.zip --region $AWS_REGION
