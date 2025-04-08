@@ -1,34 +1,42 @@
 #!/bin/bash
 
-echo ">>> 배포 시작: $(date)" >> /home/ubuntu/deploy.log
-
-# 배포 디렉토리 설정
+LOG_FILE=/home/ubuntu/deploy.log
 DEPLOY_PATH=/home/ubuntu/app/
+HEALTH_URL="http://localhost:8080/api/auth/health-check"
 
-# .env 파일 복사 확인
-if [ ! -f "$DEPLOY_PATH/.env" ]; then
-  echo ">>> .env 파일이 없습니다. 복사합니다." >> /home/ubuntu/deploy.log
-  cp /home/ubuntu/.env $DEPLOY_PATH/  # 경로 주의
-fi
+echo ">>> 배포 시작: $(date)" >> $LOG_FILE
 
-# docker-compose.yml 복사
-echo ">>> docker-compose.yml 파일 복사" >> /home/ubuntu/deploy.log
-cp /home/ubuntu/docker-compose.yml $DEPLOY_PATH/
-
-# 배포 디렉토리로 이동
 cd $DEPLOY_PATH || exit
 
-# Docker 이미지 pull
-echo ">>> Docker 이미지 가져오기" >> /home/ubuntu/deploy.log
+# 기존 컨테이너 종료 및 삭제
+echo ">>> 기존 컨테이너 종료 및 제거" >> $LOG_FILE
+docker-compose down
+
+# 최신 이미지 Pull
+echo ">>> Docker 이미지 pull" >> $LOG_FILE
 docker-compose pull
 
-# 기존 컨테이너 중지 및 제거
-echo ">>> 애플리케이션 컨테이너 중지 및 제거" >> /home/ubuntu/deploy.log
-docker-compose stop server
-docker-compose rm -f server
-
-# 애플리케이션 컨테이너 재시작
-echo ">>> Docker Compose로 애플리케이션 시작" >> /home/ubuntu/deploy.log
+# 컨테이너 실행
+echo ">>> Docker Compose로 애플리케이션 실행" >> $LOG_FILE
 docker-compose up -d
 
-echo ">>> 배포 완료: $(date)" >> /home/ubuntu/deploy.log
+# Health check
+echo ">>> 애플리케이션 Health Check 시작" >> $LOG_FILE
+
+for i in {1..20}
+do
+  STATUS=$(curl -s $HEALTH_URL | grep '"status":"UP"')
+  if [ -n "$STATUS" ]; then
+    echo ">>> 서버가 정상적으로 기동되었습니다." >> $LOG_FILE
+    break
+  fi
+  echo ">>> 서버가 아직 기동되지 않았습니다. 재시도: $i" >> $LOG_FILE
+  sleep 5
+done
+
+if [ -z "$STATUS" ]; then
+  echo ">>> [ERROR] 서버가 정상적으로 기동되지 않았습니다." >> $LOG_FILE
+  exit 1
+fi
+
+echo ">>> 배포 완료: $(date)" >> $LOG_FILE

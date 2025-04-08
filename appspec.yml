@@ -2,14 +2,17 @@ version: 0.0
 os: linux
 
 files:
-  - source: /
+  - source: appspec.yml
     destination: /home/ubuntu/app
-    overwrite: yes
+  - source: docker-compose.yml
+    destination: /home/ubuntu/app
+  - source: scripts/
+    destination: /home/ubuntu/app/scripts
   - source: .env
     destination: /home/ubuntu/app
 
 permissions:
-  - object: /
+  - object: /home/ubuntu/app
     owner: ubuntu
     group: ubuntu
 
