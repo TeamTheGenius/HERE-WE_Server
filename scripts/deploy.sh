@@ -8,6 +8,17 @@ echo ">>> 배포 시작: $(date)" >> $LOG_FILE
 
 cd $DEPLOY_PATH || exit
 
+# .env 로부터 불러오기
+export $(grep -v '^#' ${DEPLOY_PATH}.env | xargs)
+
+# Docker Hub 로그인
+echo ">>> Docker Hub 로그인" >> $LOG_FILE
+docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_ACCESS_TOKEN}
+if [ $? -ne 0 ]; then
+  echo ">>> [ERROR] Docker Hub 로그인 실패" >> $LOG_FILE
+  exit 1
+fi
+
 # 기존 컨테이너 종료 및 삭제
 echo ">>> 기존 컨테이너 종료 및 제거" >> $LOG_FILE
 docker-compose down
