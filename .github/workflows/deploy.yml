@@ -106,6 +106,7 @@ jobs:
           mkdir -p deploy
           cp appspec.yml deploy/
           cp scripts/deploy.sh deploy/
+          cp docker-compose.yml deploy/
           cp HERE-WE-SECRET/.env deploy/
           cp HERE-WE-SECRET/main/resources/*.yml deploy/
           cd deploy
