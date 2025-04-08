@@ -44,8 +44,8 @@ echo ">>> 애플리케이션 Health Check 시작" >> $LOG_FILE
 
 for i in {1..20}
 do
-  STATUS=$(curl -s $HEALTH_URL | grep '"status":"UP"')
-  if [ -n "$STATUS" ]; then
+  STATUS=$(curl -s $HEALTH_URL)
+  if [[ "$STATUS" == *"health check OK"* || "$STATUS" == *"OK"* ]]; then
     echo ">>> 서버가 정상적으로 기동되었습니다." >> $LOG_FILE
     break
   fi
@@ -53,7 +53,7 @@ do
   sleep 5
 done
 
-if [ -z "$STATUS" ]; then
+if [[ ! "$STATUS" == *"health check OK"* && ! "$STATUS" == *"OK"* ]]; then
   echo ">>> [ERROR] 서버가 정상적으로 기동되지 않았습니다." >> $LOG_FILE
   exit 1
 fi
