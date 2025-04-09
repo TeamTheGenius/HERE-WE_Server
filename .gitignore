@@ -7,6 +7,7 @@ build/
 !**/src/test/**/build/
 
 *.yml
+.env
 
 ### STS ###
 .apt_generated
@@ -43,3 +44,4 @@ out/
 *.DS_Store
 src/main/generated/**
 /.idea
+/mysql_data

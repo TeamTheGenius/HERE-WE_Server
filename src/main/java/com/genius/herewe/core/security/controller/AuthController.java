@@ -1,6 +1,7 @@
 package com.genius.herewe.core.security.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ public class AuthController implements AuthApi {
 
 	@PostMapping("/auth")
 	public SingleResponse<AuthResponse> authorize(HttpServletResponse response,
-		@RequestBody AuthRequest authRequest) {
+												  @RequestBody AuthRequest authRequest) {
 
 		User user = userFacade.findUser(authRequest.userId());
 
@@ -35,5 +36,10 @@ public class AuthController implements AuthApi {
 
 		AuthResponse authResponse = userFacade.getAuthInfo(user.getId());
 		return new SingleResponse<>(HttpStatus.OK, authResponse);
+	}
+
+	@GetMapping("/auth/health-check")
+	public String healthCheck() {
+		return "health check OK";
 	}
 }
