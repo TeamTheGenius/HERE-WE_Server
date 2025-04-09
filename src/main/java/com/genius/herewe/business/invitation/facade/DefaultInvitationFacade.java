@@ -20,6 +20,7 @@ import com.genius.herewe.business.invitation.dto.InvitationInfo;
 import com.genius.herewe.business.invitation.dto.InvitationRequest;
 import com.genius.herewe.business.invitation.service.InvitationService;
 import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.user.domain.ProviderInfo;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.service.UserService;
 import com.genius.herewe.infra.mail.dto.MailRequest;
@@ -84,13 +85,14 @@ public class DefaultInvitationFacade implements InvitationFacade {
 				return invitationService.save(newInvitation);
 			});
 
+		String inviteUrl = getInviteUrl(invitation.getToken(), user.getProviderInfo());
 		MailRequest mailRequest = MailRequest.builder()
 			.receiverMail(user.getEmail())
 			.nickname(nickname)
 			.crewName(crew.getName())
 			.introduce(crew.getIntroduce())
 			.memberCount(crew.getParticipantCount())
-			.inviteUrl(BASE_URL + INVITE_URL + invitation.getToken())
+			.inviteUrl(inviteUrl)
 			.build();
 
 		mailManager.sendAsync(mailRequest).thenAccept(result -> {
@@ -101,6 +103,10 @@ public class DefaultInvitationFacade implements InvitationFacade {
 				log.info("Email sent successfully for invitation: {}", invitation.getToken());
 			}
 		});
+	}
+
+	private String getInviteUrl(String token, ProviderInfo provider) {
+		return String.format(BASE_URL + INVITE_URL, token, provider.name().toLowerCase());
 	}
 
 	@Transactional
