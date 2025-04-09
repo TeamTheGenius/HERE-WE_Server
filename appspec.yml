@@ -1,0 +1,30 @@
+version: 0.0
+os: linux
+
+files:
+  - source: appspec.yml
+    destination: /home/ubuntu/app
+  - source: docker-compose.yml
+    destination: /home/ubuntu/app
+  - source: scripts/
+    destination: /home/ubuntu/app/scripts
+  - source: .env
+    destination: /home/ubuntu/app
+
+  # ✅ 여기에 설정 파일 추가
+  - source: application-prod.yml
+    destination: /home/ubuntu/app
+  - source: application-oauth.yml
+    destination: /home/ubuntu/app
+  - source: application-common.yml
+    destination: /home/ubuntu/app
+
+permissions:
+  - object: /home/ubuntu/app
+    owner: ubuntu
+    group: ubuntu
+
+hooks:
+  ApplicationStart:
+    - location: scripts/deploy.sh
+      timeout: 60
