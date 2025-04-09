@@ -47,7 +47,7 @@ jobs:
           
           mkdir -p src/main/resources
           cp HERE-WE-SECRET/main/resources/application.yml src/main/resources/
-          cp HERE-WE-SECRET/main/resources/application-dev.yml src/main/resources/
+          cp HERE-WE-SECRET/main/resources/application-prod.yml src/main/resources/
           cp HERE-WE-SECRET/main/resources/application-oauth.yml src/main/resources/
           cp HERE-WE-SECRET/main/resources/application-common.yml src/main/resources/
 
