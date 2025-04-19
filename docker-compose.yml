@@ -13,10 +13,8 @@ services:
     volumes:
       - ./configs:/config  # <== 이 폴더 안에 yml 파일들 넣어두기
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/api/auth/health-check" ]
       interval: 10s
@@ -48,12 +46,20 @@ services:
     image: redis
     ports:
       - 6379:6379
-    command: redis-server --requirepass ${REDIS_ROOT_PASSWORD} --appendonly yes --save 900 1 --save 300 10 --save 60 10000 --replicaof no one --replica-read-only no
+    command: >
+      redis-server 
+      --requirepass ${REDIS_ROOT_PASSWORD} 
+      --appendonly yes 
+      --save 900 1 
+      --save 300 10 
+      --save 60 10000 
+      --replicaof no one 
+      --replica-read-only no
     volumes:
       - ./redis_data:/data
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${REDIS_ROOT_PASSWORD}", "ping" ]
+      test: [ "CMD-SHELL", "redis-cli -a $REDIS_ROOT_PASSWORD ping" ]
       interval: 5s
       timeout: 3s
       retries: 10
