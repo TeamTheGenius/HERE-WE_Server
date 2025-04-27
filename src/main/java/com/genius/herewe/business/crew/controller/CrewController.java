@@ -43,7 +43,7 @@ public class CrewController implements CrewApi {
 
 	@GetMapping("/profile/{crewId}")
 	public SingleResponse<CrewProfileResponse> inquiryCrewProfile(@HereWeUser User user,
-		@PathVariable Long crewId) {
+																  @PathVariable Long crewId) {
 		CrewProfileResponse crewProfileResponse = crewFacade.inquiryCrewProfile(user.getId(), crewId);
 		return new SingleResponse<>(HttpStatus.OK, crewProfileResponse);
 	}
@@ -124,6 +124,13 @@ public class CrewController implements CrewApi {
 
 		crewFacade.expelCrew(user.getId(), new CrewExpelRequest(crewId, nickname));
 
+		return CommonResponse.ok();
+	}
+
+	@DeleteMapping("/{crewId}/members/me")
+	public CommonResponse quitCrew(@HereWeUser User user,
+								   @PathVariable Long crewId) {
+		crewFacade.quitCrew(user.getId(), crewId);
 		return CommonResponse.ok();
 	}
 }
