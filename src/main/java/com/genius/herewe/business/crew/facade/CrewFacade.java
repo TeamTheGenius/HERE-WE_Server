@@ -27,4 +27,6 @@ public interface CrewFacade {
 	void deleteCrew(Long crewId);
 
 	void expelCrew(Long userId, CrewExpelRequest expelRequest);
+
+	void quitCrew(Long userId, Long crewId);
 }

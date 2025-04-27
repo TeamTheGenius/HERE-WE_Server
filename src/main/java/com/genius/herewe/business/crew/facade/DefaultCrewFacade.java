@@ -125,4 +125,19 @@ public class DefaultCrewFacade implements CrewFacade {
 		crewMemberService.delete(crewMember);
 		crew.updateParticipantCount(-1);
 	}
+
+	@Override
+	@Transactional
+	public void quitCrew(Long userId, Long crewId) {
+		User user = userService.findById(userId);
+		Crew crew = crewService.findById(crewId);
+
+		CrewMember crewMember = crewMemberService.find(userId, crewId);
+		if (crewMember.getRole() == CrewRole.LEADER) {
+			throw new BusinessException(LEADER_CANNOT_EXPEL);
+		}
+
+		crewMemberService.delete(crewMember);
+		crew.updateParticipantCount(-1);
+	}
 }
