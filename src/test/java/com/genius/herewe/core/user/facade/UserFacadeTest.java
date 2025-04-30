@@ -24,7 +24,7 @@ import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.domain.Token;
 import com.genius.herewe.core.security.dto.AuthResponse;
 import com.genius.herewe.core.security.fixture.TokenFixture;
-import com.genius.herewe.core.security.service.token.RegistrationTokenService;
+import com.genius.herewe.core.security.service.token.AuthTokenService;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.dto.SignupRequest;
@@ -40,12 +40,12 @@ class UserFacadeTest {
 	@Mock
 	private UserService userService;
 	@Mock
-	private RegistrationTokenService registrationTokenService;
+	private AuthTokenService authTokenService;
 	private UserFacade userFacade;
 
 	@BeforeEach
 	public void init() {
-		userFacade = new DefaultUserFacade(userService, registrationTokenService, filesManager);
+		userFacade = new DefaultUserFacade(userService, authTokenService, filesManager);
 	}
 
 	@Nested
@@ -202,7 +202,7 @@ class UserFacadeTest {
 					registrationToken, targetNickname
 				);
 
-				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
+				given(authTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when & then
 				assertThatNoException()
@@ -216,7 +216,7 @@ class UserFacadeTest {
 				SignupRequest signupRequest = new SignupRequest(
 					registrationToken, existNickname
 				);
-				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
+				given(authTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when & then
 				assertThatThrownBy(() -> userFacade.signup(signupRequest))
@@ -236,7 +236,7 @@ class UserFacadeTest {
 				SignupRequest signupRequest = new SignupRequest(registrationToken, user.getNickname());
 
 				given(userService.findById(user.getId())).willReturn(user);
-				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
+				given(authTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when
 				SignupResponse signupResponse = userFacade.signup(signupRequest);
@@ -255,7 +255,7 @@ class UserFacadeTest {
 				SignupRequest signupRequest = new SignupRequest(registrationToken, user.getNickname());
 
 				given(userService.findById(user.getId())).willReturn(user);
-				given(registrationTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
+				given(authTokenService.getUserIdFromToken(registrationToken)).willReturn(user.getId());
 
 				//when & then
 				assertThatThrownBy(() -> userFacade.signup(signupRequest))

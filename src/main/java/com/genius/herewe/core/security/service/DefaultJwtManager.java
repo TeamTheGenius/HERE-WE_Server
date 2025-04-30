@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-public class DefaultJwtFacade implements JwtFacade {
+public class DefaultJwtManager implements JwtManager {
 	private final CustomUserDetailsService customUserDetailsService;
 	private final UserService userService;
 	private final RefreshTokenService refreshTokenService;
@@ -47,13 +47,13 @@ public class DefaultJwtFacade implements JwtFacade {
 	private final long ACCESS_EXPIRATION;
 	private final long REFRESH_EXPIRATION;
 
-	public DefaultJwtFacade(CustomUserDetailsService customUserDetailsService,
-							UserService userService, RefreshTokenService refreshTokenService,
-							@Value("${jwt.issuer}") String ISSUER,
-							@Value("${jwt.secret.access}") String ACCESS_SECRET_KEY,
-							@Value("${jwt.secret.refresh}") String REFRESH_SECRET_KEY,
-							@Value("${jwt.expiration.access}") long ACCESS_EXPIRATION,
-							@Value("${jwt.expiration.refresh}") long REFRESH_EXPIRATION) {
+	public DefaultJwtManager(CustomUserDetailsService customUserDetailsService,
+							 UserService userService, RefreshTokenService refreshTokenService,
+							 @Value("${jwt.issuer}") String ISSUER,
+							 @Value("${jwt.secret.access}") String ACCESS_SECRET_KEY,
+							 @Value("${jwt.secret.refresh}") String REFRESH_SECRET_KEY,
+							 @Value("${jwt.expiration.access}") long ACCESS_EXPIRATION,
+							 @Value("${jwt.expiration.refresh}") long REFRESH_EXPIRATION) {
 		this.customUserDetailsService = customUserDetailsService;
 		this.userService = userService;
 		this.refreshTokenService = refreshTokenService;

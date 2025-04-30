@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.constants.JwtStatus;
-import com.genius.herewe.core.security.service.JwtFacade;
+import com.genius.herewe.core.security.service.JwtManager;
 import com.genius.herewe.core.user.domain.User;
 
 import jakarta.servlet.FilterChain;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private final JwtFacade jwtFacade;
+	private final JwtManager jwtManager;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
@@ -39,8 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		String accessToken = jwtFacade.resolveAccessToken(request);
-		JwtStatus accessStatus = jwtFacade.verifyAccessToken(accessToken);
+		String accessToken = jwtManager.resolveAccessToken(request);
+		JwtStatus accessStatus = jwtManager.verifyAccessToken(accessToken);
 
 		if (accessStatus == VALID) {
 			setAuthenticationToContext(accessToken);
@@ -48,26 +48,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		String refreshToken = jwtFacade.resolveRefreshToken(request);
-		jwtFacade.verifyRefreshToken(refreshToken);
-		User user = jwtFacade.getPKFromRefresh(refreshToken);
+		String refreshToken = jwtManager.resolveRefreshToken(request);
+		jwtManager.verifyRefreshToken(refreshToken);
+		User user = jwtManager.getPKFromRefresh(refreshToken);
 
-		boolean isHijacked = jwtFacade.isRefreshHijacked(user.getId(), refreshToken);
+		boolean isHijacked = jwtManager.isRefreshHijacked(user.getId(), refreshToken);
 		if (isHijacked) {
-			jwtFacade.logout(response, user.getId());
+			jwtManager.logout(response, user.getId());
 			throw new BusinessException(TOKEN_HIJACKED);
 		}
 
-		String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
-		jwtFacade.generateRefreshToken(response, user);
-		jwtFacade.setReissuedHeader(response);
+		String reissuedAccessToken = jwtManager.generateAccessToken(response, user);
+		jwtManager.generateRefreshToken(response, user);
+		jwtManager.setReissuedHeader(response);
 
 		setAuthenticationToContext(reissuedAccessToken);
 		filterChain.doFilter(request, response);
 	}
 
 	private void setAuthenticationToContext(String accessToken) {
-		Authentication authentication = jwtFacade.createAuthentication(accessToken);
+		Authentication authentication = jwtManager.createAuthentication(accessToken);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 

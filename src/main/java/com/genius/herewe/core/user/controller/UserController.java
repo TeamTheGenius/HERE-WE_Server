@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
-import com.genius.herewe.core.security.service.token.RegistrationTokenService;
+import com.genius.herewe.core.security.service.token.AuthTokenService;
 import com.genius.herewe.core.user.dto.SignupRequest;
 import com.genius.herewe.core.user.dto.SignupResponse;
 import com.genius.herewe.core.user.facade.UserFacade;
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class UserController implements UserApi {
 	private final UserFacade userFacade;
-	private final RegistrationTokenService registrationTokenService;
+	private final AuthTokenService authTokenService;
 	private final FileHolderFinder holderFinder;
 	private final FilesManager filesManager;
 
@@ -48,7 +48,7 @@ public class UserController implements UserApi {
 
 	@GetMapping("/auth/profile")
 	public SingleResponse<FileResponse> getProfile(@RequestParam("token") String token) {
-		Long userId = registrationTokenService.getUserIdFromToken(token);
+		Long userId = authTokenService.getUserIdFromToken(token);
 		FileHolder fileHolder = holderFinder.find(userId, FileType.PROFILE);
 		FileResponse fileResponse = filesManager.convertToFileResponse(fileHolder.getFiles());
 
@@ -60,7 +60,7 @@ public class UserController implements UserApi {
 		@RequestParam("token") String token,
 		@RequestParam(value = "files") MultipartFile multipartFile
 	) {
-		Long userId = registrationTokenService.getUserIdFromToken(token);
+		Long userId = authTokenService.getUserIdFromToken(token);
 		FileHolder fileHolder = holderFinder.find(userId, FileType.PROFILE);
 		Files files = filesManager.updateFile(fileHolder.getFiles(), multipartFile);
 		FileResponse fileResponse = filesManager.convertToFileResponse(files);
