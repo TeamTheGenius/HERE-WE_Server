@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.dto.AuthRequest;
 import com.genius.herewe.core.security.dto.AuthResponse;
-import com.genius.herewe.core.security.service.JwtFacade;
-import com.genius.herewe.core.security.service.token.AuthTokenService;
-import com.genius.herewe.core.user.domain.User;
+import com.genius.herewe.core.security.facade.AuthFacade;
 import com.genius.herewe.core.user.facade.UserFacade;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -23,22 +22,20 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class AuthController implements AuthApi {
 	public final UserFacade userFacade;
-	public final JwtFacade jwtFacade;
-	public final AuthTokenService authTokenService;
+	private final AuthFacade authFacade;
 
 	@PostMapping("/auth")
 	public SingleResponse<AuthResponse> authorize(HttpServletResponse response,
 												  @RequestBody AuthRequest authRequest) {
+		Long userId = authFacade.authorize(response, authRequest);
+		AuthResponse authResponse = userFacade.getAuthInfo(userId);
+		return new SingleResponse<>(HttpStatus.OK, authResponse);
+	}
 
-		authTokenService.validateAuthToken(authRequest.userId(), authRequest.token());
-		User user = userFacade.findUser(authRequest.userId());
-
-		jwtFacade.generateAccessToken(response, user);
-		jwtFacade.generateRefreshToken(response, user);
-		jwtFacade.setReissuedHeader(response);
-
-		AuthResponse authResponse = userFacade.getAuthInfo(user.getId());
-		authTokenService.deleteAuthToken(user.getId());
+	@PostMapping("/auth/reissue")
+	public SingleResponse<AuthResponse> reissueToken(HttpServletRequest request, HttpServletResponse response) {
+		Long userId = authFacade.reissueToken(request, response);
+		AuthResponse authResponse = userFacade.getAuthInfo(userId);
 		return new SingleResponse<>(HttpStatus.OK, authResponse);
 	}
 

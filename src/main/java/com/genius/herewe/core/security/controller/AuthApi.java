@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Tag(name = "Auth API", description = "인증/인가 관련 API")
@@ -47,4 +48,6 @@ public interface AuthApi {
 	@PostMapping("/auth")
 	SingleResponse<AuthResponse> authorize(HttpServletResponse response,
 										   @RequestBody AuthRequest authRequest);
+
+	SingleResponse<AuthResponse> reissueToken(HttpServletRequest request, HttpServletResponse response);
 }
