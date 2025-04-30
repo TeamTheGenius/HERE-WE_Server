@@ -11,6 +11,7 @@ import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.dto.AuthRequest;
 import com.genius.herewe.core.security.dto.AuthResponse;
 import com.genius.herewe.core.security.service.JwtFacade;
+import com.genius.herewe.core.security.service.token.AuthTokenService;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.facade.UserFacade;
 
@@ -23,11 +24,13 @@ import lombok.RequiredArgsConstructor;
 public class AuthController implements AuthApi {
 	public final UserFacade userFacade;
 	public final JwtFacade jwtFacade;
+	public final AuthTokenService authTokenService;
 
 	@PostMapping("/auth")
 	public SingleResponse<AuthResponse> authorize(HttpServletResponse response,
 												  @RequestBody AuthRequest authRequest) {
 
+		authTokenService.validateAuthToken(authRequest.userId(), authRequest.token());
 		User user = userFacade.findUser(authRequest.userId());
 
 		jwtFacade.generateAccessToken(response, user);
@@ -35,6 +38,7 @@ public class AuthController implements AuthApi {
 		jwtFacade.setReissuedHeader(response);
 
 		AuthResponse authResponse = userFacade.getAuthInfo(user.getId());
+		authTokenService.deleteAuthToken(user.getId());
 		return new SingleResponse<>(HttpStatus.OK, authResponse);
 	}
 
