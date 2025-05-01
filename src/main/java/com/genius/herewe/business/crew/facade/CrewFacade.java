@@ -29,4 +29,6 @@ public interface CrewFacade {
 	void expelCrew(Long userId, CrewExpelRequest expelRequest);
 
 	void quitCrew(Long userId, Long crewId);
+
+	void handoverLeader(Long crewId, Long userId, String targetNickname);
 }
