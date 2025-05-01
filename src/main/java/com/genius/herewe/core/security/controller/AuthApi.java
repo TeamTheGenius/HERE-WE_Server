@@ -2,7 +2,9 @@ package com.genius.herewe.core.security.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.genius.herewe.core.global.response.CommonResponse;
 import com.genius.herewe.core.global.response.ExceptionResponse;
 import com.genius.herewe.core.global.response.SingleResponse;
 import com.genius.herewe.core.security.dto.AuthRequest;
@@ -111,4 +113,6 @@ public interface AuthApi {
 		)
 	})
 	SingleResponse<AuthResponse> reissueToken(HttpServletRequest request, HttpServletResponse response);
+
+	CommonResponse logout(HttpServletResponse response, @RequestParam String nickname);
 }
