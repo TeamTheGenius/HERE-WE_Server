@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewLeaderTransferRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
@@ -488,5 +489,8 @@ public interface CrewApi {
 	CommonResponse expelCrew(
 		@HereWeUser User user, @PathVariable Long crewId,
 		@RequestParam(name = "nickname") String nickname);
+
+	CommonResponse handOverLeader(@HereWeUser User user, @PathVariable Long crewId,
+								  @RequestBody @Valid CrewLeaderTransferRequest transferRequest);
 }
 
