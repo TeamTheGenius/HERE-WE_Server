@@ -114,5 +114,34 @@ public interface AuthApi {
 	})
 	SingleResponse<AuthResponse> reissueToken(HttpServletRequest request, HttpServletResponse response);
 
+	@Operation(summary = "로그아웃 API", description = "로그아웃 처리를 하는 API로서, redis & cookie에서 토큰 정보 삭제")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "로그아웃 처리 성공"
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "해당 닉네임을 사용하고 있는 사용자를 찾지 못한 경우",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "해당 닉네임을 사용하고 있는 사용자를 찾지 못한 경우",
+						value = """
+							{
+								"resultCode": "404",
+								"code": "MEMBER_NOT_FOUND",
+								"message": "사용자를 찾을 수 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
 	CommonResponse logout(HttpServletResponse response, @RequestParam String nickname);
+
+	@Operation(summary = "health check 전용 API", description = "서버가 제대로 동작하는지 확인하는 API")
+	String healthCheck();
 }
