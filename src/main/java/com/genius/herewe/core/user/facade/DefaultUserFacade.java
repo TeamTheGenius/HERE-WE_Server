@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.core.global.exception.BusinessException;
+import com.genius.herewe.core.security.domain.TokenType;
 import com.genius.herewe.core.security.dto.AuthResponse;
 import com.genius.herewe.core.security.service.token.AuthTokenService;
 import com.genius.herewe.core.user.domain.Role;
@@ -63,9 +64,10 @@ public class DefaultUserFacade implements UserFacade {
 		user.updateNickname(nickname);
 		user.updateRole(Role.USER);
 		authTokenService.deleteRegistrationToken(signupRequest.token());
+		String authToken = authTokenService.generateTokenForUser(userId, TokenType.AUTH_TOKEN);
 
 		FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
-		return new SignupResponse(user.getId(), user.getNickname(), fileResponse);
+		return new SignupResponse(user.getId(), authToken);
 	}
 
 	@Override
