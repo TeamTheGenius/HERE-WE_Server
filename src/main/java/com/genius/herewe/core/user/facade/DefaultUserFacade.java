@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.security.dto.AuthResponse;
-import com.genius.herewe.core.security.service.token.RegistrationTokenService;
+import com.genius.herewe.core.security.service.token.AuthTokenService;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
 import com.genius.herewe.core.user.dto.SignupRequest;
@@ -28,7 +28,7 @@ public class DefaultUserFacade implements UserFacade {
 	private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9가-힣]{2,20}$");
 
 	private final UserService userService;
-	private final RegistrationTokenService registrationTokenService;
+	private final AuthTokenService authTokenService;
 	private final FilesManager filesManager;
 
 	@Override
@@ -51,7 +51,7 @@ public class DefaultUserFacade implements UserFacade {
 	@Override
 	@Transactional
 	public SignupResponse signup(SignupRequest signupRequest) {
-		Long userId = registrationTokenService.getUserIdFromToken(signupRequest.token());
+		Long userId = authTokenService.getUserIdFromToken(signupRequest.token());
 		User user = userService.findById(userId);
 		String nickname = signupRequest.nickname();
 
@@ -62,7 +62,7 @@ public class DefaultUserFacade implements UserFacade {
 
 		user.updateNickname(nickname);
 		user.updateRole(Role.USER);
-		registrationTokenService.deleteToken(signupRequest.token());
+		authTokenService.deleteRegistrationToken(signupRequest.token());
 
 		FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
 		return new SignupResponse(user.getId(), user.getNickname(), fileResponse);

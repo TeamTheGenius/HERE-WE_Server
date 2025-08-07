@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
 import com.genius.herewe.business.crew.dto.CrewExpelRequest;
 import com.genius.herewe.business.crew.dto.CrewIdResponse;
+import com.genius.herewe.business.crew.dto.CrewLeaderTransferRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
@@ -43,7 +44,7 @@ public class CrewController implements CrewApi {
 
 	@GetMapping("/profile/{crewId}")
 	public SingleResponse<CrewProfileResponse> inquiryCrewProfile(@HereWeUser User user,
-		@PathVariable Long crewId) {
+																  @PathVariable Long crewId) {
 		CrewProfileResponse crewProfileResponse = crewFacade.inquiryCrewProfile(user.getId(), crewId);
 		return new SingleResponse<>(HttpStatus.OK, crewProfileResponse);
 	}
@@ -124,6 +125,21 @@ public class CrewController implements CrewApi {
 
 		crewFacade.expelCrew(user.getId(), new CrewExpelRequest(crewId, nickname));
 
+		return CommonResponse.ok();
+	}
+
+	@DeleteMapping("/{crewId}/members/me")
+	public CommonResponse quitCrew(@HereWeUser User user,
+								   @PathVariable Long crewId) {
+		crewFacade.quitCrew(user.getId(), crewId);
+		return CommonResponse.ok();
+	}
+
+	@PatchMapping("/{crewId}/members/leader")
+	public CommonResponse handOverLeader(@HereWeUser User user, @PathVariable Long crewId,
+										 @RequestBody @Valid CrewLeaderTransferRequest transferRequest) {
+
+		crewFacade.handoverLeader(crewId, user.getId(), transferRequest.nickname());
 		return CommonResponse.ok();
 	}
 }

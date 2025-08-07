@@ -19,7 +19,7 @@ import com.genius.herewe.core.security.filter.JwtAuthenticationFilter;
 import com.genius.herewe.core.security.handler.OAuth2FailureHandler;
 import com.genius.herewe.core.security.handler.OAuth2SuccessHandler;
 import com.genius.herewe.core.security.service.CustomOAuth2Service;
-import com.genius.herewe.core.security.service.JwtFacade;
+import com.genius.herewe.core.security.service.JwtManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +37,7 @@ public class SecurityConfig {
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final OAuth2FailureHandler oAuth2FailureHandler;
 
-	private final JwtFacade jwtFacade;
+	private final JwtManager jwtManager;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -59,7 +59,7 @@ public class SecurityConfig {
 			// JWT
 			.sessionManagement(configurer -> configurer
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.addFilterBefore(new JwtAuthenticationFilter(jwtFacade), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new JwtAuthenticationFilter(jwtManager), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(new AuthenticationExceptionFilter(), JwtAuthenticationFilter.class)
 
 			// OAuth2

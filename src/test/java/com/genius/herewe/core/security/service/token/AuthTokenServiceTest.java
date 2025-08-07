@@ -20,15 +20,15 @@ import com.genius.herewe.core.security.fixture.TokenFixture;
 import com.genius.herewe.core.security.repository.TokenRepository;
 
 @ExtendWith(MockitoExtension.class)
-class RegistrationTokenServiceTest {
+class AuthTokenServiceTest {
 	private final long TTL = 1800;
 	@Mock
 	private TokenRepository tokenRepository;
-	private RegistrationTokenService registrationTokenService;
+	private AuthTokenService authTokenService;
 
 	@BeforeEach
 	void init() {
-		registrationTokenService = new RegistrationTokenService(tokenRepository, TTL);
+		authTokenService = new AuthTokenService(tokenRepository, TTL);
 	}
 
 	@Nested
@@ -46,9 +46,9 @@ class RegistrationTokenServiceTest {
 				given(tokenRepository.findRegistrationToken(token.getToken())).willReturn(Optional.empty());
 
 				//when & then
-				assertThatThrownBy(() -> registrationTokenService.getUserIdFromToken(token.getToken()))
+				assertThatThrownBy(() -> authTokenService.getUserIdFromToken(token.getToken()))
 					.isInstanceOf(BusinessException.class)
-					.hasMessageContaining(REGISTRATION_TOKEN_NOT_FOUND.getMessage());
+					.hasMessageContaining(TOKEN_NOT_FOUND_IN_REDIS.getMessage());
 			}
 
 			@Test
@@ -58,7 +58,7 @@ class RegistrationTokenServiceTest {
 				given(tokenRepository.findRegistrationToken(token.getToken())).willReturn(Optional.of(token));
 
 				//when
-				Long userId = registrationTokenService.getUserIdFromToken(token.getToken());
+				Long userId = authTokenService.getUserIdFromToken(token.getToken());
 
 				//then
 				assertThat(userId).isEqualTo(token.getUserId());

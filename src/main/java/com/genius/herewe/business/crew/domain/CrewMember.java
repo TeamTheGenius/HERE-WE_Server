@@ -51,6 +51,11 @@ public class CrewMember {
 		return new CrewMember(role, LocalDate.now());
 	}
 
+	//== 비지니스 로직 ==//
+	public void updateRole(CrewRole crewRole) {
+		this.role = crewRole;
+	}
+
 	//== 연관관계 편의 메서드 ==//
 	public void joinCrew(User user, Crew crew) {
 		this.user = user;

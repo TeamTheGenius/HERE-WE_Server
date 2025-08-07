@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.genius.herewe.business.crew.dto.CrewCreateRequest;
+import com.genius.herewe.business.crew.dto.CrewLeaderTransferRequest;
 import com.genius.herewe.business.crew.dto.CrewMemberResponse;
 import com.genius.herewe.business.crew.dto.CrewModifyRequest;
 import com.genius.herewe.business.crew.dto.CrewPreviewResponse;
@@ -418,7 +419,7 @@ public interface CrewApi {
 						{
 							"resultCode": 400,
 							"code": "LEADER_CANNOT_EXPEL",
-							"message"; "CREW LEADER는 CREW에서 탈퇴할 수 없습니다."
+							"message": "CREW LEADER는 CREW에서 탈퇴할 수 없습니다."
 						}
 						"""
 				)
@@ -435,7 +436,7 @@ public interface CrewApi {
 						{
 							"resultCode": 403,
 							"code": "LEADER_PERMISSION_DENIED",
-							"message"; "CREW LEADER의 권한이 필요합니다."
+							"message": "CREW LEADER의 권한이 필요합니다."
 						}
 						"""
 				)
@@ -457,7 +458,7 @@ public interface CrewApi {
 							{
 								"resultCode": 404,
 								"code": "MEMBER_NOT_FOUND",
-								"message"; "사용자를 찾을 수 없습니다."
+								"message": "사용자를 찾을 수 없습니다."
 							}
 							"""
 					),
@@ -467,7 +468,7 @@ public interface CrewApi {
 							{
 								"resultCode": 404,
 								"code": "CREW_NOT_FOUND",
-								"message"; "해당 CREW를 찾을 수 없습니다."
+								"message": "해당 CREW를 찾을 수 없습니다."
 							}
 							"""
 					),
@@ -477,7 +478,7 @@ public interface CrewApi {
 							{
 								"resultCode": 404,
 								"code": "MEMBER_NOT_FOUND",
-								"message"; "사용자를 찾을 수 없습니다."
+								"message": "사용자를 찾을 수 없습니다."
 							}
 							"""
 					)
@@ -488,5 +489,66 @@ public interface CrewApi {
 	CommonResponse expelCrew(
 		@HereWeUser User user, @PathVariable Long crewId,
 		@RequestParam(name = "nickname") String nickname);
+
+	@Operation(summary = "크루 리더 양도 API", description = "크루 멤버에 대하여 크루 리더를 양도하는 API")
+	@ApiResponses({
+		@ApiResponse(
+			responseCode = "200",
+			description = "크루 리더 양도 성공"
+		),
+		@ApiResponse(
+			responseCode = "403",
+			description = """
+				1. 요청자가 크루 리더가 아닌 경우
+				2. 대상자가 크루 멤버가 아닌 경우
+				""",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "1. 요청자가 크루 리더가 아닌 경우",
+						value = """
+							{
+								"resultCode": 403,
+								"code": "LEADER_PERMISSION_DENIED",
+								"message": "CREW LEADER의 권한이 필요합니다."
+							}
+							"""
+					),
+					@ExampleObject(
+						name = "2. 대상자가 크루 멤버가 아닌 경우",
+						value = """
+							{
+								"resultCode": 403,
+								"code": "CREW_MEMBERSHIP_REQUIRED",
+								"message": "크루 멤버에게만 허용된 작업입니다. 크루에 참여 후 재시도해주세요."
+							}
+							"""
+					)
+				}
+			)
+		),
+		@ApiResponse(
+			responseCode = "404",
+			description = "닉네임을 통해 대상자를 찾을 수 없는 경우",
+			content = @Content(
+				schema = @Schema(implementation = ExceptionResponse.class),
+				examples = {
+					@ExampleObject(
+						name = "닉네임을 통해 대상자를 찾을 수 없는 경우",
+						value = """
+							{
+								"resultCode": 404,
+								"code": "MEMBER_NOT_FOUND",
+								"message": "사용자를 찾을 수 없습니다."
+							}
+							"""
+					)
+				}
+			)
+		)
+	})
+	CommonResponse handOverLeader(@HereWeUser User user, @PathVariable Long crewId,
+								  @RequestBody @Valid CrewLeaderTransferRequest transferRequest);
 }
 

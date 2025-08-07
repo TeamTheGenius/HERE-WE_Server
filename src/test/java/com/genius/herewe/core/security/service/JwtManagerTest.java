@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @ExtendWith(MockitoExtension.class)
-class JwtFacadeTest {
+class JwtManagerTest {
 	private static final String TEST_ISSUER = "test-issuer";
 	private static final String TEST_ACCESS_SECRET = "testsecretkeytestsecretkeytestsecretkey";
 	private static final String TEST_REFRESH_SECRET = "refreshsecretrefreshsecretrefreshsecret";
@@ -49,11 +49,11 @@ class JwtFacadeTest {
 	private HttpServletRequest request;
 	@Mock
 	private HttpServletResponse response;
-	private JwtFacade jwtFacade;
+	private JwtManager jwtManager;
 
 	@BeforeEach
 	void init() {
-		jwtFacade = new DefaultJwtFacade(
+		jwtManager = new DefaultJwtManager(
 			customUserDetailsService, userService, refreshTokenService,
 			TEST_ISSUER, TEST_ACCESS_SECRET, TEST_REFRESH_SECRET,
 			TEST_ACCESS_EXPIRATION, TEST_REFRESH_EXPIRATION
@@ -73,7 +73,7 @@ class JwtFacadeTest {
 				User notRegistered = UserFixture.createByRole(Role.NOT_REGISTERED);
 
 				//when & then
-				assertThatThrownBy(() -> jwtFacade.verifyIssueCondition(notRegistered))
+				assertThatThrownBy(() -> jwtManager.verifyIssueCondition(notRegistered))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(UNAUTHORIZED_ISSUE.getMessage());
 			}
@@ -87,7 +87,7 @@ class JwtFacadeTest {
 
 				//when & then
 				assertThatNoException()
-					.isThrownBy(() -> jwtFacade.verifyIssueCondition(user));
+					.isThrownBy(() -> jwtManager.verifyIssueCondition(user));
 			}
 		}
 
@@ -101,7 +101,7 @@ class JwtFacadeTest {
 				User user = UserFixture.createDefault();
 
 				// when
-				String accessToken = jwtFacade.generateAccessToken(response, user);
+				String accessToken = jwtManager.generateAccessToken(response, user);
 
 				// then
 				assertThat(accessToken).startsWith(ACCESS_PREFIX.getValue());
@@ -124,7 +124,7 @@ class JwtFacadeTest {
 				User notRegistered = UserFixture.createByRole(Role.NOT_REGISTERED);
 
 				//when & then
-				assertThatThrownBy(() -> jwtFacade.verifyIssueCondition(notRegistered))
+				assertThatThrownBy(() -> jwtManager.verifyIssueCondition(notRegistered))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(UNAUTHORIZED_ISSUE.getMessage());
 			}
@@ -138,7 +138,7 @@ class JwtFacadeTest {
 
 				//when & then
 				assertThatNoException()
-					.isThrownBy(() -> jwtFacade.verifyIssueCondition(user));
+					.isThrownBy(() -> jwtManager.verifyIssueCondition(user));
 			}
 		}
 
@@ -153,7 +153,7 @@ class JwtFacadeTest {
 				ArgumentCaptor<String> headerValueCaptor = ArgumentCaptor.forClass(String.class);
 
 				//when
-				String refreshToken = jwtFacade.generateRefreshToken(response, user);
+				String refreshToken = jwtManager.generateRefreshToken(response, user);
 
 				//then
 				verify(response).addHeader(eq(REFRESH_ISSUE.getValue()), headerValueCaptor.capture());
@@ -197,7 +197,7 @@ class JwtFacadeTest {
 				mockRequest.addHeader(ACCESS_HEADER.getValue(), bearerToken);
 
 				//when
-				String resolvedAccessToken = jwtFacade.resolveAccessToken(mockRequest);
+				String resolvedAccessToken = jwtManager.resolveAccessToken(mockRequest);
 
 				//then
 				assertThat(resolvedAccessToken).isEqualTo(accessToken);
@@ -211,7 +211,7 @@ class JwtFacadeTest {
 				mockRequest.addHeader(ACCESS_HEADER.getValue(), headerValue);
 
 				//when
-				String resolvedToken = jwtFacade.resolveAccessToken(mockRequest);
+				String resolvedToken = jwtManager.resolveAccessToken(mockRequest);
 
 				//then
 				assertThat(resolvedToken).isEqualTo("");
@@ -225,7 +225,7 @@ class JwtFacadeTest {
 				mockRequest.addHeader(ACCESS_HEADER.getValue(), headerValue);
 
 				//when & then
-				assertThatThrownBy(() -> jwtFacade.resolveAccessToken(mockRequest))
+				assertThatThrownBy(() -> jwtManager.resolveAccessToken(mockRequest))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(JWT_NOT_FOUND_IN_HEADER.getMessage());
 			}
@@ -244,7 +244,7 @@ class JwtFacadeTest {
 				mockRequest.setCookies(refreshCookie);
 
 				//when
-				String resolvedRefreshToken = jwtFacade.resolveRefreshToken(mockRequest);
+				String resolvedRefreshToken = jwtManager.resolveRefreshToken(mockRequest);
 
 				//then
 				assertThat(resolvedRefreshToken).isEqualTo(refreshToken);
@@ -258,7 +258,7 @@ class JwtFacadeTest {
 				mockRequest.setCookies(fakeCookie);
 
 				//when & then
-				assertThatThrownBy(() -> jwtFacade.resolveRefreshToken(mockRequest))
+				assertThatThrownBy(() -> jwtManager.resolveRefreshToken(mockRequest))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(JWT_NOT_FOUND_IN_COOKIE.getMessage());
 			}
@@ -276,10 +276,10 @@ class JwtFacadeTest {
 			public void it_returns_VALID() {
 				//given
 				User user = UserFixture.createDefault();
-				String accessToken = jwtFacade.generateAccessToken(response, user).substring(7);
+				String accessToken = jwtManager.generateAccessToken(response, user).substring(7);
 
 				//when
-				JwtStatus status = jwtFacade.verifyAccessToken(accessToken);
+				JwtStatus status = jwtManager.verifyAccessToken(accessToken);
 
 				//then
 				assertThat(status).isEqualTo(JwtStatus.VALID);
@@ -289,16 +289,16 @@ class JwtFacadeTest {
 			@DisplayName("만료된 토큰이라면 EXPIRED를 반환해야 한다.")
 			public void it_return_EXPIRED() {
 				//given
-				JwtFacade expiredJwtFacade = new DefaultJwtFacade(
+				JwtManager expiredJwtManager = new DefaultJwtManager(
 					customUserDetailsService, userService, refreshTokenService,
 					TEST_ISSUER, TEST_ACCESS_SECRET, TEST_REFRESH_SECRET,
 					0L, TEST_REFRESH_EXPIRATION
 				);
 				User user = UserFixture.createDefault();
-				String accessToken = expiredJwtFacade.generateAccessToken(response, user).substring(7);
+				String accessToken = expiredJwtManager.generateAccessToken(response, user).substring(7);
 
 				//when
-				JwtStatus status = expiredJwtFacade.verifyAccessToken(accessToken);
+				JwtStatus status = expiredJwtManager.verifyAccessToken(accessToken);
 
 				//then
 				assertThat(status).isEqualTo(JwtStatus.EXPIRED);
@@ -312,7 +312,7 @@ class JwtFacadeTest {
 				String emptyToken = "";
 
 				//when
-				JwtStatus jwtStatus = jwtFacade.verifyAccessToken(emptyToken);
+				JwtStatus jwtStatus = jwtManager.verifyAccessToken(emptyToken);
 
 				//then
 				assertThat(jwtStatus).isEqualTo(JwtStatus.NEED_CHECK_RT);
@@ -325,7 +325,7 @@ class JwtFacadeTest {
 				String fakeAccessToken = "fake.access.token";
 
 				//when & then
-				assertThatThrownBy(() -> jwtFacade.verifyAccessToken(fakeAccessToken))
+				assertThatThrownBy(() -> jwtManager.verifyAccessToken(fakeAccessToken))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(JWT_NOT_VALID.getMessage());
 			}
@@ -339,11 +339,11 @@ class JwtFacadeTest {
 			public void it_does_not_throw_exception() {
 				//given
 				User user = UserFixture.createDefault();
-				String refreshToken = jwtFacade.generateRefreshToken(response, user);
+				String refreshToken = jwtManager.generateRefreshToken(response, user);
 
 				//when & then
 				assertThatNoException()
-					.isThrownBy(() -> jwtFacade.verifyRefreshToken(refreshToken));
+					.isThrownBy(() -> jwtManager.verifyRefreshToken(refreshToken));
 			}
 
 			@Test
@@ -351,15 +351,15 @@ class JwtFacadeTest {
 			public void it_throw_JWT_NOT_VALID_exception() {
 				//given
 				User user = UserFixture.createDefault();
-				JwtFacade expiredJwtFacade = new DefaultJwtFacade(
+				JwtManager expiredJwtManager = new DefaultJwtManager(
 					customUserDetailsService, userService, refreshTokenService,
 					TEST_ISSUER, TEST_ACCESS_SECRET, TEST_REFRESH_SECRET,
 					TEST_ACCESS_EXPIRATION, 0L
 				);
-				String expiredToken = expiredJwtFacade.generateRefreshToken(response, user);
+				String expiredToken = expiredJwtManager.generateRefreshToken(response, user);
 
 				//when & then
-				assertThatThrownBy(() -> expiredJwtFacade.verifyRefreshToken(expiredToken))
+				assertThatThrownBy(() -> expiredJwtManager.verifyRefreshToken(expiredToken))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(JWT_NOT_VALID.getMessage());
 			}
@@ -371,7 +371,7 @@ class JwtFacadeTest {
 				String expiredToken = "refresh.invalid.token";
 
 				//when & then
-				assertThatThrownBy(() -> jwtFacade.verifyRefreshToken(expiredToken))
+				assertThatThrownBy(() -> jwtManager.verifyRefreshToken(expiredToken))
 					.isInstanceOf(BusinessException.class)
 					.hasMessageContaining(JWT_NOT_VALID.getMessage());
 			}

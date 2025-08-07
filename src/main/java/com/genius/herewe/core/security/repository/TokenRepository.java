@@ -1,5 +1,7 @@
 package com.genius.herewe.core.security.repository;
 
+import static com.genius.herewe.core.security.domain.TokenType.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,16 +18,18 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class TokenRepository {
-	public static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
-	public static final String REGISTRATION_TOKEN_PREFIX = "registration_token:";
 	private final RedisTemplate<String, String> redisTemplate;
 
 	public Optional<Token> findRefreshToken(Long userId) {
-		return findByKey(REFRESH_TOKEN_PREFIX + userId);
+		return findByKey(REFRESH_TOKEN.getPREFIX() + userId);
 	}
 
 	public Optional<Token> findRegistrationToken(String uuidToken) {
-		return findByKey(REGISTRATION_TOKEN_PREFIX + uuidToken);
+		return findByKey(REGISTRATION_TOKEN.getPREFIX() + uuidToken);
+	}
+
+	public Optional<Token> findAuthToken(Long userId) {
+		return findByKey(AUTH_TOKEN.getPREFIX() + userId);
 	}
 
 	private Optional<Token> findByKey(String key) {
@@ -37,7 +41,7 @@ public class TokenRepository {
 	}
 
 	public Token saveRefreshToken(Token token) {
-		String key = REFRESH_TOKEN_PREFIX + token.getUserId();
+		String key = REFRESH_TOKEN.getPREFIX() + token.getUserId();
 
 		Map<String, String> map = new HashMap<>();
 		map.put("userId", String.valueOf(token.getUserId()));
@@ -51,20 +55,37 @@ public class TokenRepository {
 		return token;
 	}
 
-	public Token saveRegistrationToken(String tokenValue, Long userId, long ttl) {
-		String key = REGISTRATION_TOKEN_PREFIX + tokenValue;
+	public Token saveAuthToken(String tokenValue, Long userId, long ttl) {
+		String key = AUTH_TOKEN.getPREFIX() + userId;
 
 		Map<String, String> map = new HashMap<>();
 		map.put("userId", String.valueOf(userId));
 		map.put("token", tokenValue);
-		map.put("tokenType", TokenType.REGISTRATION_TOKEN.name());
+		map.put("tokenType", AUTH_TOKEN.name());
+
+		saveToRedis(key, map, ttl);
+		return Token.builder()
+			.userId(userId)
+			.token(tokenValue)
+			.tokenType(AUTH_TOKEN)
+			.ttl(ttl)
+			.build();
+	}
+
+	public Token saveRegistrationToken(String tokenValue, Long userId, long ttl) {
+		String key = REGISTRATION_TOKEN.getPREFIX() + tokenValue;
+
+		Map<String, String> map = new HashMap<>();
+		map.put("userId", String.valueOf(userId));
+		map.put("token", tokenValue);
+		map.put("tokenType", REGISTRATION_TOKEN.name());
 
 		saveToRedis(key, map, ttl);
 
 		return Token.builder()
 			.userId(userId)
 			.token(tokenValue)
-			.tokenType(TokenType.REGISTRATION_TOKEN)
+			.tokenType(REGISTRATION_TOKEN)
 			.ttl(ttl)
 			.build();
 	}
@@ -75,10 +96,14 @@ public class TokenRepository {
 	}
 
 	public void deleteRefreshToken(Long userId) {
-		redisTemplate.delete(REFRESH_TOKEN_PREFIX + userId);
+		redisTemplate.delete(REFRESH_TOKEN.getPREFIX() + userId);
 	}
 
 	public void deleteRegistrationToken(String token) {
-		redisTemplate.delete(REGISTRATION_TOKEN_PREFIX + token);
+		redisTemplate.delete(REGISTRATION_TOKEN.getPREFIX() + token);
+	}
+
+	public void deleteAuthToken(Long userId) {
+		redisTemplate.delete(AUTH_TOKEN.getPREFIX() + userId);
 	}
 }

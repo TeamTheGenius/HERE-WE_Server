@@ -1,5 +1,7 @@
 package com.genius.herewe.core.security.handler;
 
+import static com.genius.herewe.core.security.domain.TokenType.*;
+
 import java.io.IOException;
 import java.net.URI;
 
@@ -12,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.genius.herewe.core.global.exception.BusinessException;
 import com.genius.herewe.core.global.exception.ErrorCode;
 import com.genius.herewe.core.security.domain.UserPrincipal;
-import com.genius.herewe.core.security.service.token.RegistrationTokenService;
+import com.genius.herewe.core.security.service.token.AuthTokenService;
 import com.genius.herewe.core.user.domain.ProviderInfo;
 import com.genius.herewe.core.user.domain.Role;
 import com.genius.herewe.core.user.domain.User;
@@ -27,15 +29,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	private final String SIGNUP_URL;
 	private final String AUTH_URL;
 	private final UserRepository userRepository;
-	private final RegistrationTokenService registrationTokenService;
+	private final AuthTokenService authTokenService;
 
 	public OAuth2SuccessHandler(@Value("${url.base}") String BASE_URL,
 								@Value("${url.path.signup}") String SIGN_UP_PATH,
 								@Value("${url.path.auth}") String AUTH_PATH,
 								UserRepository userRepository,
-								RegistrationTokenService registrationTokenService) {
+								AuthTokenService authTokenService) {
 		this.userRepository = userRepository;
-		this.registrationTokenService = registrationTokenService;
+		this.authTokenService = authTokenService;
 		this.SIGNUP_URL = BASE_URL + SIGN_UP_PATH;
 		this.AUTH_URL = BASE_URL + AUTH_PATH;
 	}
@@ -51,21 +53,24 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		User user = userRepository.findByOAuth2Info(email, providerInfo)
 			.orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-		String registrationToken = registrationTokenService.generateTokenForUser(user.getId());
-
-		String redirectUrl = getRedirectUrlByRole(user.getRole(), user.getId(), registrationToken);
+		String redirectUrl = getRedirectUrlByRole(user);
 		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
 
-	private String getRedirectUrlByRole(Role role, Long userId, String token) {
+	private String getRedirectUrlByRole(User user) {
+		Role role = user.getRole();
 		if (role == Role.NOT_REGISTERED) {
+			String token = authTokenService.generateTokenForUser(user.getId(), REGISTRATION_TOKEN);
 			return UriComponentsBuilder.fromUri(URI.create(SIGNUP_URL))
 				.queryParam("token", token)
 				.build()
 				.toUriString();
 		}
+
+		String token = authTokenService.generateTokenForUser(user.getId(), AUTH_TOKEN);
 		return UriComponentsBuilder.fromUri(URI.create(AUTH_URL))
-			.queryParam("id", userId)
+			.queryParam("userId", user.getId())
+			.queryParam("token", token)
 			.build()
 			.toUriString();
 	}

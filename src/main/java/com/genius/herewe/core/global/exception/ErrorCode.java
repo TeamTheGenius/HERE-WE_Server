@@ -28,6 +28,7 @@ public enum ErrorCode {
 	CREW_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 CREW를 찾을 수 없습니다."),
 	LEADER_PERMISSION_DENIED(HttpStatus.FORBIDDEN, "CREW LEADER의 권한이 필요합니다."),
 	LEADER_CANNOT_EXPEL(HttpStatus.BAD_REQUEST, "CREW LEADER는 CREW에서 탈퇴할 수 없습니다."),
+	LEADER_ALREADY_ASSIGNED(HttpStatus.BAD_REQUEST, "이미 LEADER인 사용자에 대해서는 LEADER 양도가 불가능합니다."),
 
 	CREW_JOIN_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 크루에 대한 참여 정보가 없습니다."),
 	ALREADY_JOINED_CREW(HttpStatus.BAD_REQUEST, "이미 참여한 크루입니다."),
@@ -54,10 +55,10 @@ public enum ErrorCode {
 	JWT_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),
 	JWT_NOT_FOUND_IN_HEADER(HttpStatus.UNAUTHORIZED, "Header에서 JWT를 찾을 수 없습니다."),
 	JWT_NOT_FOUND_IN_COOKIE(HttpStatus.UNAUTHORIZED, "Cookie에서 JWT를 찾을 수 없습니다."),
-	REFRESH_NOT_FOUND_IN_DB(HttpStatus.NOT_FOUND, "DB에서 사용자의 Refresh token 정보를 찾을 수 없습니다."),
+	REFRESH_NOT_FOUND_IN_DB(HttpStatus.UNAUTHORIZED, "DB에서 사용자의 Refresh token 정보를 찾을 수 없습니다."),
 	TOKEN_HIJACKED(HttpStatus.UNAUTHORIZED, "토큰 탈취가 감지되었습니다. 다시 로그인해주세요."),
 
-	REGISTRATION_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "회원가입 토큰을 찾을 수 없습니다."),
+	TOKEN_NOT_FOUND_IN_REDIS(HttpStatus.UNAUTHORIZED, "Redis에서 저장되어 있는 토큰을 찾을 수 없습니다."),
 
 	FILE_NOT_EXIST(HttpStatus.NOT_FOUND, "해당 파일이 존재하지 않습니다."),
 	FILE_INVALID(HttpStatus.BAD_REQUEST, "파일의 형태가 유효하지 않습니다."),

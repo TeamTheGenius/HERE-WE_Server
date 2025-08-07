@@ -8,7 +8,7 @@ import com.genius.herewe.core.user.domain.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public interface JwtFacade {
+public interface JwtManager {
 	void verifyIssueCondition(User user);
 
 	String generateAccessToken(HttpServletResponse response, User user);

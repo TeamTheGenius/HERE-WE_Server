@@ -2,6 +2,8 @@ package com.genius.herewe.business.crew.facade;
 
 import static com.genius.herewe.core.global.exception.ErrorCode.*;
 
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -124,5 +126,41 @@ public class DefaultCrewFacade implements CrewFacade {
 		}
 		crewMemberService.delete(crewMember);
 		crew.updateParticipantCount(-1);
+	}
+
+	@Override
+	@Transactional
+	public void quitCrew(Long userId, Long crewId) {
+		User user = userService.findById(userId);
+		Crew crew = crewService.findById(crewId);
+
+		CrewMember crewMember = crewMemberService.find(userId, crewId);
+		if (crewMember.getRole() == CrewRole.LEADER) {
+			throw new BusinessException(LEADER_CANNOT_EXPEL);
+		}
+
+		crewMemberService.delete(crewMember);
+		crew.updateParticipantCount(-1);
+	}
+
+	@Override
+	@Transactional
+	public void handoverLeader(Long crewId, Long userId, String targetNickname) {
+		User leader = userService.findById(userId);
+		User newLeader = userService.findByNickname(targetNickname)
+			.orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
+
+		CrewMember originLeaderJoinInfo = crewMemberService.find(leader.getId(), crewId);
+		if (originLeaderJoinInfo.getRole() != CrewRole.LEADER) {
+			throw new BusinessException(LEADER_PERMISSION_DENIED);
+		}
+		if (Objects.equals(leader.getId(), newLeader.getId())) {
+			throw new BusinessException(LEADER_ALREADY_ASSIGNED);
+		}
+		CrewMember newLeaderJoinInfo = crewMemberService.findOptional(newLeader.getId(), crewId)
+			.orElseThrow(() -> new BusinessException(CREW_MEMBERSHIP_REQUIRED));
+
+		originLeaderJoinInfo.updateRole(CrewRole.MEMBER);
+		newLeaderJoinInfo.updateRole(CrewRole.LEADER);
 	}
 }
